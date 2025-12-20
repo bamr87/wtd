@@ -417,8 +417,344 @@ def serve(
     console.info(f"Starting WTD API server on http://{host}:{port}")
     console.print("[dim]Press Ctrl+C to stop[/]")
     
-    app = create_app()
-    uvicorn.run(app, host=host, port=port)
+    api_app = create_app()
+    uvicorn.run(api_app, host=host, port=port)
+
+
+# ============================================================================
+# Routines Subcommand Group
+# ============================================================================
+
+routines_app = typer.Typer(
+    name="routines",
+    help="🔄 Manage routine/recurring TODOs",
+    rich_markup_mode="rich",
+)
+app.add_typer(routines_app, name="routines")
+
+
+@routines_app.callback(invoke_without_command=True)
+def routines_default(ctx: typer.Context):
+    """Show routine summary if no subcommand given."""
+    if ctx.invoked_subcommand is None:
+        routines_list()
+
+
+@routines_app.command("list")
+def routines_list(
+    show_archived: bool = typer.Option(
+        False,
+        "--archived",
+        "-a",
+        help="Include archived routines",
+    ),
+):
+    """
+    📋 List all routines.
+    """
+    from wtd.core.routines import RoutineManager
+    from wtd.ui.routines_output import print_routine_summary, print_all_routines
+    
+    manager = RoutineManager()
+    print_routine_summary(manager)
+    print_all_routines(manager, show_archived)
+
+
+@routines_app.command("due")
+def routines_due():
+    """
+    ⏰ Show routines that are due now.
+    """
+    from wtd.core.routines import RoutineManager
+    from wtd.ui.routines_output import print_routine_summary, print_due_routines
+    
+    manager = RoutineManager()
+    print_routine_summary(manager)
+    
+    due = manager.get_due_routines()
+    overdue = manager.get_overdue_routines()
+    
+    if overdue:
+        console.print()
+        console.print(f"[bold red]🚨 {len(overdue)} Overdue Routine(s)![/]")
+    
+    print_due_routines(due)
+
+
+@routines_app.command("review")
+def routines_review():
+    """
+    🔍 Review routines that need re-evaluation.
+    """
+    from wtd.core.routines import RoutineManager
+    from wtd.ui.routines_output import print_routines_needing_review
+    
+    manager = RoutineManager()
+    routines = manager.get_routines_needing_review()
+    
+    console.header("🔍 Routine Review")
+    print_routines_needing_review(routines)
+
+
+@routines_app.command("sync")
+def routines_sync(
+    path: Optional[Path] = typer.Argument(
+        None,
+        help="Path to scan for routine files",
+        exists=True,
+        resolve_path=True,
+    ),
+):
+    """
+    🔄 Sync routines from markdown files.
+    
+    Scans for routines.md files and imports routine definitions.
+    """
+    from wtd.core.routines import RoutineManager
+    from wtd.ui.routines_output import print_sync_result
+    
+    scan_path = path or Path.cwd()
+    manager = RoutineManager()
+    
+    with console.spinner() as progress:
+        task = progress.add_task("Syncing routines...", total=None)
+        stats = manager.sync_from_files(scan_path)
+        progress.remove_task(task)
+    
+    print_sync_result(stats)
+
+
+@routines_app.command("complete")
+def routines_complete(
+    routine_id: str = typer.Argument(
+        ...,
+        help="Routine ID or partial title to complete",
+    ),
+    notes: str = typer.Option(
+        "",
+        "--notes",
+        "-n",
+        help="Completion notes",
+    ),
+):
+    """
+    ✅ Mark a routine as completed for this cycle.
+    """
+    from uuid import UUID
+    from wtd.core.routines import RoutineManager
+    
+    manager = RoutineManager()
+    
+    # Try to find by ID or title
+    routine = None
+    try:
+        routine = manager.get(UUID(routine_id))
+    except ValueError:
+        # Search by title
+        for r in manager.routines.values():
+            if routine_id.lower() in r.title.lower():
+                routine = r
+                break
+    
+    if routine is None:
+        console.error(f"Routine not found: {routine_id}")
+        raise typer.Exit(1)
+    
+    manager.complete_routine(routine.id, notes)
+    console.success(f"Completed: {routine.title}")
+    
+    if routine.next_due:
+        console.info(f"Next due: {routine.next_due.strftime('%Y-%m-%d %H:%M')}")
+
+
+@routines_app.command("skip")
+def routines_skip(
+    routine_id: str = typer.Argument(
+        ...,
+        help="Routine ID or partial title to skip",
+    ),
+    reason: str = typer.Option(
+        "",
+        "--reason",
+        "-r",
+        help="Reason for skipping",
+    ),
+):
+    """
+    ⏭️  Skip a routine for this cycle.
+    """
+    from uuid import UUID
+    from wtd.core.routines import RoutineManager
+    
+    manager = RoutineManager()
+    
+    # Try to find by ID or title
+    routine = None
+    try:
+        routine = manager.get(UUID(routine_id))
+    except ValueError:
+        for r in manager.routines.values():
+            if routine_id.lower() in r.title.lower():
+                routine = r
+                break
+    
+    if routine is None:
+        console.error(f"Routine not found: {routine_id}")
+        raise typer.Exit(1)
+    
+    manager.skip_routine(routine.id, reason)
+    console.warning(f"Skipped: {routine.title}")
+    console.muted("Note: Frequently skipping a routine will flag it for review")
+
+
+@routines_app.command("snooze")
+def routines_snooze(
+    routine_id: str = typer.Argument(
+        ...,
+        help="Routine ID or partial title to snooze",
+    ),
+    hours: int = typer.Option(
+        24,
+        "--hours",
+        "-h",
+        help="Hours to snooze",
+    ),
+):
+    """
+    💤 Snooze a routine for a specified time.
+    """
+    from uuid import UUID
+    from wtd.core.routines import RoutineManager
+    
+    manager = RoutineManager()
+    
+    routine = None
+    try:
+        routine = manager.get(UUID(routine_id))
+    except ValueError:
+        for r in manager.routines.values():
+            if routine_id.lower() in r.title.lower():
+                routine = r
+                break
+    
+    if routine is None:
+        console.error(f"Routine not found: {routine_id}")
+        raise typer.Exit(1)
+    
+    manager.snooze_routine(routine.id, hours)
+    console.info(f"Snoozed '{routine.title}' for {hours} hours")
+
+
+@routines_app.command("pause")
+def routines_pause(
+    routine_id: str = typer.Argument(
+        ...,
+        help="Routine ID or partial title to pause",
+    ),
+):
+    """
+    ⏸️  Pause a routine indefinitely.
+    """
+    from uuid import UUID
+    from wtd.core.routines import RoutineManager
+    
+    manager = RoutineManager()
+    
+    routine = None
+    try:
+        routine = manager.get(UUID(routine_id))
+    except ValueError:
+        for r in manager.routines.values():
+            if routine_id.lower() in r.title.lower():
+                routine = r
+                break
+    
+    if routine is None:
+        console.error(f"Routine not found: {routine_id}")
+        raise typer.Exit(1)
+    
+    routine.pause()
+    manager._save()
+    console.warning(f"Paused: {routine.title}")
+    console.muted("Use 'wtd routines resume' to resume")
+
+
+@routines_app.command("resume")
+def routines_resume(
+    routine_id: str = typer.Argument(
+        ...,
+        help="Routine ID or partial title to resume",
+    ),
+):
+    """
+    ▶️  Resume a paused routine.
+    """
+    from uuid import UUID
+    from wtd.core.routines import RoutineManager
+    
+    manager = RoutineManager()
+    
+    routine = None
+    try:
+        routine = manager.get(UUID(routine_id))
+    except ValueError:
+        for r in manager.routines.values():
+            if routine_id.lower() in r.title.lower():
+                routine = r
+                break
+    
+    if routine is None:
+        console.error(f"Routine not found: {routine_id}")
+        raise typer.Exit(1)
+    
+    routine.resume()
+    manager._save()
+    console.success(f"Resumed: {routine.title}")
+    
+    if routine.next_due:
+        console.info(f"Next due: {routine.next_due.strftime('%Y-%m-%d %H:%M')}")
+
+
+@routines_app.command("trigger")
+def routines_trigger(
+    trigger_name: str = typer.Argument(
+        ...,
+        help="Trigger name (on-release, on-pr, on-deploy, etc.)",
+    ),
+):
+    """
+    ⚡ Trigger conditional routines.
+    
+    Use this to manually trigger event-based routines like on-release or on-deploy.
+    """
+    from wtd.core.routines import RoutineManager, RoutineTrigger
+    from wtd.ui.routines_output import print_due_routines
+    
+    # Map trigger name
+    trigger_map = {
+        "on-release": RoutineTrigger.ON_RELEASE,
+        "on-pr": RoutineTrigger.ON_PR,
+        "on-deploy": RoutineTrigger.ON_DEPLOY,
+        "on-error-spike": RoutineTrigger.ON_ERROR_SPIKE,
+        "on-commit": RoutineTrigger.ON_COMMIT,
+        "on-merge": RoutineTrigger.ON_MERGE,
+        "on-startup": RoutineTrigger.ON_STARTUP,
+    }
+    
+    trigger = trigger_map.get(trigger_name.lower())
+    if trigger is None:
+        console.error(f"Unknown trigger: {trigger_name}")
+        console.info(f"Valid triggers: {', '.join(trigger_map.keys())}")
+        raise typer.Exit(1)
+    
+    manager = RoutineManager()
+    triggered = manager.trigger_conditional(trigger)
+    
+    if triggered:
+        console.success(f"Triggered {len(triggered)} routine(s) for '{trigger_name}'")
+        print_due_routines(triggered)
+    else:
+        console.info(f"No routines configured for trigger: {trigger_name}")
 
 
 if __name__ == "__main__":
