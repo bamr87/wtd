@@ -1,0 +1,5788 @@
+{
+  "events": [
+    {
+      "at": "1970-01-01T00:00:00+00:00",
+      "data": {
+        "note": "This file is the durable, always-updated core memory for WTD. It will be rewritten with real timestamps and repo fingerprint on first run."
+      },
+      "event": "bootstrap"
+    },
+    {
+      "at": "2025-12-20T05:44:00.353585+00:00",
+      "data": {
+        "scan_id": "7fb009b21233",
+        "todo_count": 30
+      },
+      "event": "scan_merged"
+    },
+    {
+      "at": "2025-12-20T05:44:04.052968+00:00",
+      "data": {
+        "scan_id": "df9207a1cb8b",
+        "todo_count": 32
+      },
+      "event": "scan_merged"
+    },
+    {
+      "at": "2025-12-20T05:45:53.227517+00:00",
+      "data": {
+        "scan_id": "deccc52b2594",
+        "todo_count": 34
+      },
+      "event": "scan_merged"
+    },
+    {
+      "at": "2025-12-20T05:49:43.040205+00:00",
+      "data": {
+        "scan_id": "b7ea6916adb8",
+        "todo_count": 38
+      },
+      "event": "scan_merged"
+    },
+    {
+      "at": "2025-12-20T05:49:47.448011+00:00",
+      "data": {
+        "scan_id": "a8f04c34a80b",
+        "todo_count": 48
+      },
+      "event": "scan_merged"
+    }
+  ],
+  "indexes": {
+    "contexts": {
+      "bugfix": 19,
+      "build": 18,
+      "refactor": 1,
+      "unknown": 4,
+      "write": 6
+    },
+    "files": {
+      "PRD.md": {
+        "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+        "todo_count": 4,
+        "todo_ids": [
+          "todo_scanned_7213b1766ac99790b6c7f6c3b54952b3",
+          "todo_scanned_9b361db588fad6d46bcf1c835017f9bc",
+          "todo_scanned_718d773b6f811f21d434918aae3765c4",
+          "todo_scanned_d45a02964d0b7c1a9a40542a52f01367"
+        ]
+      },
+      "TODO/README.md": {
+        "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+        "todo_count": 5,
+        "todo_ids": [
+          "todo_scanned_f6ba8fe5edcef42847b78912ebd21c84",
+          "todo_scanned_1893e72786bd98f2d1198e44ba8f4737",
+          "todo_scanned_beb6db548214ab31d73067944527a03f",
+          "todo_scanned_b488e9d9aac71ebe2c4ea64821794168",
+          "todo_scanned_e30870f43907836adb6b1b950a2cf097"
+        ]
+      },
+      "TODO/alpha-release.md": {
+        "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+        "todo_count": 12,
+        "todo_ids": [
+          "todo_scanned_58ba8e9c509e7bb3c1682539dddb8cc5",
+          "todo_scanned_0582af9fb95052eed7b8c1b6bbada904",
+          "todo_scanned_444292cdf4171f9bae827658a6912a58",
+          "todo_scanned_f21e3373d5c54aaf4319657ffeb78c0f",
+          "todo_scanned_57cdef360fc6edea2ecf900e42f8d1f9",
+          "todo_scanned_ba1a1610785c33281b98a9edba21c5fc",
+          "todo_scanned_b0f4ac7dbcac9928eca42ed7769a320b",
+          "todo_scanned_95c8d3c34b14a0dc5803f273f0e9b379",
+          "todo_scanned_5dcdc9b4f557359fc4840323a226be8e",
+          "todo_scanned_2b79df86e567499765878b4f30566ed3",
+          "todo_scanned_a4c4044611f09996e65dc2fb9870907a",
+          "todo_scanned_b9f33fa0857a026f6190be7b2d31cac8"
+        ]
+      },
+      "TODO/bugs.md": {
+        "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+        "todo_count": 8,
+        "todo_ids": [
+          "todo_scanned_a9f3d5711a320e71aa9d92d2c2f789da",
+          "todo_scanned_4dc39d10b3bb4556c955d11918fb7b4a",
+          "todo_scanned_7dcb04272b8bdc5177816d47a7c81f65",
+          "todo_scanned_cf4b2c2c53c171d92fd5ccf46990c6ab",
+          "todo_scanned_95abd0cbc807d9da969991c15c1960b4",
+          "todo_scanned_f0d76985ade656356c94a8bce99b4e7e",
+          "todo_scanned_a24f5f614a9fccdf9aeaaec4e4562538",
+          "todo_scanned_cd3919f94dc91f3c508b6403864e52c3"
+        ]
+      },
+      "tree.json": {
+        "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+        "todo_count": 18,
+        "todo_ids": [
+          "todo_scanned_20f5e325a2371030e8a7a82162cdeaec",
+          "todo_scanned_5423829e998d27352f571667570c7431",
+          "todo_scanned_69b433ed8dbe09729a4a2d82e5bd888f",
+          "todo_scanned_2ea8e9cf7282e4c4d92bab030b8bcb6a",
+          "todo_scanned_38f92d0fc50291f84bc1e35f4e4a57e6",
+          "todo_scanned_f406b345d00e12403ab1509fd94e30d9",
+          "todo_scanned_168e06f40096d3b64ee302fd9df75cbd",
+          "todo_scanned_12a52f2cd0aeb81bc658e72a0b1ec976",
+          "todo_scanned_38624ec791681ec2c7a198a4711fe524",
+          "todo_scanned_5d792bae7abadd8cc1fb6768ef7778a6",
+          "todo_scanned_8cb67a561ae234af13daeb266e024563",
+          "todo_scanned_3aec70d7dc7ea6252c7f41ee5c21bd15",
+          "todo_scanned_f8f430dfcb22afd2989d807a478b9f1a",
+          "todo_scanned_8d798584f833bb94769aedb317700d97",
+          "todo_scanned_eeda775add5af71a9d4ef06f3d19ec76",
+          "todo_scanned_edb98a8fcdc9fe7ac6534f5deca559d6",
+          "todo_scanned_69efa7e6c391a7e85adae19b8d56801e",
+          "todo_scanned_d270b3ff179fae432c8a43e3484b98a3"
+        ]
+      },
+      "wtd/core/scanner.py": {
+        "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+        "todo_count": 1,
+        "todo_ids": [
+          "todo_scanned_8abdce8ca1290f187f00af4cc11d59b6"
+        ]
+      }
+    },
+    "status_counts": {
+      "pending": 48
+    },
+    "tags": {
+      "bug": 10,
+      "markdown": 28,
+      "todo": 10
+    }
+  },
+  "nodes": {
+    "todo_scanned_0368c6e654e6692f757732418bcb51fd": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "bugfix",
+      "depth": 0,
+      "description": "Fixes Needed\\\",\",",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:43.037207+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:43.039711+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:43.039742+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:43.037207+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_0368c6e654e6692f757732418bcb51fd",
+      "parent_node_id": null,
+      "priority": "critical",
+      "result": null,
+      "seen_count": 1,
+      "source": {
+        "file_path": "tree.json",
+        "line_number": 992,
+        "raw_text": "\"raw_text\": \"\\\"raw_text\\\": \\\"# Bug Fixes Needed\\\",\",",
+        "source_type": "comment",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "bug"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Fixes Needed\\\",\","
+    },
+    "todo_scanned_0582af9fb95052eed7b8c1b6bbada904": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "build",
+      "depth": 0,
+      "description": "Add \"one clarifying question\" mode for ambiguous TODOs",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:43.037207+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:43.038832+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:43.038866+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:49:47.446010+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_0582af9fb95052eed7b8c1b6bbada904",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 2,
+      "source": {
+        "file_path": "TODO/alpha-release.md",
+        "line_number": 8,
+        "raw_text": "- [ ] Add \"one clarifying question\" mode for ambiguous TODOs",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Add \"one clarifying question\" mode for ambiguous TODOs"
+    },
+    "todo_scanned_071a604f9ee64a7f4335473f45221914": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "build",
+      "depth": 0,
+      "description": "Add end-to-end tests for CLI commands",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:44:00.350851+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:44:00.353059+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:44:00.353093+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:44:04.052345+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:45:53.226715+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:45:53.224401+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_071a604f9ee64a7f4335473f45221914",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 3,
+      "source": {
+        "file_path": "TODO/alpha-release.md",
+        "line_number": 16,
+        "raw_text": "- [ ] Add end-to-end tests for CLI commands",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Add end-to-end tests for CLI commands"
+    },
+    "todo_scanned_1260389bed4cf90878f12f209cda567a": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "build",
+      "depth": 0,
+      "description": "Implement GitHub API integration\\\\\\\",\\\",\",",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:43.037207+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:43.039908+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:43.039941+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:43.037207+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_1260389bed4cf90878f12f209cda567a",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 1,
+      "source": {
+        "file_path": "tree.json",
+        "line_number": 1289,
+        "raw_text": "\"raw_text\": \"\\\"raw_text\\\": \\\"\\\\\\\"raw_text\\\\\\\": \\\\\\\"# TODO: Implement GitHub API integration\\\\\\\",\\\",\",",
+        "source_type": "comment",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "todo"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Implement GitHub API integration\\\\\\\",\\\",\","
+    },
+    "todo_scanned_12a52f2cd0aeb81bc658e72a0b1ec976": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "build",
+      "depth": 0,
+      "description": "Implement GitHub API integration\",",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:47.447250+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:47.447280+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_12a52f2cd0aeb81bc658e72a0b1ec976",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 1,
+      "source": {
+        "file_path": "tree.json",
+        "line_number": 1964,
+        "raw_text": "\"raw_text\": \"# TODO: Implement GitHub API integration\",",
+        "source_type": "comment",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "todo"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Implement GitHub API integration\","
+    },
+    "todo_scanned_150af201e2f2d859668cea1469abdf5c": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "build",
+      "depth": 0,
+      "description": "Create VSCode extension for seamless integration",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:44:00.350851+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:44:00.352319+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:44:00.352354+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:44:04.051573+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:45:53.225964+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:45:53.224401+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_150af201e2f2d859668cea1469abdf5c",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 3,
+      "source": {
+        "file_path": "TODO/README.md",
+        "line_number": 9,
+        "raw_text": "- [ ] Create VSCode extension for seamless integration",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Create VSCode extension for seamless integration"
+    },
+    "todo_scanned_168e06f40096d3b64ee302fd9df75cbd": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "build",
+      "depth": 0,
+      "description": "Implement GitHub API integration\\\",\",",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:47.447177+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:47.447214+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_168e06f40096d3b64ee302fd9df75cbd",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 1,
+      "source": {
+        "file_path": "tree.json",
+        "line_number": 1718,
+        "raw_text": "\"raw_text\": \"\\\"raw_text\\\": \\\"# TODO: Implement GitHub API integration\\\",\",",
+        "source_type": "comment",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "todo"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Implement GitHub API integration\\\",\","
+    },
+    "todo_scanned_1893e72786bd98f2d1198e44ba8f4737": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "bugfix",
+      "depth": 0,
+      "description": "Add GitHub issues integration for scanning remote TODOs",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:43.037207+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:43.038462+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:43.038496+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:49:47.445650+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_1893e72786bd98f2d1198e44ba8f4737",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 2,
+      "source": {
+        "file_path": "TODO/README.md",
+        "line_number": 8,
+        "raw_text": "- [ ] Add GitHub issues integration for scanning remote TODOs",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Add GitHub issues integration for scanning remote TODOs"
+    },
+    "todo_scanned_20f5e325a2371030e8a7a82162cdeaec": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "bugfix",
+      "depth": 0,
+      "description": "Fixes Needed\\\\\\\",\\\",\",",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:47.446762+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:47.446794+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_20f5e325a2371030e8a7a82162cdeaec",
+      "parent_node_id": null,
+      "priority": "critical",
+      "result": null,
+      "seen_count": 1,
+      "source": {
+        "file_path": "tree.json",
+        "line_number": 173,
+        "raw_text": "\"raw_text\": \"\\\"raw_text\\\": \\\"\\\\\\\"raw_text\\\\\\\": \\\\\\\"# Bug Fixes Needed\\\\\\\",\\\",\",",
+        "source_type": "comment",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "bug"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Fixes Needed\\\\\\\",\\\",\","
+    },
+    "todo_scanned_224e44becae205c2c4d247ff814ff91c": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "bugfix",
+      "depth": 0,
+      "description": "Fixes Needed\",",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:43.037207+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:43.040046+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:43.040076+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:43.037207+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_224e44becae205c2c4d247ff814ff91c",
+      "parent_node_id": null,
+      "priority": "critical",
+      "result": null,
+      "seen_count": 1,
+      "source": {
+        "file_path": "tree.json",
+        "line_number": 1470,
+        "raw_text": "\"raw_text\": \"# Bug Fixes Needed\",",
+        "source_type": "comment",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "bug"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Fixes Needed\","
+    },
+    "todo_scanned_24f82e085cc1e46c1545b717b5c5ade0": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "unknown",
+      "depth": 0,
+      "description": "Set up Ollama with llama3.2 model for local AI",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:44:00.350851+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:44:00.352154+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:44:00.352189+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:44:04.051400+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:45:53.225780+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:45:53.224401+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_24f82e085cc1e46c1545b717b5c5ade0",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 3,
+      "source": {
+        "file_path": "TODO/README.md",
+        "line_number": 7,
+        "raw_text": "- [ ] Set up Ollama with llama3.2 model for local AI",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Set up Ollama with llama3.2 model for local AI"
+    },
+    "todo_scanned_297594a6a3ba497d34766e479511f4a5": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "refactor",
+      "depth": 0,
+      "description": "Improve context detection accuracy to 95%+",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:44:00.350851+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:44:00.352572+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:44:00.352606+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:44:04.051838+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:45:53.226217+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:45:53.224401+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_297594a6a3ba497d34766e479511f4a5",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 3,
+      "source": {
+        "file_path": "TODO/alpha-release.md",
+        "line_number": 7,
+        "raw_text": "- [ ] Improve context detection accuracy to 95%+",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Improve context detection accuracy to 95%+"
+    },
+    "todo_scanned_2b79df86e567499765878b4f30566ed3": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "build",
+      "depth": 0,
+      "description": "Create video tutorial for getting started",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:43.037207+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:43.039429+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:43.039463+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:49:47.446581+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_2b79df86e567499765878b4f30566ed3",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 2,
+      "source": {
+        "file_path": "TODO/alpha-release.md",
+        "line_number": 22,
+        "raw_text": "- [ ] Create video tutorial for getting started",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Create video tutorial for getting started"
+    },
+    "todo_scanned_2d095113f46ae133b9226b1e6ca88cab": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "bugfix",
+      "depth": 0,
+      "description": "Type \u201cfix bug\u201d \u2192 WTD finds issue \u2192 opens files \u2192 suggests fix \u2192 runs tests \u2192 opens PR",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:44:00.350851+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:44:00.351195+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:44:00.351234+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:44:04.050181+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:45:53.224797+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:45:53.224401+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_2d095113f46ae133b9226b1e6ca88cab",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 3,
+      "source": {
+        "file_path": "PRD.md",
+        "line_number": 84,
+        "raw_text": "- [ ] Type \u201cfix bug\u201d \u2192 WTD finds issue \u2192 opens files \u2192 suggests fix \u2192 runs tests \u2192 opens PR",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Type \u201cfix bug\u201d \u2192 WTD finds issue \u2192 opens files \u2192 suggests fix \u2192 runs tests \u2192 opens PR"
+    },
+    "todo_scanned_2ea8e9cf7282e4c4d92bab030b8bcb6a": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "bugfix",
+      "depth": 0,
+      "description": "Fixes Needed\\\\\\\",\\\",\",",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:47.446974+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:47.447004+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_2ea8e9cf7282e4c4d92bab030b8bcb6a",
+      "parent_node_id": null,
+      "priority": "critical",
+      "result": null,
+      "seen_count": 1,
+      "source": {
+        "file_path": "tree.json",
+        "line_number": 1115,
+        "raw_text": "\"raw_text\": \"\\\"raw_text\\\": \\\"\\\\\\\"raw_text\\\\\\\": \\\\\\\"# Bug Fixes Needed\\\\\\\",\\\",\",",
+        "source_type": "comment",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "bug"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Fixes Needed\\\\\\\",\\\",\","
+    },
+    "todo_scanned_3616bdda3b6063ff77db6e8c3699fb3e": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "unknown",
+      "depth": 0,
+      "description": "Average human keystrokes per completed TODO \u2264 5",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:44:00.350851+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:44:00.351287+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:44:00.351322+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:44:04.050264+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:45:53.224881+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:45:53.224401+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_3616bdda3b6063ff77db6e8c3699fb3e",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 3,
+      "source": {
+        "file_path": "PRD.md",
+        "line_number": 85,
+        "raw_text": "- [ ] Average human keystrokes per completed TODO \u2264 5",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Average human keystrokes per completed TODO \u2264 5"
+    },
+    "todo_scanned_38624ec791681ec2c7a198a4711fe524": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "build",
+      "depth": 0,
+      "description": "Implement GitHub API integration\\\\\\\",\\\",\",",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:47.447314+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:47.447344+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_38624ec791681ec2c7a198a4711fe524",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 1,
+      "source": {
+        "file_path": "tree.json",
+        "line_number": 2015,
+        "raw_text": "\"raw_text\": \"\\\"raw_text\\\": \\\"\\\\\\\"raw_text\\\\\\\": \\\\\\\"# TODO: Implement GitHub API integration\\\\\\\",\\\",\",",
+        "source_type": "comment",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "todo"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Implement GitHub API integration\\\\\\\",\\\",\","
+    },
+    "todo_scanned_38f92d0fc50291f84bc1e35f4e4a57e6": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "build",
+      "depth": 0,
+      "description": "Implement GitHub API integration\\\\\\\",\\\",\",",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:47.447039+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:47.447069+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_38f92d0fc50291f84bc1e35f4e4a57e6",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 1,
+      "source": {
+        "file_path": "tree.json",
+        "line_number": 1217,
+        "raw_text": "\"raw_text\": \"\\\"raw_text\\\": \\\"\\\\\\\"raw_text\\\\\\\": \\\\\\\"# TODO: Implement GitHub API integration\\\\\\\",\\\",\",",
+        "source_type": "comment",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "todo"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Implement GitHub API integration\\\\\\\",\\\",\","
+    },
+    "todo_scanned_3aded4954788bd37148422a74dc07351": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "build",
+      "depth": 0,
+      "description": "Add support for monorepo scanning",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:44:00.350851+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:44:00.352815+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:44:00.352849+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:44:04.052094+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:45:53.226468+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:45:53.224401+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_3aded4954788bd37148422a74dc07351",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 3,
+      "source": {
+        "file_path": "TODO/alpha-release.md",
+        "line_number": 10,
+        "raw_text": "- [ ] Add support for monorepo scanning",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Add support for monorepo scanning"
+    },
+    "todo_scanned_3aec70d7dc7ea6252c7f41ee5c21bd15": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "build",
+      "depth": 0,
+      "description": "Implement GitHub API integration\",",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:47.447507+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:47.447538+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_3aec70d7dc7ea6252c7f41ee5c21bd15",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 1,
+      "source": {
+        "file_path": "tree.json",
+        "line_number": 2298,
+        "raw_text": "\"raw_text\": \"# TODO: Implement GitHub API integration\",",
+        "source_type": "comment",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "todo"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Implement GitHub API integration\","
+    },
+    "todo_scanned_3b7a0c7c868f20670f880fa4b03bf45f": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "bugfix",
+      "depth": 0,
+      "description": "Fix: Workspace orchestrator fails silently when VSCode not installed",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:44:00.350851+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:44:00.351742+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:44:00.351776+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:44:04.050708+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:45:53.225317+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:45:53.224401+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_3b7a0c7c868f20670f880fa4b03bf45f",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 3,
+      "source": {
+        "file_path": "TODO/bugs.md",
+        "line_number": 7,
+        "raw_text": "- [ ] Fix: Workspace orchestrator fails silently when VSCode not installed",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Fix: Workspace orchestrator fails silently when VSCode not installed"
+    },
+    "todo_scanned_444292cdf4171f9bae827658a6912a58": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "build",
+      "depth": 0,
+      "description": "Implement workspace setup with zero config",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:43.037207+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:43.038905+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:43.038941+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:49:47.446081+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_444292cdf4171f9bae827658a6912a58",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 2,
+      "source": {
+        "file_path": "TODO/alpha-release.md",
+        "line_number": 9,
+        "raw_text": "- [ ] Implement workspace setup with zero config",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Implement workspace setup with zero config"
+    },
+    "todo_scanned_48a75410e564b9b15cc748793fe9d01d": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "unknown",
+      "depth": 0,
+      "description": "Set up CI/CD pipeline with GitHub Actions",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:44:00.350851+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:44:00.353143+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:44:00.353184+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:44:04.052424+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:45:53.226797+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:45:53.224401+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_48a75410e564b9b15cc748793fe9d01d",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 3,
+      "source": {
+        "file_path": "TODO/alpha-release.md",
+        "line_number": 17,
+        "raw_text": "- [ ] Set up CI/CD pipeline with GitHub Actions",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Set up CI/CD pipeline with GitHub Actions"
+    },
+    "todo_scanned_49d858aa2265cc66b33920a290ef1414": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "bugfix",
+      "depth": 0,
+      "description": "Fixes Needed\\\",\",",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:45:53.224401+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:45:53.227258+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:45:53.227291+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:45:53.224401+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_49d858aa2265cc66b33920a290ef1414",
+      "parent_node_id": null,
+      "priority": "critical",
+      "result": null,
+      "seen_count": 1,
+      "source": {
+        "file_path": "tree.json",
+        "line_number": 1079,
+        "raw_text": "\"raw_text\": \"\\\"raw_text\\\": \\\"# Bug Fixes Needed\\\",\",",
+        "source_type": "comment",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "bug"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Fixes Needed\\\",\","
+    },
+    "todo_scanned_4dc39d10b3bb4556c955d11918fb7b4a": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "bugfix",
+      "depth": 0,
+      "description": "Fix: Scanner sometimes picks up false positives from example code",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:43.037207+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:43.037857+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:43.037892+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:49:47.445066+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_4dc39d10b3bb4556c955d11918fb7b4a",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 2,
+      "source": {
+        "file_path": "TODO/bugs.md",
+        "line_number": 5,
+        "raw_text": "- [ ] Fix: Scanner sometimes picks up false positives from example code",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Fix: Scanner sometimes picks up false positives from example code"
+    },
+    "todo_scanned_4e0a5d2650ef4de00425c2f42d32029c": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "build",
+      "depth": 0,
+      "description": "Implement GitHub API integration\\\",\",",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:43.037207+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:43.039777+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:43.039807+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:43.037207+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_4e0a5d2650ef4de00425c2f42d32029c",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 1,
+      "source": {
+        "file_path": "tree.json",
+        "line_number": 1043,
+        "raw_text": "\"raw_text\": \"\\\"raw_text\\\": \\\"# TODO: Implement GitHub API integration\\\",\",",
+        "source_type": "comment",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "todo"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Implement GitHub API integration\\\",\","
+    },
+    "todo_scanned_5423829e998d27352f571667570c7431": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "build",
+      "depth": 0,
+      "description": "Implement GitHub API integration\\\\\\\\\\\\\\\",\\\\\\\",\\\",\",",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:47.446838+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:47.446870+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_5423829e998d27352f571667570c7431",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 1,
+      "source": {
+        "file_path": "tree.json",
+        "line_number": 340,
+        "raw_text": "\"raw_text\": \"\\\"raw_text\\\": \\\"\\\\\\\"raw_text\\\\\\\": \\\\\\\"\\\\\\\\\\\\\\\"raw_text\\\\\\\\\\\\\\\": \\\\\\\\\\\\\\\"# TODO: Implement GitHub API integration\\\\\\\\\\\\\\\",\\\\\\\",\\\",\",",
+        "source_type": "comment",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "todo"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Implement GitHub API integration\\\\\\\\\\\\\\\",\\\\\\\",\\\",\","
+    },
+    "todo_scanned_57cdef360fc6edea2ecf900e42f8d1f9": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "write",
+      "depth": 0,
+      "description": "Write unit tests for scanner module",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:43.037207+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:43.039057+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:43.039097+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:49:47.446224+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_57cdef360fc6edea2ecf900e42f8d1f9",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 2,
+      "source": {
+        "file_path": "TODO/alpha-release.md",
+        "line_number": 14,
+        "raw_text": "- [ ] Write unit tests for scanner module",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Write unit tests for scanner module"
+    },
+    "todo_scanned_58ba8e9c509e7bb3c1682539dddb8cc5": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "refactor",
+      "depth": 0,
+      "description": "Improve context detection accuracy to 95%+",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:43.037207+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:43.038758+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:43.038792+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:49:47.445938+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_58ba8e9c509e7bb3c1682539dddb8cc5",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 2,
+      "source": {
+        "file_path": "TODO/alpha-release.md",
+        "line_number": 7,
+        "raw_text": "- [ ] Improve context detection accuracy to 95%+",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Improve context detection accuracy to 95%+"
+    },
+    "todo_scanned_5d792bae7abadd8cc1fb6768ef7778a6": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "bugfix",
+      "depth": 0,
+      "description": "Fixes Needed\\\",\",",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:47.447378+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:47.447408+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_5d792bae7abadd8cc1fb6768ef7778a6",
+      "parent_node_id": null,
+      "priority": "critical",
+      "result": null,
+      "seen_count": 1,
+      "source": {
+        "file_path": "tree.json",
+        "line_number": 2182,
+        "raw_text": "\"raw_text\": \"\\\"raw_text\\\": \\\"# Bug Fixes Needed\\\",\",",
+        "source_type": "comment",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "bug"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Fixes Needed\\\",\","
+    },
+    "todo_scanned_5dcdc9b4f557359fc4840323a226be8e": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "write",
+      "depth": 0,
+      "description": "Write API documentation with examples",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:43.037207+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:43.039356+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:43.039390+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:49:47.446510+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_5dcdc9b4f557359fc4840323a226be8e",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 2,
+      "source": {
+        "file_path": "TODO/alpha-release.md",
+        "line_number": 21,
+        "raw_text": "- [ ] Write API documentation with examples",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Write API documentation with examples"
+    },
+    "todo_scanned_69b433ed8dbe09729a4a2d82e5bd888f": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "bugfix",
+      "depth": 0,
+      "description": "Fixes Needed\\\",\",",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:47.446906+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:47.446938+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_69b433ed8dbe09729a4a2d82e5bd888f",
+      "parent_node_id": null,
+      "priority": "critical",
+      "result": null,
+      "seen_count": 1,
+      "source": {
+        "file_path": "tree.json",
+        "line_number": 507,
+        "raw_text": "\"raw_text\": \"\\\"raw_text\\\": \\\"# Bug Fixes Needed\\\",\",",
+        "source_type": "comment",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "bug"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Fixes Needed\\\",\","
+    },
+    "todo_scanned_69efa7e6c391a7e85adae19b8d56801e": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "build",
+      "depth": 0,
+      "description": "Implement GitHub API integration\\\",\",",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:47.447835+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:47.447866+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_69efa7e6c391a7e85adae19b8d56801e",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 1,
+      "source": {
+        "file_path": "tree.json",
+        "line_number": 3736,
+        "raw_text": "\"raw_text\": \"\\\"raw_text\\\": \\\"# TODO: Implement GitHub API integration\\\",\",",
+        "source_type": "comment",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "todo"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Implement GitHub API integration\\\",\","
+    },
+    "todo_scanned_6b3fac66341099cb1fbb12919919ccbd": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "bugfix",
+      "depth": 0,
+      "description": "Add GitHub issues integration for scanning remote TODOs",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:44:00.350851+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:44:00.352237+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:44:00.352271+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:44:04.051486+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:45:53.225876+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:45:53.224401+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_6b3fac66341099cb1fbb12919919ccbd",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 3,
+      "source": {
+        "file_path": "TODO/README.md",
+        "line_number": 8,
+        "raw_text": "- [ ] Add GitHub issues integration for scanning remote TODOs",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Add GitHub issues integration for scanning remote TODOs"
+    },
+    "todo_scanned_6c2ad86ffabec78c9b7195062c5c3df6": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "bugfix",
+      "depth": 0,
+      "description": "Fix: Scanner sometimes picks up false positives from example code",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:44:00.350851+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:44:00.351566+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:44:00.351601+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:44:04.050545+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:45:53.225152+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:45:53.224401+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_6c2ad86ffabec78c9b7195062c5c3df6",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 3,
+      "source": {
+        "file_path": "TODO/bugs.md",
+        "line_number": 5,
+        "raw_text": "- [ ] Fix: Scanner sometimes picks up false positives from example code",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Fix: Scanner sometimes picks up false positives from example code"
+    },
+    "todo_scanned_700c3b5f5cebf2652fe183e5b9768375": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "build",
+      "depth": 0,
+      "description": "Add \"one clarifying question\" mode for ambiguous TODOs",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:44:00.350851+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:44:00.352654+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:44:00.352687+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:44:04.051931+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:45:53.226301+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:45:53.224401+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_700c3b5f5cebf2652fe183e5b9768375",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 3,
+      "source": {
+        "file_path": "TODO/alpha-release.md",
+        "line_number": 8,
+        "raw_text": "- [ ] Add \"one clarifying question\" mode for ambiguous TODOs",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Add \"one clarifying question\" mode for ambiguous TODOs"
+    },
+    "todo_scanned_716bb3f4671e5eb3e14e388e67893365": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "bugfix",
+      "depth": 0,
+      "description": "Fixes Needed\",",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:45:53.224401+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:45:53.227340+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:45:53.227372+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:45:53.224401+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_716bb3f4671e5eb3e14e388e67893365",
+      "parent_node_id": null,
+      "priority": "critical",
+      "result": null,
+      "seen_count": 1,
+      "source": {
+        "file_path": "tree.json",
+        "line_number": 1137,
+        "raw_text": "\"raw_text\": \"# Bug Fixes Needed\",",
+        "source_type": "comment",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "bug"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Fixes Needed\","
+    },
+    "todo_scanned_718d773b6f811f21d434918aae3765c4": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "bugfix",
+      "depth": 0,
+      "description": "Type \u201cfix bug\u201d \u2192 WTD finds issue \u2192 opens files \u2192 suggests fix \u2192 runs tests \u2192 opens PR",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:43.037207+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:43.037532+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:43.037569+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:49:47.444747+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_718d773b6f811f21d434918aae3765c4",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 2,
+      "source": {
+        "file_path": "PRD.md",
+        "line_number": 84,
+        "raw_text": "- [ ] Type \u201cfix bug\u201d \u2192 WTD finds issue \u2192 opens files \u2192 suggests fix \u2192 runs tests \u2192 opens PR",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Type \u201cfix bug\u201d \u2192 WTD finds issue \u2192 opens files \u2192 suggests fix \u2192 runs tests \u2192 opens PR"
+    },
+    "todo_scanned_71a4f9e72bba78b853f043c0e9e43911": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "build",
+      "depth": 0,
+      "description": "Implement GitHub API integration\",",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:45:53.224401+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:45:53.227176+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:45:53.227210+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:45:53.224401+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_71a4f9e72bba78b853f043c0e9e43911",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 1,
+      "source": {
+        "file_path": "tree.json",
+        "line_number": 970,
+        "raw_text": "\"raw_text\": \"# TODO: Implement GitHub API integration\",",
+        "source_type": "comment",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "todo"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Implement GitHub API integration\","
+    },
+    "todo_scanned_7213b1766ac99790b6c7f6c3b54952b3": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "unknown",
+      "depth": 0,
+      "description": "`wtd` in any repo opens exact tools/tabs needed with zero config",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:43.037207+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:43.037322+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:43.037375+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:49:47.444563+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_7213b1766ac99790b6c7f6c3b54952b3",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 2,
+      "source": {
+        "file_path": "PRD.md",
+        "line_number": 82,
+        "raw_text": "- [ ] `wtd` in any repo opens exact tools/tabs needed with zero config",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "`wtd` in any repo opens exact tools/tabs needed with zero config"
+    },
+    "todo_scanned_7780fa335e10421b7ee0534644394e2f": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "unknown",
+      "depth": 0,
+      "description": "`wtd` in any repo opens exact tools/tabs needed with zero config",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:44:00.350851+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:44:00.350970+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:44:00.351024+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:44:04.049973+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:45:53.224594+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:45:53.224401+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_7780fa335e10421b7ee0534644394e2f",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 3,
+      "source": {
+        "file_path": "PRD.md",
+        "line_number": 82,
+        "raw_text": "- [ ] `wtd` in any repo opens exact tools/tabs needed with zero config",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "`wtd` in any repo opens exact tools/tabs needed with zero config"
+    },
+    "todo_scanned_7a507ea7f2b8fc956e995fe0cd0afd0d": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "build",
+      "depth": 0,
+      "description": "Create video tutorial for getting started",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:44:00.350851+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:44:00.353330+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:44:00.353370+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:44:04.052591+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:45:53.226963+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:45:53.224401+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_7a507ea7f2b8fc956e995fe0cd0afd0d",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 3,
+      "source": {
+        "file_path": "TODO/alpha-release.md",
+        "line_number": 22,
+        "raw_text": "- [ ] Create video tutorial for getting started",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Create video tutorial for getting started"
+    },
+    "todo_scanned_7ccafce4eb046c144413db90918dc66d": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "build",
+      "depth": 0,
+      "description": "Implement GitHub API integration",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:44:00.350851+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:44:00.351384+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:44:00.351427+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:44:04.050369+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:45:53.224982+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:45:53.224401+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_7ccafce4eb046c144413db90918dc66d",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 3,
+      "source": {
+        "file_path": "wtd/core/scanner.py",
+        "line_number": 306,
+        "raw_text": "# TODO: Implement GitHub API integration",
+        "source_type": "comment",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "todo"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Implement GitHub API integration"
+    },
+    "todo_scanned_7cd33be9c10a01f94c98641eeab4272d": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "build",
+      "depth": 0,
+      "description": "Implement GitHub API integration\\\",\",",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:45:53.224401+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:45:53.227420+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:45:53.227452+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:45:53.224401+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_7cd33be9c10a01f94c98641eeab4272d",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 1,
+      "source": {
+        "file_path": "tree.json",
+        "line_number": 1710,
+        "raw_text": "\"raw_text\": \"\\\"raw_text\\\": \\\"# TODO: Implement GitHub API integration\\\",\",",
+        "source_type": "comment",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "todo"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Implement GitHub API integration\\\",\","
+    },
+    "todo_scanned_7dcb04272b8bdc5177816d47a7c81f65": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "bugfix",
+      "depth": 0,
+      "description": "Fix: Dashboard crashes when TODO tree is empty",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:43.037207+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:43.037932+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:43.037969+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:49:47.445140+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_7dcb04272b8bdc5177816d47a7c81f65",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 2,
+      "source": {
+        "file_path": "TODO/bugs.md",
+        "line_number": 6,
+        "raw_text": "- [ ] Fix: Dashboard crashes when TODO tree is empty",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Fix: Dashboard crashes when TODO tree is empty"
+    },
+    "todo_scanned_844d219e39f661e17b786fd64b8341a7": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "bugfix",
+      "depth": 0,
+      "description": "Fix: Timestamps show in UTC instead of local timezone",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:44:00.350851+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:44:00.351988+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:44:00.352022+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:44:04.051215+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:45:53.225563+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:45:53.224401+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_844d219e39f661e17b786fd64b8341a7",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 3,
+      "source": {
+        "file_path": "TODO/bugs.md",
+        "line_number": 16,
+        "raw_text": "- [ ] Fix: Timestamps show in UTC instead of local timezone",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Fix: Timestamps show in UTC instead of local timezone"
+    },
+    "todo_scanned_84794c55b243a973dccd5bd81d558d17": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "bugfix",
+      "depth": 0,
+      "description": "Fixes Needed\",",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:44:04.049792+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:44:04.052880+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:44:04.052912+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:44:04.049792+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_84794c55b243a973dccd5bd81d558d17",
+      "parent_node_id": null,
+      "priority": "critical",
+      "result": null,
+      "seen_count": 1,
+      "source": {
+        "file_path": "tree.json",
+        "line_number": 951,
+        "raw_text": "\"raw_text\": \"# Bug Fixes Needed\",",
+        "source_type": "comment",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "bug"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Fixes Needed\","
+    },
+    "todo_scanned_883adff5752a37b1feb7bd2d588690bc": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "bugfix",
+      "depth": 0,
+      "description": "Fixes Needed",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:44:00.350851+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:44:00.351480+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:44:00.351516+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:44:04.050461+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:45:53.225070+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:45:53.224401+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_883adff5752a37b1feb7bd2d588690bc",
+      "parent_node_id": null,
+      "priority": "critical",
+      "result": null,
+      "seen_count": 3,
+      "source": {
+        "file_path": "TODO/bugs.md",
+        "line_number": 1,
+        "raw_text": "# Bug Fixes Needed",
+        "source_type": "comment",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "bug"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Fixes Needed"
+    },
+    "todo_scanned_8abdce8ca1290f187f00af4cc11d59b6": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "build",
+      "depth": 0,
+      "description": "Implement GitHub API integration",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:43.037207+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:43.037691+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:43.037732+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:49:47.444911+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_8abdce8ca1290f187f00af4cc11d59b6",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 2,
+      "source": {
+        "file_path": "wtd/core/scanner.py",
+        "line_number": 306,
+        "raw_text": "# TODO: Implement GitHub API integration",
+        "source_type": "comment",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "todo"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Implement GitHub API integration"
+    },
+    "todo_scanned_8cb67a561ae234af13daeb266e024563": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "bugfix",
+      "depth": 0,
+      "description": "Fixes Needed\",",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:47.447442+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:47.447472+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_8cb67a561ae234af13daeb266e024563",
+      "parent_node_id": null,
+      "priority": "critical",
+      "result": null,
+      "seen_count": 1,
+      "source": {
+        "file_path": "tree.json",
+        "line_number": 2247,
+        "raw_text": "\"raw_text\": \"# Bug Fixes Needed\",",
+        "source_type": "comment",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "bug"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Fixes Needed\","
+    },
+    "todo_scanned_8d60c4a60176eb71633525730547d0ae": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "build",
+      "depth": 0,
+      "description": "Implement GitHub API integration\\\",\",",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:43.037207+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:43.040110+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:43.040140+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:43.037207+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_8d60c4a60176eb71633525730547d0ae",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 1,
+      "source": {
+        "file_path": "tree.json",
+        "line_number": 2106,
+        "raw_text": "\"raw_text\": \"\\\"raw_text\\\": \\\"# TODO: Implement GitHub API integration\\\",\",",
+        "source_type": "comment",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "todo"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Implement GitHub API integration\\\",\","
+    },
+    "todo_scanned_8d798584f833bb94769aedb317700d97": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "bugfix",
+      "depth": 0,
+      "description": "Fixes Needed\\\\\\\",\\\",\",",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:47.447640+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:47.447669+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_8d798584f833bb94769aedb317700d97",
+      "parent_node_id": null,
+      "priority": "critical",
+      "result": null,
+      "seen_count": 1,
+      "source": {
+        "file_path": "tree.json",
+        "line_number": 2632,
+        "raw_text": "\"raw_text\": \"\\\"raw_text\\\": \\\"\\\\\\\"raw_text\\\\\\\": \\\\\\\"# Bug Fixes Needed\\\\\\\",\\\",\",",
+        "source_type": "comment",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "bug"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Fixes Needed\\\\\\\",\\\",\","
+    },
+    "todo_scanned_91c3bbe034ecb86e7c94d3f2c6b18815": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "build",
+      "depth": 0,
+      "description": "Implement cross-machine sync via cloud storage",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:44:00.350851+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:44:00.352490+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:44:00.352524+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:44:04.051751+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:45:53.226132+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:45:53.224401+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_91c3bbe034ecb86e7c94d3f2c6b18815",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 3,
+      "source": {
+        "file_path": "TODO/README.md",
+        "line_number": 11,
+        "raw_text": "- [ ] Implement cross-machine sync via cloud storage",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Implement cross-machine sync via cloud storage"
+    },
+    "todo_scanned_922b10317d6232d8bc06175f78854936": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "write",
+      "depth": 0,
+      "description": "Write unit tests for scanner module",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:44:00.350851+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:44:00.352896+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:44:00.352929+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:44:04.052180+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:45:53.226549+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:45:53.224401+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_922b10317d6232d8bc06175f78854936",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 3,
+      "source": {
+        "file_path": "TODO/alpha-release.md",
+        "line_number": 14,
+        "raw_text": "- [ ] Write unit tests for scanner module",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Write unit tests for scanner module"
+    },
+    "todo_scanned_95abd0cbc807d9da969991c15c1960b4": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "bugfix",
+      "depth": 0,
+      "description": "Fix: Progress bar doesn't update in real-time during execution",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:43.037207+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:43.038084+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:43.038119+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:49:47.445286+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_95abd0cbc807d9da969991c15c1960b4",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 2,
+      "source": {
+        "file_path": "TODO/bugs.md",
+        "line_number": 11,
+        "raw_text": "- [ ] Fix: Progress bar doesn't update in real-time during execution",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Fix: Progress bar doesn't update in real-time during execution"
+    },
+    "todo_scanned_95c8d3c34b14a0dc5803f273f0e9b379": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "unknown",
+      "depth": 0,
+      "description": "Set up CI/CD pipeline with GitHub Actions",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:43.037207+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:43.039283+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:43.039317+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:49:47.446439+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_95c8d3c34b14a0dc5803f273f0e9b379",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 2,
+      "source": {
+        "file_path": "TODO/alpha-release.md",
+        "line_number": 17,
+        "raw_text": "- [ ] Set up CI/CD pipeline with GitHub Actions",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Set up CI/CD pipeline with GitHub Actions"
+    },
+    "todo_scanned_96ce9255358c514772e37b30ab0bd5a3": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "bugfix",
+      "depth": 0,
+      "description": "Fixes Needed\\\",\",",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:43.037207+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:43.039981+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:43.040011+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:43.037207+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_96ce9255358c514772e37b30ab0bd5a3",
+      "parent_node_id": null,
+      "priority": "critical",
+      "result": null,
+      "seen_count": 1,
+      "source": {
+        "file_path": "tree.json",
+        "line_number": 1405,
+        "raw_text": "\"raw_text\": \"\\\"raw_text\\\": \\\"# Bug Fixes Needed\\\",\",",
+        "source_type": "comment",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "bug"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Fixes Needed\\\",\","
+    },
+    "todo_scanned_9b361db588fad6d46bcf1c835017f9bc": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "write",
+      "depth": 0,
+      "description": "Type \u201cwrite article about X\u201d \u2192 WTD creates outline \u2192 drafts \u2192 opens editor \u2192 publishes draft",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:43.037207+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:43.037441+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:43.037484+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:49:47.444662+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_9b361db588fad6d46bcf1c835017f9bc",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 2,
+      "source": {
+        "file_path": "PRD.md",
+        "line_number": 83,
+        "raw_text": "- [ ] Type \u201cwrite article about X\u201d \u2192 WTD creates outline \u2192 drafts \u2192 opens editor \u2192 publishes draft",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Type \u201cwrite article about X\u201d \u2192 WTD creates outline \u2192 drafts \u2192 opens editor \u2192 publishes draft"
+    },
+    "todo_scanned_a24f5f614a9fccdf9aeaaec4e4562538": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "bugfix",
+      "depth": 0,
+      "description": "Fix: Timestamps show in UTC instead of local timezone",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:43.037207+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:43.038233+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:43.038268+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:49:47.445431+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_a24f5f614a9fccdf9aeaaec4e4562538",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 2,
+      "source": {
+        "file_path": "TODO/bugs.md",
+        "line_number": 16,
+        "raw_text": "- [ ] Fix: Timestamps show in UTC instead of local timezone",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Fix: Timestamps show in UTC instead of local timezone"
+    },
+    "todo_scanned_a4c4044611f09996e65dc2fb9870907a": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "write",
+      "depth": 0,
+      "description": "Add inline code documentation",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:43.037207+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:43.039502+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:43.039536+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:49:47.446653+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_a4c4044611f09996e65dc2fb9870907a",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 2,
+      "source": {
+        "file_path": "TODO/alpha-release.md",
+        "line_number": 23,
+        "raw_text": "- [ ] Add inline code documentation",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Add inline code documentation"
+    },
+    "todo_scanned_a9f3d5711a320e71aa9d92d2c2f789da": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "bugfix",
+      "depth": 0,
+      "description": "Fixes Needed",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:43.037207+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:43.037779+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:43.037815+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:49:47.444988+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_a9f3d5711a320e71aa9d92d2c2f789da",
+      "parent_node_id": null,
+      "priority": "critical",
+      "result": null,
+      "seen_count": 2,
+      "source": {
+        "file_path": "TODO/bugs.md",
+        "line_number": 1,
+        "raw_text": "# Bug Fixes Needed",
+        "source_type": "comment",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "bug"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Fixes Needed"
+    },
+    "todo_scanned_acda5cf02793bf2f9730cefcfd109181": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "bugfix",
+      "depth": 0,
+      "description": "Fixes Needed\\\\\\\",\\\",\",",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:43.037207+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:43.039645+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:43.039676+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:43.037207+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_acda5cf02793bf2f9730cefcfd109181",
+      "parent_node_id": null,
+      "priority": "critical",
+      "result": null,
+      "seen_count": 1,
+      "source": {
+        "file_path": "tree.json",
+        "line_number": 746,
+        "raw_text": "\"raw_text\": \"\\\"raw_text\\\": \\\"\\\\\\\"raw_text\\\\\\\": \\\\\\\"# Bug Fixes Needed\\\\\\\",\\\",\",",
+        "source_type": "comment",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "bug"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Fixes Needed\\\\\\\",\\\",\","
+    },
+    "todo_scanned_afa78a51e830015a2eb136bd91693aa1": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "bugfix",
+      "depth": 0,
+      "description": "Fix: Progress bar doesn't update in real-time during execution",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:44:00.350851+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:44:00.351824+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:44:00.351858+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:44:04.050866+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:45:53.225398+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:45:53.224401+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_afa78a51e830015a2eb136bd91693aa1",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 3,
+      "source": {
+        "file_path": "TODO/bugs.md",
+        "line_number": 11,
+        "raw_text": "- [ ] Fix: Progress bar doesn't update in real-time during execution",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Fix: Progress bar doesn't update in real-time during execution"
+    },
+    "todo_scanned_b0f4ac7dbcac9928eca42ed7769a320b": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "build",
+      "depth": 0,
+      "description": "Add end-to-end tests for CLI commands",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:43.037207+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:43.039209+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:43.039243+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:49:47.446368+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_b0f4ac7dbcac9928eca42ed7769a320b",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 2,
+      "source": {
+        "file_path": "TODO/alpha-release.md",
+        "line_number": 16,
+        "raw_text": "- [ ] Add end-to-end tests for CLI commands",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Add end-to-end tests for CLI commands"
+    },
+    "todo_scanned_b17ef239cb0c39f558f276d292da2d5c": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "bugfix",
+      "depth": 0,
+      "description": "Fix: Config changes require restart to take effect",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:44:00.350851+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:44:00.351906+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:44:00.351940+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:44:04.051047+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:45:53.225482+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:45:53.224401+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_b17ef239cb0c39f558f276d292da2d5c",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 3,
+      "source": {
+        "file_path": "TODO/bugs.md",
+        "line_number": 12,
+        "raw_text": "- [ ] Fix: Config changes require restart to take effect",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Fix: Config changes require restart to take effect"
+    },
+    "todo_scanned_b23f9a6af24d9f507ac1d43fbe331d6a": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "write",
+      "depth": 0,
+      "description": "Write contribution guidelines",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:44:00.350851+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:44:00.353503+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:44:00.353538+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:44:04.052748+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:45:53.227125+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:45:53.224401+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_b23f9a6af24d9f507ac1d43fbe331d6a",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 3,
+      "source": {
+        "file_path": "TODO/alpha-release.md",
+        "line_number": 24,
+        "raw_text": "- [ ] Write contribution guidelines",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Write contribution guidelines"
+    },
+    "todo_scanned_b488e9d9aac71ebe2c4ea64821794168": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "build",
+      "depth": 0,
+      "description": "Add support for Notion and Obsidian notes",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:43.037207+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:43.038609+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:43.038643+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:49:47.445794+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_b488e9d9aac71ebe2c4ea64821794168",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 2,
+      "source": {
+        "file_path": "TODO/README.md",
+        "line_number": 10,
+        "raw_text": "- [ ] Add support for Notion and Obsidian notes",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Add support for Notion and Obsidian notes"
+    },
+    "todo_scanned_b7ebd95473608cecbe26ec407432212b": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "bugfix",
+      "depth": 0,
+      "description": "Fix: Long TODO titles get truncated in narrow terminals",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:44:00.350851+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:44:00.352070+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:44:00.352104+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:44:04.051304+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:45:53.225642+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:45:53.224401+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_b7ebd95473608cecbe26ec407432212b",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 3,
+      "source": {
+        "file_path": "TODO/bugs.md",
+        "line_number": 17,
+        "raw_text": "- [ ] Fix: Long TODO titles get truncated in narrow terminals",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Fix: Long TODO titles get truncated in narrow terminals"
+    },
+    "todo_scanned_b9f33fa0857a026f6190be7b2d31cac8": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "write",
+      "depth": 0,
+      "description": "Write contribution guidelines",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:43.037207+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:43.039574+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:43.039609+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:49:47.446723+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_b9f33fa0857a026f6190be7b2d31cac8",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 2,
+      "source": {
+        "file_path": "TODO/alpha-release.md",
+        "line_number": 24,
+        "raw_text": "- [ ] Write contribution guidelines",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Write contribution guidelines"
+    },
+    "todo_scanned_ba1a1610785c33281b98a9edba21c5fc": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "write",
+      "depth": 0,
+      "description": "Write integration tests for tree operations",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:43.037207+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:43.039136+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:43.039170+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:49:47.446296+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_ba1a1610785c33281b98a9edba21c5fc",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 2,
+      "source": {
+        "file_path": "TODO/alpha-release.md",
+        "line_number": 15,
+        "raw_text": "- [ ] Write integration tests for tree operations",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Write integration tests for tree operations"
+    },
+    "todo_scanned_beb6db548214ab31d73067944527a03f": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "build",
+      "depth": 0,
+      "description": "Create VSCode extension for seamless integration",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:43.037207+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:43.038536+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:43.038570+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:49:47.445723+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_beb6db548214ab31d73067944527a03f",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 2,
+      "source": {
+        "file_path": "TODO/README.md",
+        "line_number": 9,
+        "raw_text": "- [ ] Create VSCode extension for seamless integration",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Create VSCode extension for seamless integration"
+    },
+    "todo_scanned_c1a1810cb70286fbccb713470d5be3f6": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "write",
+      "depth": 0,
+      "description": "Type \u201cwrite article about X\u201d \u2192 WTD creates outline \u2192 drafts \u2192 opens editor \u2192 publishes draft",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:44:00.350851+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:44:00.351098+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:44:00.351139+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:44:04.050084+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:45:53.224706+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:45:53.224401+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_c1a1810cb70286fbccb713470d5be3f6",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 3,
+      "source": {
+        "file_path": "PRD.md",
+        "line_number": 83,
+        "raw_text": "- [ ] Type \u201cwrite article about X\u201d \u2192 WTD creates outline \u2192 drafts \u2192 opens editor \u2192 publishes draft",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Type \u201cwrite article about X\u201d \u2192 WTD creates outline \u2192 drafts \u2192 opens editor \u2192 publishes draft"
+    },
+    "todo_scanned_cd3919f94dc91f3c508b6403864e52c3": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "bugfix",
+      "depth": 0,
+      "description": "Fix: Long TODO titles get truncated in narrow terminals",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:43.037207+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:43.038308+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:43.038345+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:49:47.445503+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_cd3919f94dc91f3c508b6403864e52c3",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 2,
+      "source": {
+        "file_path": "TODO/bugs.md",
+        "line_number": 17,
+        "raw_text": "- [ ] Fix: Long TODO titles get truncated in narrow terminals",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Fix: Long TODO titles get truncated in narrow terminals"
+    },
+    "todo_scanned_cf4b2c2c53c171d92fd5ccf46990c6ab": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "bugfix",
+      "depth": 0,
+      "description": "Fix: Workspace orchestrator fails silently when VSCode not installed",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:43.037207+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:43.038010+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:43.038044+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:49:47.445213+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_cf4b2c2c53c171d92fd5ccf46990c6ab",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 2,
+      "source": {
+        "file_path": "TODO/bugs.md",
+        "line_number": 7,
+        "raw_text": "- [ ] Fix: Workspace orchestrator fails silently when VSCode not installed",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Fix: Workspace orchestrator fails silently when VSCode not installed"
+    },
+    "todo_scanned_cffe181257a71e3e34a78094e90278e2": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "build",
+      "depth": 0,
+      "description": "Implement workspace setup with zero config",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:44:00.350851+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:44:00.352734+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:44:00.352767+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:44:04.052013+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:45:53.226383+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:45:53.224401+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_cffe181257a71e3e34a78094e90278e2",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 3,
+      "source": {
+        "file_path": "TODO/alpha-release.md",
+        "line_number": 9,
+        "raw_text": "- [ ] Implement workspace setup with zero config",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Implement workspace setup with zero config"
+    },
+    "todo_scanned_d270b3ff179fae432c8a43e3484b98a3": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "build",
+      "depth": 0,
+      "description": "Implement GitHub API integration\\\",\",",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:47.447900+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:47.447931+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_d270b3ff179fae432c8a43e3484b98a3",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 1,
+      "source": {
+        "file_path": "tree.json",
+        "line_number": 3903,
+        "raw_text": "\"raw_text\": \"\\\"raw_text\\\": \\\"# TODO: Implement GitHub API integration\\\",\",",
+        "source_type": "comment",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "todo"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Implement GitHub API integration\\\",\","
+    },
+    "todo_scanned_d45a02964d0b7c1a9a40542a52f01367": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "unknown",
+      "depth": 0,
+      "description": "Average human keystrokes per completed TODO \u2264 5",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:43.037207+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:43.037609+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:43.037641+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:49:47.444822+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_d45a02964d0b7c1a9a40542a52f01367",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 2,
+      "source": {
+        "file_path": "PRD.md",
+        "line_number": 85,
+        "raw_text": "- [ ] Average human keystrokes per completed TODO \u2264 5",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Average human keystrokes per completed TODO \u2264 5"
+    },
+    "todo_scanned_e19ab887232e17499ad3461f6c25ce6f": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "build",
+      "depth": 0,
+      "description": "Implement GitHub API integration\",",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:43.037207+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:43.039843+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:43.039872+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:43.037207+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_e19ab887232e17499ad3461f6c25ce6f",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 1,
+      "source": {
+        "file_path": "tree.json",
+        "line_number": 1238,
+        "raw_text": "\"raw_text\": \"# TODO: Implement GitHub API integration\",",
+        "source_type": "comment",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "todo"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Implement GitHub API integration\","
+    },
+    "todo_scanned_e30870f43907836adb6b1b950a2cf097": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "build",
+      "depth": 0,
+      "description": "Implement cross-machine sync via cloud storage",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:43.037207+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:43.038682+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:43.038717+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:49:47.445865+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_e30870f43907836adb6b1b950a2cf097",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 2,
+      "source": {
+        "file_path": "TODO/README.md",
+        "line_number": 11,
+        "raw_text": "- [ ] Implement cross-machine sync via cloud storage",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Implement cross-machine sync via cloud storage"
+    },
+    "todo_scanned_e3d146b47aa9dfd045a6e703920d15cf": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "write",
+      "depth": 0,
+      "description": "Add inline code documentation",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:44:00.350851+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:44:00.353421+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:44:00.353458+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:44:04.052669+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:45:53.227044+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:45:53.224401+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_e3d146b47aa9dfd045a6e703920d15cf",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 3,
+      "source": {
+        "file_path": "TODO/alpha-release.md",
+        "line_number": 23,
+        "raw_text": "- [ ] Add inline code documentation",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Add inline code documentation"
+    },
+    "todo_scanned_e9bc0fe16f23be6c31444c2b6870c755": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "build",
+      "depth": 0,
+      "description": "Implement GitHub API integration\",",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:44:04.049792+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:44:04.052800+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:44:04.052833+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:44:04.049792+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_e9bc0fe16f23be6c31444c2b6870c755",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 1,
+      "source": {
+        "file_path": "tree.json",
+        "line_number": 849,
+        "raw_text": "\"raw_text\": \"# TODO: Implement GitHub API integration\",",
+        "source_type": "comment",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "todo"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Implement GitHub API integration\","
+    },
+    "todo_scanned_ebc1f49b2fdb86787c386f4ae5337656": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "write",
+      "depth": 0,
+      "description": "Write integration tests for tree operations",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:44:00.350851+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:44:00.352976+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:44:00.353012+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:44:04.052260+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:45:53.226631+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:45:53.224401+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_ebc1f49b2fdb86787c386f4ae5337656",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 3,
+      "source": {
+        "file_path": "TODO/alpha-release.md",
+        "line_number": 15,
+        "raw_text": "- [ ] Write integration tests for tree operations",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Write integration tests for tree operations"
+    },
+    "todo_scanned_edb98a8fcdc9fe7ac6534f5deca559d6": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "bugfix",
+      "depth": 0,
+      "description": "Fixes Needed\\\\\\\\\\\\\\\",\\\\\\\",\\\",\",",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:47.447770+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:47.447799+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_edb98a8fcdc9fe7ac6534f5deca559d6",
+      "parent_node_id": null,
+      "priority": "critical",
+      "result": null,
+      "seen_count": 1,
+      "source": {
+        "file_path": "tree.json",
+        "line_number": 2887,
+        "raw_text": "\"raw_text\": \"\\\"raw_text\\\": \\\"\\\\\\\"raw_text\\\\\\\": \\\\\\\"\\\\\\\\\\\\\\\"raw_text\\\\\\\\\\\\\\\": \\\\\\\\\\\\\\\"# Bug Fixes Needed\\\\\\\\\\\\\\\",\\\\\\\",\\\",\",",
+        "source_type": "comment",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "bug"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Fixes Needed\\\\\\\\\\\\\\\",\\\\\\\",\\\",\","
+    },
+    "todo_scanned_edcb192eccfb404355eea7b2a7267060": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "bugfix",
+      "depth": 0,
+      "description": "Fix: Dashboard crashes when TODO tree is empty",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:44:00.350851+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:44:00.351658+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:44:00.351693+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:44:04.050626+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:45:53.225234+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:45:53.224401+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_edcb192eccfb404355eea7b2a7267060",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 3,
+      "source": {
+        "file_path": "TODO/bugs.md",
+        "line_number": 6,
+        "raw_text": "- [ ] Fix: Dashboard crashes when TODO tree is empty",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Fix: Dashboard crashes when TODO tree is empty"
+    },
+    "todo_scanned_eeda775add5af71a9d4ef06f3d19ec76": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "bugfix",
+      "depth": 0,
+      "description": "Fixes Needed\",",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:47.447703+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:47.447734+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_eeda775add5af71a9d4ef06f3d19ec76",
+      "parent_node_id": null,
+      "priority": "critical",
+      "result": null,
+      "seen_count": 1,
+      "source": {
+        "file_path": "tree.json",
+        "line_number": 2836,
+        "raw_text": "\"raw_text\": \"# Bug Fixes Needed\",",
+        "source_type": "comment",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "bug"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Fixes Needed\","
+    },
+    "todo_scanned_efa58a6df3d19a346b3a5d54c667d593": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "build",
+      "depth": 0,
+      "description": "Add support for Notion and Obsidian notes",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:44:00.350851+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:44:00.352403+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:44:00.352437+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:44:04.051663+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:45:53.226049+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:45:53.224401+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_efa58a6df3d19a346b3a5d54c667d593",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 3,
+      "source": {
+        "file_path": "TODO/README.md",
+        "line_number": 10,
+        "raw_text": "- [ ] Add support for Notion and Obsidian notes",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Add support for Notion and Obsidian notes"
+    },
+    "todo_scanned_f0d76985ade656356c94a8bce99b4e7e": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "bugfix",
+      "depth": 0,
+      "description": "Fix: Config changes require restart to take effect",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:43.037207+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:43.038159+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:43.038193+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:49:47.445358+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_f0d76985ade656356c94a8bce99b4e7e",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 2,
+      "source": {
+        "file_path": "TODO/bugs.md",
+        "line_number": 12,
+        "raw_text": "- [ ] Fix: Config changes require restart to take effect",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Fix: Config changes require restart to take effect"
+    },
+    "todo_scanned_f21e3373d5c54aaf4319657ffeb78c0f": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "build",
+      "depth": 0,
+      "description": "Add support for monorepo scanning",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:43.037207+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:43.038981+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:43.039015+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:49:47.446152+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_f21e3373d5c54aaf4319657ffeb78c0f",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 2,
+      "source": {
+        "file_path": "TODO/alpha-release.md",
+        "line_number": 10,
+        "raw_text": "- [ ] Add support for monorepo scanning",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Add support for monorepo scanning"
+    },
+    "todo_scanned_f406b345d00e12403ab1509fd94e30d9": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "bugfix",
+      "depth": 0,
+      "description": "Fixes Needed\\\",\",",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:47.447107+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:47.447139+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_f406b345d00e12403ab1509fd94e30d9",
+      "parent_node_id": null,
+      "priority": "critical",
+      "result": null,
+      "seen_count": 1,
+      "source": {
+        "file_path": "tree.json",
+        "line_number": 1616,
+        "raw_text": "\"raw_text\": \"\\\"raw_text\\\": \\\"# Bug Fixes Needed\\\",\",",
+        "source_type": "comment",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "bug"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Fixes Needed\\\",\","
+    },
+    "todo_scanned_f6ba8fe5edcef42847b78912ebd21c84": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "unknown",
+      "depth": 0,
+      "description": "Set up Ollama with llama3.2 model for local AI",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:43.037207+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:43.038387+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:43.038423+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:49:47.445578+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_f6ba8fe5edcef42847b78912ebd21c84",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 2,
+      "source": {
+        "file_path": "TODO/README.md",
+        "line_number": 7,
+        "raw_text": "- [ ] Set up Ollama with llama3.2 model for local AI",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Set up Ollama with llama3.2 model for local AI"
+    },
+    "todo_scanned_f8f430dfcb22afd2989d807a478b9f1a": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "build",
+      "depth": 0,
+      "description": "Implement GitHub API integration\\\\\\\",\\\",\",",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:49:47.447575+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:49:47.447605+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:49:47.444419+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_f8f430dfcb22afd2989d807a478b9f1a",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 1,
+      "source": {
+        "file_path": "tree.json",
+        "line_number": 2349,
+        "raw_text": "\"raw_text\": \"\\\"raw_text\\\": \\\"\\\\\\\"raw_text\\\\\\\": \\\\\\\"# TODO: Implement GitHub API integration\\\\\\\",\\\",\",",
+        "source_type": "comment",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "todo"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Implement GitHub API integration\\\\\\\",\\\",\","
+    },
+    "todo_scanned_fec8e6133015a3876f4821792e38feec": {
+      "actions": [],
+      "children_node_ids": [],
+      "context": "write",
+      "depth": 0,
+      "description": "Write API documentation with examples",
+      "error": null,
+      "first_seen_at": "2025-12-20T05:44:00.350851+00:00",
+      "fitness_score": 1.0,
+      "history": [
+        {
+          "at": "2025-12-20T05:44:00.353234+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "created"
+        },
+        {
+          "at": "2025-12-20T05:44:00.353273+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:44:04.052512+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        },
+        {
+          "at": "2025-12-20T05:45:53.226882+00:00",
+          "data": {
+            "via": "scan"
+          },
+          "event": "seen"
+        }
+      ],
+      "kind": "scanned",
+      "last_seen_at": "2025-12-20T05:45:53.224401+00:00",
+      "metadata": {},
+      "node_id": "todo_scanned_fec8e6133015a3876f4821792e38feec",
+      "parent_node_id": null,
+      "priority": "medium",
+      "result": null,
+      "seen_count": 3,
+      "source": {
+        "file_path": "TODO/alpha-release.md",
+        "line_number": 21,
+        "raw_text": "- [ ] Write API documentation with examples",
+        "source_type": "markdown_task",
+        "url": null
+      },
+      "status": "pending",
+      "tags": [
+        "markdown"
+      ],
+      "timeline": {
+        "completed_at": null,
+        "created_at": null,
+        "started_at": null
+      },
+      "title": "Write API documentation with examples"
+    }
+  },
+  "repo": {
+    "created_at": "2025-12-20T05:44:00.350593+00:00",
+    "fingerprint": "2f8a78c365efbe35",
+    "last_scan_at": "2025-12-20T05:49:47.444419+00:00",
+    "last_updated_at": "2025-12-20T05:49:47.448171+00:00",
+    "root": "."
+  },
+  "scans": [
+    {
+      "at": "2025-12-20T05:44:00.350851+00:00",
+      "confidence": 0.8666666666666667,
+      "context": "bugfix",
+      "duration_ms": 148,
+      "node_ids": [
+        "todo_scanned_7780fa335e10421b7ee0534644394e2f",
+        "todo_scanned_c1a1810cb70286fbccb713470d5be3f6",
+        "todo_scanned_2d095113f46ae133b9226b1e6ca88cab",
+        "todo_scanned_3616bdda3b6063ff77db6e8c3699fb3e",
+        "todo_scanned_7ccafce4eb046c144413db90918dc66d",
+        "todo_scanned_883adff5752a37b1feb7bd2d588690bc",
+        "todo_scanned_6c2ad86ffabec78c9b7195062c5c3df6",
+        "todo_scanned_edcb192eccfb404355eea7b2a7267060",
+        "todo_scanned_3b7a0c7c868f20670f880fa4b03bf45f",
+        "todo_scanned_afa78a51e830015a2eb136bd91693aa1",
+        "todo_scanned_b17ef239cb0c39f558f276d292da2d5c",
+        "todo_scanned_844d219e39f661e17b786fd64b8341a7",
+        "todo_scanned_b7ebd95473608cecbe26ec407432212b",
+        "todo_scanned_24f82e085cc1e46c1545b717b5c5ade0",
+        "todo_scanned_6b3fac66341099cb1fbb12919919ccbd",
+        "todo_scanned_150af201e2f2d859668cea1469abdf5c",
+        "todo_scanned_efa58a6df3d19a346b3a5d54c667d593",
+        "todo_scanned_91c3bbe034ecb86e7c94d3f2c6b18815",
+        "todo_scanned_297594a6a3ba497d34766e479511f4a5",
+        "todo_scanned_700c3b5f5cebf2652fe183e5b9768375",
+        "todo_scanned_cffe181257a71e3e34a78094e90278e2",
+        "todo_scanned_3aded4954788bd37148422a74dc07351",
+        "todo_scanned_922b10317d6232d8bc06175f78854936",
+        "todo_scanned_ebc1f49b2fdb86787c386f4ae5337656",
+        "todo_scanned_071a604f9ee64a7f4335473f45221914",
+        "todo_scanned_48a75410e564b9b15cc748793fe9d01d",
+        "todo_scanned_fec8e6133015a3876f4821792e38feec",
+        "todo_scanned_7a507ea7f2b8fc956e995fe0cd0afd0d",
+        "todo_scanned_e3d146b47aa9dfd045a6e703920d15cf",
+        "todo_scanned_b23f9a6af24d9f507ac1d43fbe331d6a"
+      ],
+      "path": ".",
+      "repo_root": ".",
+      "scan_id": "7fb009b21233",
+      "sources_scanned": 3105,
+      "todo_count": 30
+    },
+    {
+      "at": "2025-12-20T05:44:04.049792+00:00",
+      "confidence": 0.875,
+      "context": "bugfix",
+      "duration_ms": 93,
+      "node_ids": [
+        "todo_scanned_7780fa335e10421b7ee0534644394e2f",
+        "todo_scanned_c1a1810cb70286fbccb713470d5be3f6",
+        "todo_scanned_2d095113f46ae133b9226b1e6ca88cab",
+        "todo_scanned_3616bdda3b6063ff77db6e8c3699fb3e",
+        "todo_scanned_7ccafce4eb046c144413db90918dc66d",
+        "todo_scanned_883adff5752a37b1feb7bd2d588690bc",
+        "todo_scanned_6c2ad86ffabec78c9b7195062c5c3df6",
+        "todo_scanned_edcb192eccfb404355eea7b2a7267060",
+        "todo_scanned_3b7a0c7c868f20670f880fa4b03bf45f",
+        "todo_scanned_afa78a51e830015a2eb136bd91693aa1",
+        "todo_scanned_b17ef239cb0c39f558f276d292da2d5c",
+        "todo_scanned_844d219e39f661e17b786fd64b8341a7",
+        "todo_scanned_b7ebd95473608cecbe26ec407432212b",
+        "todo_scanned_24f82e085cc1e46c1545b717b5c5ade0",
+        "todo_scanned_6b3fac66341099cb1fbb12919919ccbd",
+        "todo_scanned_150af201e2f2d859668cea1469abdf5c",
+        "todo_scanned_efa58a6df3d19a346b3a5d54c667d593",
+        "todo_scanned_91c3bbe034ecb86e7c94d3f2c6b18815",
+        "todo_scanned_297594a6a3ba497d34766e479511f4a5",
+        "todo_scanned_700c3b5f5cebf2652fe183e5b9768375",
+        "todo_scanned_cffe181257a71e3e34a78094e90278e2",
+        "todo_scanned_3aded4954788bd37148422a74dc07351",
+        "todo_scanned_922b10317d6232d8bc06175f78854936",
+        "todo_scanned_ebc1f49b2fdb86787c386f4ae5337656",
+        "todo_scanned_071a604f9ee64a7f4335473f45221914",
+        "todo_scanned_48a75410e564b9b15cc748793fe9d01d",
+        "todo_scanned_fec8e6133015a3876f4821792e38feec",
+        "todo_scanned_7a507ea7f2b8fc956e995fe0cd0afd0d",
+        "todo_scanned_e3d146b47aa9dfd045a6e703920d15cf",
+        "todo_scanned_b23f9a6af24d9f507ac1d43fbe331d6a",
+        "todo_scanned_e9bc0fe16f23be6c31444c2b6870c755",
+        "todo_scanned_84794c55b243a973dccd5bd81d558d17"
+      ],
+      "path": ".",
+      "repo_root": ".",
+      "scan_id": "df9207a1cb8b",
+      "sources_scanned": 3105,
+      "todo_count": 32
+    },
+    {
+      "at": "2025-12-20T05:45:53.224401+00:00",
+      "confidence": 0.8823529411764706,
+      "context": "bugfix",
+      "duration_ms": 146,
+      "node_ids": [
+        "todo_scanned_7780fa335e10421b7ee0534644394e2f",
+        "todo_scanned_c1a1810cb70286fbccb713470d5be3f6",
+        "todo_scanned_2d095113f46ae133b9226b1e6ca88cab",
+        "todo_scanned_3616bdda3b6063ff77db6e8c3699fb3e",
+        "todo_scanned_7ccafce4eb046c144413db90918dc66d",
+        "todo_scanned_883adff5752a37b1feb7bd2d588690bc",
+        "todo_scanned_6c2ad86ffabec78c9b7195062c5c3df6",
+        "todo_scanned_edcb192eccfb404355eea7b2a7267060",
+        "todo_scanned_3b7a0c7c868f20670f880fa4b03bf45f",
+        "todo_scanned_afa78a51e830015a2eb136bd91693aa1",
+        "todo_scanned_b17ef239cb0c39f558f276d292da2d5c",
+        "todo_scanned_844d219e39f661e17b786fd64b8341a7",
+        "todo_scanned_b7ebd95473608cecbe26ec407432212b",
+        "todo_scanned_24f82e085cc1e46c1545b717b5c5ade0",
+        "todo_scanned_6b3fac66341099cb1fbb12919919ccbd",
+        "todo_scanned_150af201e2f2d859668cea1469abdf5c",
+        "todo_scanned_efa58a6df3d19a346b3a5d54c667d593",
+        "todo_scanned_91c3bbe034ecb86e7c94d3f2c6b18815",
+        "todo_scanned_297594a6a3ba497d34766e479511f4a5",
+        "todo_scanned_700c3b5f5cebf2652fe183e5b9768375",
+        "todo_scanned_cffe181257a71e3e34a78094e90278e2",
+        "todo_scanned_3aded4954788bd37148422a74dc07351",
+        "todo_scanned_922b10317d6232d8bc06175f78854936",
+        "todo_scanned_ebc1f49b2fdb86787c386f4ae5337656",
+        "todo_scanned_071a604f9ee64a7f4335473f45221914",
+        "todo_scanned_48a75410e564b9b15cc748793fe9d01d",
+        "todo_scanned_fec8e6133015a3876f4821792e38feec",
+        "todo_scanned_7a507ea7f2b8fc956e995fe0cd0afd0d",
+        "todo_scanned_e3d146b47aa9dfd045a6e703920d15cf",
+        "todo_scanned_b23f9a6af24d9f507ac1d43fbe331d6a",
+        "todo_scanned_71a4f9e72bba78b853f043c0e9e43911",
+        "todo_scanned_49d858aa2265cc66b33920a290ef1414",
+        "todo_scanned_716bb3f4671e5eb3e14e388e67893365",
+        "todo_scanned_7cd33be9c10a01f94c98641eeab4272d"
+      ],
+      "path": ".",
+      "repo_root": ".",
+      "scan_id": "deccc52b2594",
+      "sources_scanned": 3105,
+      "todo_count": 34
+    },
+    {
+      "at": "2025-12-20T05:49:43.037207+00:00",
+      "confidence": 0.8947368421052632,
+      "context": "bugfix",
+      "duration_ms": 145,
+      "node_ids": [
+        "todo_scanned_7213b1766ac99790b6c7f6c3b54952b3",
+        "todo_scanned_9b361db588fad6d46bcf1c835017f9bc",
+        "todo_scanned_718d773b6f811f21d434918aae3765c4",
+        "todo_scanned_d45a02964d0b7c1a9a40542a52f01367",
+        "todo_scanned_8abdce8ca1290f187f00af4cc11d59b6",
+        "todo_scanned_a9f3d5711a320e71aa9d92d2c2f789da",
+        "todo_scanned_4dc39d10b3bb4556c955d11918fb7b4a",
+        "todo_scanned_7dcb04272b8bdc5177816d47a7c81f65",
+        "todo_scanned_cf4b2c2c53c171d92fd5ccf46990c6ab",
+        "todo_scanned_95abd0cbc807d9da969991c15c1960b4",
+        "todo_scanned_f0d76985ade656356c94a8bce99b4e7e",
+        "todo_scanned_a24f5f614a9fccdf9aeaaec4e4562538",
+        "todo_scanned_cd3919f94dc91f3c508b6403864e52c3",
+        "todo_scanned_f6ba8fe5edcef42847b78912ebd21c84",
+        "todo_scanned_1893e72786bd98f2d1198e44ba8f4737",
+        "todo_scanned_beb6db548214ab31d73067944527a03f",
+        "todo_scanned_b488e9d9aac71ebe2c4ea64821794168",
+        "todo_scanned_e30870f43907836adb6b1b950a2cf097",
+        "todo_scanned_58ba8e9c509e7bb3c1682539dddb8cc5",
+        "todo_scanned_0582af9fb95052eed7b8c1b6bbada904",
+        "todo_scanned_444292cdf4171f9bae827658a6912a58",
+        "todo_scanned_f21e3373d5c54aaf4319657ffeb78c0f",
+        "todo_scanned_57cdef360fc6edea2ecf900e42f8d1f9",
+        "todo_scanned_ba1a1610785c33281b98a9edba21c5fc",
+        "todo_scanned_b0f4ac7dbcac9928eca42ed7769a320b",
+        "todo_scanned_95c8d3c34b14a0dc5803f273f0e9b379",
+        "todo_scanned_5dcdc9b4f557359fc4840323a226be8e",
+        "todo_scanned_2b79df86e567499765878b4f30566ed3",
+        "todo_scanned_a4c4044611f09996e65dc2fb9870907a",
+        "todo_scanned_b9f33fa0857a026f6190be7b2d31cac8",
+        "todo_scanned_acda5cf02793bf2f9730cefcfd109181",
+        "todo_scanned_0368c6e654e6692f757732418bcb51fd",
+        "todo_scanned_4e0a5d2650ef4de00425c2f42d32029c",
+        "todo_scanned_e19ab887232e17499ad3461f6c25ce6f",
+        "todo_scanned_1260389bed4cf90878f12f209cda567a",
+        "todo_scanned_96ce9255358c514772e37b30ab0bd5a3",
+        "todo_scanned_224e44becae205c2c4d247ff814ff91c",
+        "todo_scanned_8d60c4a60176eb71633525730547d0ae"
+      ],
+      "path": ".",
+      "repo_root": ".",
+      "scan_id": "b7ea6916adb8",
+      "sources_scanned": 3105,
+      "todo_count": 38
+    },
+    {
+      "at": "2025-12-20T05:49:47.444419+00:00",
+      "confidence": 0.9166666666666666,
+      "context": "bugfix",
+      "duration_ms": 97,
+      "node_ids": [
+        "todo_scanned_7213b1766ac99790b6c7f6c3b54952b3",
+        "todo_scanned_9b361db588fad6d46bcf1c835017f9bc",
+        "todo_scanned_718d773b6f811f21d434918aae3765c4",
+        "todo_scanned_d45a02964d0b7c1a9a40542a52f01367",
+        "todo_scanned_8abdce8ca1290f187f00af4cc11d59b6",
+        "todo_scanned_a9f3d5711a320e71aa9d92d2c2f789da",
+        "todo_scanned_4dc39d10b3bb4556c955d11918fb7b4a",
+        "todo_scanned_7dcb04272b8bdc5177816d47a7c81f65",
+        "todo_scanned_cf4b2c2c53c171d92fd5ccf46990c6ab",
+        "todo_scanned_95abd0cbc807d9da969991c15c1960b4",
+        "todo_scanned_f0d76985ade656356c94a8bce99b4e7e",
+        "todo_scanned_a24f5f614a9fccdf9aeaaec4e4562538",
+        "todo_scanned_cd3919f94dc91f3c508b6403864e52c3",
+        "todo_scanned_f6ba8fe5edcef42847b78912ebd21c84",
+        "todo_scanned_1893e72786bd98f2d1198e44ba8f4737",
+        "todo_scanned_beb6db548214ab31d73067944527a03f",
+        "todo_scanned_b488e9d9aac71ebe2c4ea64821794168",
+        "todo_scanned_e30870f43907836adb6b1b950a2cf097",
+        "todo_scanned_58ba8e9c509e7bb3c1682539dddb8cc5",
+        "todo_scanned_0582af9fb95052eed7b8c1b6bbada904",
+        "todo_scanned_444292cdf4171f9bae827658a6912a58",
+        "todo_scanned_f21e3373d5c54aaf4319657ffeb78c0f",
+        "todo_scanned_57cdef360fc6edea2ecf900e42f8d1f9",
+        "todo_scanned_ba1a1610785c33281b98a9edba21c5fc",
+        "todo_scanned_b0f4ac7dbcac9928eca42ed7769a320b",
+        "todo_scanned_95c8d3c34b14a0dc5803f273f0e9b379",
+        "todo_scanned_5dcdc9b4f557359fc4840323a226be8e",
+        "todo_scanned_2b79df86e567499765878b4f30566ed3",
+        "todo_scanned_a4c4044611f09996e65dc2fb9870907a",
+        "todo_scanned_b9f33fa0857a026f6190be7b2d31cac8",
+        "todo_scanned_20f5e325a2371030e8a7a82162cdeaec",
+        "todo_scanned_5423829e998d27352f571667570c7431",
+        "todo_scanned_69b433ed8dbe09729a4a2d82e5bd888f",
+        "todo_scanned_2ea8e9cf7282e4c4d92bab030b8bcb6a",
+        "todo_scanned_38f92d0fc50291f84bc1e35f4e4a57e6",
+        "todo_scanned_f406b345d00e12403ab1509fd94e30d9",
+        "todo_scanned_168e06f40096d3b64ee302fd9df75cbd",
+        "todo_scanned_12a52f2cd0aeb81bc658e72a0b1ec976",
+        "todo_scanned_38624ec791681ec2c7a198a4711fe524",
+        "todo_scanned_5d792bae7abadd8cc1fb6768ef7778a6",
+        "todo_scanned_8cb67a561ae234af13daeb266e024563",
+        "todo_scanned_3aec70d7dc7ea6252c7f41ee5c21bd15",
+        "todo_scanned_f8f430dfcb22afd2989d807a478b9f1a",
+        "todo_scanned_8d798584f833bb94769aedb317700d97",
+        "todo_scanned_eeda775add5af71a9d4ef06f3d19ec76",
+        "todo_scanned_edb98a8fcdc9fe7ac6534f5deca559d6",
+        "todo_scanned_69efa7e6c391a7e85adae19b8d56801e",
+        "todo_scanned_d270b3ff179fae432c8a43e3484b98a3"
+      ],
+      "path": ".",
+      "repo_root": ".",
+      "scan_id": "a8f04c34a80b",
+      "sources_scanned": 3105,
+      "todo_count": 48
+    }
+  ],
+  "schema_version": 1,
+  "state": {
+    "current_node_ids": [
+      "todo_scanned_7213b1766ac99790b6c7f6c3b54952b3",
+      "todo_scanned_9b361db588fad6d46bcf1c835017f9bc",
+      "todo_scanned_718d773b6f811f21d434918aae3765c4",
+      "todo_scanned_d45a02964d0b7c1a9a40542a52f01367",
+      "todo_scanned_8abdce8ca1290f187f00af4cc11d59b6",
+      "todo_scanned_a9f3d5711a320e71aa9d92d2c2f789da",
+      "todo_scanned_4dc39d10b3bb4556c955d11918fb7b4a",
+      "todo_scanned_7dcb04272b8bdc5177816d47a7c81f65",
+      "todo_scanned_cf4b2c2c53c171d92fd5ccf46990c6ab",
+      "todo_scanned_95abd0cbc807d9da969991c15c1960b4",
+      "todo_scanned_f0d76985ade656356c94a8bce99b4e7e",
+      "todo_scanned_a24f5f614a9fccdf9aeaaec4e4562538",
+      "todo_scanned_cd3919f94dc91f3c508b6403864e52c3",
+      "todo_scanned_f6ba8fe5edcef42847b78912ebd21c84",
+      "todo_scanned_1893e72786bd98f2d1198e44ba8f4737",
+      "todo_scanned_beb6db548214ab31d73067944527a03f",
+      "todo_scanned_b488e9d9aac71ebe2c4ea64821794168",
+      "todo_scanned_e30870f43907836adb6b1b950a2cf097",
+      "todo_scanned_58ba8e9c509e7bb3c1682539dddb8cc5",
+      "todo_scanned_0582af9fb95052eed7b8c1b6bbada904",
+      "todo_scanned_444292cdf4171f9bae827658a6912a58",
+      "todo_scanned_f21e3373d5c54aaf4319657ffeb78c0f",
+      "todo_scanned_57cdef360fc6edea2ecf900e42f8d1f9",
+      "todo_scanned_ba1a1610785c33281b98a9edba21c5fc",
+      "todo_scanned_b0f4ac7dbcac9928eca42ed7769a320b",
+      "todo_scanned_95c8d3c34b14a0dc5803f273f0e9b379",
+      "todo_scanned_5dcdc9b4f557359fc4840323a226be8e",
+      "todo_scanned_2b79df86e567499765878b4f30566ed3",
+      "todo_scanned_a4c4044611f09996e65dc2fb9870907a",
+      "todo_scanned_b9f33fa0857a026f6190be7b2d31cac8",
+      "todo_scanned_20f5e325a2371030e8a7a82162cdeaec",
+      "todo_scanned_5423829e998d27352f571667570c7431",
+      "todo_scanned_69b433ed8dbe09729a4a2d82e5bd888f",
+      "todo_scanned_2ea8e9cf7282e4c4d92bab030b8bcb6a",
+      "todo_scanned_38f92d0fc50291f84bc1e35f4e4a57e6",
+      "todo_scanned_f406b345d00e12403ab1509fd94e30d9",
+      "todo_scanned_168e06f40096d3b64ee302fd9df75cbd",
+      "todo_scanned_12a52f2cd0aeb81bc658e72a0b1ec976",
+      "todo_scanned_38624ec791681ec2c7a198a4711fe524",
+      "todo_scanned_5d792bae7abadd8cc1fb6768ef7778a6",
+      "todo_scanned_8cb67a561ae234af13daeb266e024563",
+      "todo_scanned_3aec70d7dc7ea6252c7f41ee5c21bd15",
+      "todo_scanned_f8f430dfcb22afd2989d807a478b9f1a",
+      "todo_scanned_8d798584f833bb94769aedb317700d97",
+      "todo_scanned_eeda775add5af71a9d4ef06f3d19ec76",
+      "todo_scanned_edb98a8fcdc9fe7ac6534f5deca559d6",
+      "todo_scanned_69efa7e6c391a7e85adae19b8d56801e",
+      "todo_scanned_d270b3ff179fae432c8a43e3484b98a3"
+    ],
+    "current_scan_id": "a8f04c34a80b"
+  }
+}

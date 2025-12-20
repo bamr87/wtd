@@ -25,6 +25,7 @@ from textual.widgets.tree import TreeNode
 
 from wtd.core.models import TodoContext, TodoNode, TodoPriority, TodoStatus
 from wtd.core.tree import TodoTree
+from wtd.core.tree_store import TreeStore
 
 
 # Status styles
@@ -255,10 +256,11 @@ class Dashboard(App):
         Binding("?", "help", "Help"),
     ]
 
-    def __init__(self, tree: TodoTree | None = None, **kwargs):
+    def __init__(self, tree: TodoTree | None = None, store: TreeStore | None = None, **kwargs):
         super().__init__(**kwargs)
         self.todo_tree = tree or TodoTree()
         self.selected_node_id: UUID | None = None
+        self.store = store
 
     def compose(self) -> ComposeResult:
         yield Header(show_clock=True)
@@ -313,6 +315,9 @@ class Dashboard(App):
         """Execute selected TODO."""
         if self.selected_node_id:
             self.todo_tree.start_node(self.selected_node_id)
+            if self.store:
+                self.store.apply_tree(self.todo_tree, source="dashboard_execute")
+                self.store.save()
             self.action_refresh()
             self.notify("Started TODO execution", severity="information")
 
@@ -320,6 +325,9 @@ class Dashboard(App):
         """Mark selected TODO as complete."""
         if self.selected_node_id:
             self.todo_tree.complete_node(self.selected_node_id)
+            if self.store:
+                self.store.apply_tree(self.todo_tree, source="dashboard_complete")
+                self.store.save()
             self.action_refresh()
             self.notify("TODO completed!", severity="information")
 
@@ -333,6 +341,9 @@ class Dashboard(App):
         """Cancel selected TODO."""
         if self.selected_node_id:
             self.todo_tree.cancel_node(self.selected_node_id)
+            if self.store:
+                self.store.apply_tree(self.todo_tree, source="dashboard_cancel")
+                self.store.save()
             self.action_refresh()
             self.notify("TODO cancelled", severity="warning")
 
@@ -345,8 +356,8 @@ class Dashboard(App):
         )
 
 
-def run_dashboard(tree: TodoTree) -> None:
+def run_dashboard(tree: TodoTree, store: TreeStore | None = None) -> None:
     """Run the dashboard application."""
-    app = Dashboard(tree=tree)
+    app = Dashboard(tree=tree, store=store)
     app.run()
 

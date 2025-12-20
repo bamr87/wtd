@@ -312,7 +312,8 @@ class TodoTree:
     def to_dict(self) -> dict:
         """Serialize tree to dictionary."""
         return {
-            "nodes": {str(k): v.model_dump() for k, v in self._nodes.items()},
+            # Use JSON mode so datetime/Path/etc serialize cleanly for tree.json
+            "nodes": {str(k): v.model_dump(mode="json") for k, v in self._nodes.items()},
             "root_ids": [str(rid) for rid in self._root_ids],
         }
 

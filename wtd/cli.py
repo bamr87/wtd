@@ -21,6 +21,7 @@ from wtd.config import WTDConfig, get_config
 from wtd.core.agent import WTDAgent
 from wtd.core.scanner import TodoScanner
 from wtd.core.tree import TodoTree
+from wtd.core.tree_store import TreeStore, find_repo_root
 from wtd.core.workspace import WorkspaceOrchestrator
 from wtd.ui.output import (
     console,
@@ -160,11 +161,18 @@ async def _main_flow(
 
     console.info(f"Detected context: [bold]{context.value}[/]")
 
-    # Step 3: Initialize TODO tree
-    tree = agent.initialize_tree(scan_result)
+    # Step 3: Persist/merge into tree.json (core repo DNA + history)
+    repo_root = find_repo_root(path)
+    store = TreeStore(repo_root).load()
+    current_node_ids = store.merge_scan(scan_result, scan_path=path)
+    store.save()
+
+    # Step 4: Initialize TODO tree from tree.json (source of truth)
+    tree = store.to_todotree(node_ids=current_node_ids, include_done=True)
+    agent.tree = tree
     print_todo_tree(tree)
 
-    # Step 4: Suggest and set up workspace
+    # Step 5: Suggest and set up workspace
     workspace_config = await agent.suggest_workspace(context, scan_result.todos)
     
     if workspace_config.files_to_open or workspace_config.terminals or workspace_config.browser_urls:
@@ -178,14 +186,14 @@ async def _main_flow(
             
             print_workspace_setup(results)
 
-    # Step 5: Run interactive dashboard or execute
+    # Step 6: Run interactive dashboard or execute
     if interactive:
         console.info("Launching interactive dashboard...")
         console.print()
         console.print("[dim]Press 'q' to quit, '?' for help[/]")
         
         from wtd.ui.dashboard import run_dashboard
-        run_dashboard(tree)
+        run_dashboard(tree, store=store)
     else:
         # Execute mode
         next_todo = tree.get_next_actionable()
@@ -201,6 +209,10 @@ async def _main_flow(
                     progress.remove_task(task)
                 
                 print_execution_result(next_todo, result)
+
+                # Persist any state changes (status/actions/spawned children) back to tree.json
+                store.apply_tree(agent.tree, source="cli_execute")
+                store.save()
                 
                 if result.spawned_todos:
                     # Update tree visualization
@@ -232,6 +244,12 @@ def scan(
         scanner = TodoScanner(scan_path)
         result = await scanner.scan()
         print_scan_result(result)
+
+        # Persist scan into tree.json
+        repo_root = find_repo_root(scan_path)
+        store = TreeStore(repo_root).load()
+        store.merge_scan(result, scan_path=scan_path)
+        store.save()
         return result
 
     asyncio.run(_scan())
@@ -256,13 +274,17 @@ def dashboard(
         scanner = TodoScanner(scan_path)
         scan_result = await scanner.scan()
         
-        # Initialize tree
-        tree = TodoTree()
-        tree.add_todos(scan_result.todos)
+        # Persist + load tree from tree.json
+        repo_root = find_repo_root(scan_path)
+        store = TreeStore(repo_root).load()
+        node_ids = store.merge_scan(scan_result, scan_path=scan_path)
+        store.save()
+
+        tree = store.to_todotree(node_ids=node_ids, include_done=True)
         
         # Run dashboard
         from wtd.ui.dashboard import run_dashboard
-        run_dashboard(tree)
+        run_dashboard(tree, store=store)
 
     asyncio.run(_dashboard())
 
@@ -298,9 +320,15 @@ def execute(
             console.warning("No TODOs found.")
             return
         
-        # Initialize
+        # Persist + load tree from tree.json
+        repo_root = find_repo_root(scan_path)
+        store = TreeStore(repo_root).load()
+        node_ids = store.merge_scan(scan_result, scan_path=scan_path)
+        store.save()
+
         agent = WTDAgent(config)
-        tree = agent.initialize_tree(scan_result)
+        tree = store.to_todotree(node_ids=node_ids, include_done=True)
+        agent.tree = tree
         
         # Get next actionable
         next_todo = tree.get_next_actionable()
@@ -314,6 +342,8 @@ def execute(
         if auto or Confirm.ask("Execute?", default=True):
             result = await agent.execute_todo(next_todo)
             print_execution_result(next_todo, result)
+            store.apply_tree(agent.tree, source="cli_execute_command")
+            store.save()
 
     asyncio.run(_execute())
 
@@ -335,9 +365,13 @@ def status(
     async def _status():
         scanner = TodoScanner(scan_path)
         scan_result = await scanner.scan()
-        
-        tree = TodoTree()
-        tree.add_todos(scan_result.todos)
+
+        repo_root = find_repo_root(scan_path)
+        store = TreeStore(repo_root).load()
+        node_ids = store.merge_scan(scan_result, scan_path=scan_path)
+        store.save()
+
+        tree = store.to_todotree(node_ids=node_ids, include_done=True)
         
         print_todo_tree(tree)
 

@@ -23,6 +23,7 @@ from wtd.core.models import (
 from wtd.core.scanner import TodoScanner
 from wtd.core.tree import TodoTree
 from wtd.core.workspace import WorkspaceOrchestrator
+from wtd.core.tree_store import TreeStore, find_repo_root
 
 
 def create_app() -> FastAPI:
@@ -48,6 +49,7 @@ def create_app() -> FastAPI:
     # Global state (in production, use proper state management)
     app.state.trees: dict[str, TodoTree] = {}
     app.state.agents: dict[str, WTDAgent] = {}
+    app.state.stores: dict[str, TreeStore] = {}
 
     # Request/Response models
     class ScanRequest(BaseModel):
@@ -132,11 +134,20 @@ def create_app() -> FastAPI:
         config = get_config()
         agent = WTDAgent(config)
         context = await agent.analyze_context(result)
-        tree = agent.initialize_tree(result)
+
+        # Persist/merge into tree.json (repo source of truth)
+        repo_root = find_repo_root(scan_path)
+        store = TreeStore(repo_root).load()
+        node_ids = store.merge_scan(result, scan_path=scan_path)
+        store.save()
+
+        tree = store.to_todotree(node_ids=node_ids, include_done=True)
+        agent.tree = tree
         
         # Store in app state
         app.state.trees[session_id] = tree
         app.state.agents[session_id] = agent
+        app.state.stores[session_id] = store
         
         return ScanResponse(
             context=context.value,
@@ -166,6 +177,7 @@ def create_app() -> FastAPI:
         """
         tree = app.state.trees.get(request.session_id)
         agent = app.state.agents.get(request.session_id)
+        store = app.state.stores.get(request.session_id)
         
         if not tree or not agent:
             raise HTTPException(status_code=404, detail="Session not found")
@@ -187,6 +199,11 @@ def create_app() -> FastAPI:
         
         # Execute
         result = await agent.execute_todo(todo)
+
+        # Persist tree changes
+        if store is not None:
+            store.apply_tree(agent.tree, source="api_execute")
+            store.save()
         
         return ExecuteResponse(
             success=result.success,
@@ -257,6 +274,7 @@ def create_app() -> FastAPI:
         """Spawn subtasks for a TODO."""
         tree = app.state.trees.get(request.session_id)
         agent = app.state.agents.get(request.session_id)
+        store = app.state.stores.get(request.session_id)
         
         if not tree or not agent:
             raise HTTPException(status_code=404, detail="Session not found")
@@ -270,6 +288,10 @@ def create_app() -> FastAPI:
         
         # Spawn them
         spawned = tree.spawn_children(UUID(request.parent_id), subtasks_data)
+
+        if store is not None:
+            store.apply_tree(tree, source="api_spawn")
+            store.save()
         
         return SpawnResponse(
             spawned=[
@@ -287,6 +309,7 @@ def create_app() -> FastAPI:
     async def complete_todo(session_id: str, todo_id: str):
         """Mark a TODO as complete."""
         tree = app.state.trees.get(session_id)
+        store = app.state.stores.get(session_id)
         
         if not tree:
             raise HTTPException(status_code=404, detail="Session not found")
@@ -295,6 +318,10 @@ def create_app() -> FastAPI:
         
         if not success:
             raise HTTPException(status_code=400, detail="Could not complete TODO")
+
+        if store is not None:
+            store.apply_tree(tree, source="api_complete")
+            store.save()
         
         return {"success": True, "progress": tree.get_progress()}
 
