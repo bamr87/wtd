@@ -182,6 +182,7 @@ class TreeStore:
             self._append_event("store_corrupt_or_unreadable", {"path": str(self.tree_path)})
         self._ensure_shape()
         self._normalize_repo_metadata()
+        self._purge_self_scanned_nodes()
         return self
 
     def save(self) -> None:
@@ -594,5 +595,44 @@ class TreeStore:
         self._data["indexes"]["contexts"] = ctx_idx
         self._data["indexes"]["status_counts"] = status_counts
         self._data["repo"]["last_scan_at"] = now
+
+    def _purge_self_scanned_nodes(self) -> None:
+        """
+        Remove nodes that were accidentally created by scanning `tree.json` itself.
+
+        This can happen because the scanner's comment regex can match TODO-like strings
+        inside JSON string values (e.g. raw_text fields).
+        """
+        nodes = self._data.get("nodes", {}) or {}
+        if not nodes:
+            return
+
+        to_delete: list[str] = []
+        for nid, rec in list(nodes.items()):
+            src = (rec.get("source") or {}) if isinstance(rec, dict) else {}
+            fp = src.get("file_path")
+            if fp == "tree.json" or (isinstance(fp, str) and fp.endswith("/tree.json")):
+                to_delete.append(nid)
+
+        if not to_delete:
+            return
+
+        for nid in to_delete:
+            nodes.pop(nid, None)
+
+        # Remove from current state view
+        state = self._data.get("state", {}) or {}
+        cur = state.get("current_node_ids") or []
+        state["current_node_ids"] = [nid for nid in cur if nid not in set(to_delete)]
+
+        # Also remove from file index if present
+        idx_files = (self._data.get("indexes", {}) or {}).get("files", {})
+        if isinstance(idx_files, dict):
+            idx_files.pop("tree.json", None)
+
+        self._append_event(
+            "purged_self_scanned_nodes",
+            {"count": len(to_delete), "reason": "scanner self-ingestion of tree.json"},
+        )
 
 

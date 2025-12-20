@@ -92,7 +92,9 @@ class WorkspaceOrchestrator:
             stdout=asyncio.subprocess.DEVNULL,
             stderr=asyncio.subprocess.DEVNULL,
         )
-        return process.returncode == 0 or process.returncode is None
+        # Ensure subprocess transports close cleanly before the event loop shuts down
+        await process.wait()
+        return process.returncode == 0
 
     async def open_file_in_vscode(self, file_path: Path, line: int | None = None) -> bool:
         """Open a specific file in VSCode."""
@@ -111,7 +113,8 @@ class WorkspaceOrchestrator:
             stdout=asyncio.subprocess.DEVNULL,
             stderr=asyncio.subprocess.DEVNULL,
         )
-        return process.returncode == 0 or process.returncode is None
+        await process.wait()
+        return process.returncode == 0
 
     async def open_browser(self, url: str) -> bool:
         """Open a URL in the default browser."""
@@ -171,7 +174,8 @@ class WorkspaceOrchestrator:
                 stdout=asyncio.subprocess.DEVNULL,
                 stderr=asyncio.subprocess.DEVNULL,
             )
-            return process.returncode == 0 or process.returncode is None
+            await process.wait()
+            return process.returncode == 0
 
         elif self.system == "Linux":
             # Try common terminal emulators
@@ -188,7 +192,8 @@ class WorkspaceOrchestrator:
                         stdout=asyncio.subprocess.DEVNULL,
                         stderr=asyncio.subprocess.DEVNULL,
                     )
-                    return True
+                    await process.wait()
+                    return process.returncode == 0
                 except FileNotFoundError:
                     continue
             return False

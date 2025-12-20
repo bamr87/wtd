@@ -103,12 +103,26 @@ def main(
     
     print_banner()
     
-    asyncio.run(_main_flow(
-        scan_path,
-        interactive=interactive,
-        auto_execute=auto_execute,
-        provider=provider,
-    ))
+    result = asyncio.run(
+        _main_flow(
+            scan_path,
+            interactive=interactive,
+            auto_execute=auto_execute,
+            provider=provider,
+        )
+    )
+
+    # If interactive, start the Textual dashboard AFTER asyncio.run() completes.
+    # Textual's App.run() uses asyncio.run() internally and will crash if called
+    # from within an already-running event loop.
+    if interactive and result is not None:
+        tree, store = result
+        console.info("Launching interactive dashboard...")
+        console.print()
+        console.print("[dim]Press 'q' to quit, '?' for help[/]")
+        from wtd.ui.dashboard import run_dashboard
+
+        run_dashboard(tree, store=store)
 
 
 async def _main_flow(
@@ -117,7 +131,13 @@ async def _main_flow(
     auto_execute: bool = False,
     provider: str | None = None,
 ):
-    """Main WTD flow."""
+    """
+    Main WTD flow.
+
+    IMPORTANT: When `interactive=True`, this coroutine must NOT start the Textual UI
+    (Textual uses `asyncio.run()` internally). Instead, we return `(tree, store)` so
+    the caller can start the dashboard outside the running event loop.
+    """
     config = get_config()
     
     if provider:
@@ -188,12 +208,7 @@ async def _main_flow(
 
     # Step 6: Run interactive dashboard or execute
     if interactive:
-        console.info("Launching interactive dashboard...")
-        console.print()
-        console.print("[dim]Press 'q' to quit, '?' for help[/]")
-        
-        from wtd.ui.dashboard import run_dashboard
-        run_dashboard(tree, store=store)
+        return tree, store
     else:
         # Execute mode
         next_todo = tree.get_next_actionable()
@@ -224,6 +239,7 @@ async def _main_flow(
         
         if not next_todo:
             console.success("All TODOs completed! 🎉")
+    return None
 
 
 @app.command()
@@ -281,12 +297,14 @@ def dashboard(
         store.save()
 
         tree = store.to_todotree(node_ids=node_ids, include_done=True)
-        
-        # Run dashboard
-        from wtd.ui.dashboard import run_dashboard
-        run_dashboard(tree, store=store)
+        return tree, store
 
-    asyncio.run(_dashboard())
+    tree, store = asyncio.run(_dashboard())
+    from wtd.ui.dashboard import run_dashboard
+    console.info("Launching interactive dashboard...")
+    console.print()
+    console.print("[dim]Press 'q' to quit, '?' for help[/]")
+    run_dashboard(tree, store=store)
 
 
 @app.command()

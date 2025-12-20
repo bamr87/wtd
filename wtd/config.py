@@ -21,7 +21,7 @@ class WTDConfig(BaseSettings):
     )
 
     # LLM Settings
-    llm_provider: Literal["ollama", "openai", "anthropic"] = Field(
+    llm_provider: Literal["ollama", "openai", "anthropic", "mock"] = Field(
         default="ollama",
         description="LLM provider to use",
     )

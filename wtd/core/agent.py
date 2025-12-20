@@ -108,6 +108,49 @@ class OpenAIClient(LLMClient):
             return f"Error: {e}"
 
 
+class MockClient(LLMClient):
+    """
+    Deterministic offline LLM client for tests.
+
+    This intentionally returns small, valid JSON payloads that satisfy the prompts used by WTDAgent.
+    """
+
+    async def generate(self, prompt: str, system: str = "") -> str:
+        p = (prompt or "").lower()
+
+        # Context detection prompt (expects a single word)
+        if "respond with only the context word" in p:
+            return "bugfix"
+
+        # Clarify prompt
+        if "respond with either the question or \"clear\"" in p:
+            return "CLEAR"
+
+        # Subtasks prompt (expects JSON array)
+        if "break down this todo into specific, actionable subtasks" in p and "respond in json format" in p:
+            return json.dumps(
+                [
+                    {"title": "Identify the failing behavior", "description": "Reproduce and isolate", "priority": "high"},
+                    {"title": "Implement the fix", "description": "Make the smallest safe change", "priority": "medium"},
+                ]
+            )
+
+        # Execution plan prompt (expects JSON array of actions)
+        if "plan the execution steps for this todo" in p and "respond in json format" in p:
+            return json.dumps(
+                [
+                    {"action": "open_file", "target": "README.md", "description": "Review context"},
+                    {"action": "run_command", "target": "pytest -q", "description": "Verify behavior"},
+                ]
+            )
+
+        # Fallback: return a minimal valid JSON array to keep callers safe
+        if "respond in json format" in p:
+            return "[]"
+
+        return ""
+
+
 def get_llm_client(config: WTDConfig | None = None) -> LLMClient:
     """Get the appropriate LLM client based on configuration."""
     config = config or get_config()
@@ -116,6 +159,8 @@ def get_llm_client(config: WTDConfig | None = None) -> LLMClient:
         return OllamaClient(config)
     elif config.llm_provider == "openai":
         return OpenAIClient(config)
+    elif config.llm_provider == "mock":
+        return MockClient()
     else:
         # Default to Ollama
         return OllamaClient(config)

@@ -108,12 +108,18 @@ class TodoTreeWidget(Tree):
         self.node_map.clear()
         
         for root in self.todo_tree.root_nodes:
-            self._add_node(self.root, root)
+            self._add_todo_node(self.root, root)
         
         self.root.expand_all()
 
-    def _add_node(self, parent: TreeNode, todo: TodoNode) -> TreeNode:
-        """Add a TodoNode to the tree."""
+    def _add_todo_node(self, parent: TreeNode, todo: TodoNode) -> TreeNode:
+        """
+        Add a TodoNode to the tree.
+
+        NOTE: Do not name this method `_add_node` — Textual's `Tree` uses an internal
+        `_add_node(...)` with a different signature, and overriding it will break
+        Tree initialization.
+        """
         icon = STATUS_ICONS.get(todo.status, "?")
         priority = PRIORITY_ICONS.get(todo.priority, "")
         color = STATUS_COLORS.get(todo.status, "white")
@@ -128,7 +134,7 @@ class TodoTreeWidget(Tree):
         # Add children
         children = self.todo_tree.get_children(todo.id)
         for child in children:
-            self._add_node(node, child)
+            self._add_todo_node(node, child)
         
         return node
 

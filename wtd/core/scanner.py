@@ -127,6 +127,10 @@ class TodoScanner:
         """Scan a single file for TODOs."""
         todos: list[TodoNode] = []
         
+        # Never scan WTD's own repo memory file (prevents recursive self-ingestion)
+        if file_path.name == "tree.json":
+            return todos
+
         try:
             content = await asyncio.to_thread(file_path.read_text, encoding="utf-8")
         except (UnicodeDecodeError, PermissionError, FileNotFoundError):
