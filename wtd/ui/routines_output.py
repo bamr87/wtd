@@ -274,3 +274,5 @@ def print_sync_result(stats: dict[str, int]):
     console.print(f"  Updated: [yellow]{stats['updated']}[/]")
     console.print(f"  Unchanged: [dim]{stats['unchanged']}[/]")
 
+
+

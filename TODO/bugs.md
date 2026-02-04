@@ -16,3 +16,5 @@
 - [ ] Fix: Timestamps show in UTC instead of local timezone
 - [ ] Fix: Long TODO titles get truncated in narrow terminals
 
+
+

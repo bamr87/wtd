@@ -17,6 +17,7 @@ from textual.widgets import (
     Label,
     ListItem,
     ListView,
+    Markdown,
     ProgressBar,
     Static,
     Tree,
@@ -146,40 +147,52 @@ class TodoDetailPanel(Static):
 
     def compose(self) -> ComposeResult:
         yield Static("[bold magenta]Details[/]", classes="panel-title")
-        yield Static("Select a TODO to see details", id="detail-content")
+        with ScrollableContainer(id="detail-scroll"):
+            yield Static("Select a TODO to see details", id="detail-header")
+            yield Markdown("", id="detail-markdown")
 
     def watch_selected_todo(self, todo: TodoNode | None) -> None:
         """Update when selected TODO changes."""
-        content = self.query_one("#detail-content", Static)
+        header = self.query_one("#detail-header", Static)
+        md = self.query_one("#detail-markdown", Markdown)
         
         if todo is None:
-            content.update("Select a TODO to see details")
+            header.update("Select a TODO to see details")
+            md.update("")
             return
         
         icon = STATUS_ICONS.get(todo.status, "?")
         priority = PRIORITY_ICONS.get(todo.priority, "")
         color = STATUS_COLORS.get(todo.status, "white")
         
-        text = f"""[bold]{todo.title}[/]
+        header_text = f"""[bold]{todo.title}[/]
 
 [{color}]Status: {icon} {todo.status.value}[/]
 Priority: {priority} {todo.priority.value}
 Context: {todo.context.value}
 Depth: {todo.depth}
-Fitness: {todo.fitness_score:.2f}
+Fitness: {todo.fitness_score:.2f}"""
 
-{todo.description or 'No description'}
-"""
-        
         if todo.source and todo.source.file_path:
-            text += f"\n[dim]Source: {todo.source.file_path}:{todo.source.line_number}[/]"
-        
+            header_text += f"\n[dim]Source: {todo.source.file_path}:{todo.source.line_number}[/]"
+
+        header.update(header_text)
+
+        md_text = todo.description or "No description"
+
         if todo.actions:
-            text += f"\n\n[bold]Planned Actions:[/]\n"
+            md_text += "\n\n## Planned Actions\n"
             for action in todo.actions[:5]:
-                text += f"  • {action.get('action', 'unknown')}: {action.get('target', '')}\n"
-        
-        content.update(text)
+                action_name = action.get("action", "unknown")
+                target = action.get("target", "")
+                if target:
+                    md_text += f"- `{action_name}`: {target}\n"
+                else:
+                    md_text += f"- `{action_name}`\n"
+
+        # Render markdown for the TODO body (description + actions). This enables
+        # markdown syntax (lists, backticks, emphasis, etc.) in the terminal UI.
+        md.update(md_text)
 
 
 class ActionPanel(Static):
@@ -237,6 +250,10 @@ class Dashboard(App):
     #detail-panel {
         border: solid $secondary;
         padding: 1;
+    }
+
+    #detail-scroll {
+        height: 1fr;
     }
 
     #action-panel {
