@@ -2,12 +2,11 @@
 WTD Configuration Management
 """
 
-import os
 from pathlib import Path
-from typing import Literal
+from typing import Annotated, Literal
 
-from pydantic import Field
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import Field, field_validator
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 
 class WTDConfig(BaseSettings):
@@ -96,10 +95,55 @@ class WTDConfig(BaseSettings):
         description="Show timestamps in output",
     )
 
+    # API / Server Settings
+    api_host: str = Field(
+        default="127.0.0.1",
+        description=(
+            "Host the WTD API server binds to. Defaults to localhost so the "
+            "REST API (which can trigger workspace actions) is not exposed "
+            "on the network. Override only if you know what you're doing."
+        ),
+    )
+    api_port: int = Field(
+        default=8787,
+        ge=1,
+        le=65535,
+        description="Port the WTD API server binds to.",
+    )
+    api_cors_origins: Annotated[list[str], NoDecode] = Field(
+        default_factory=list,
+        description=(
+            "Allowed CORS origins for the WTD API. Empty (default) means "
+            "no cross-origin requests are accepted, which is appropriate "
+            "for the local-first default. Set a comma-separated list via "
+            "WTD_API_CORS_ORIGINS to opt in (e.g. 'http://localhost:3000')."
+        ),
+    )
+
     def ensure_dirs(self) -> None:
         """Ensure required directories exist."""
         self.config_dir.mkdir(parents=True, exist_ok=True)
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
+
+    @field_validator("api_cors_origins", mode="before")
+    @classmethod
+    def _split_cors_origins(cls, value: object) -> object:
+        """Allow comma-separated values from env vars (in addition to JSON)."""
+        if isinstance(value, str):
+            stripped = value.strip()
+            if not stripped:
+                return []
+            # Accept JSON-encoded lists for parity with pydantic-settings.
+            if stripped.startswith("["):
+                import json
+
+                try:
+                    return json.loads(stripped)
+                except json.JSONDecodeError:
+                    # Fall through to comma-splitting on malformed JSON.
+                    pass
+            return [item.strip() for item in stripped.split(",") if item.strip()]
+        return value
 
 
 # Global config instance
@@ -119,4 +163,3 @@ def reset_config() -> None:
     """Reset the global configuration (useful for testing)."""
     global _config
     _config = None
-

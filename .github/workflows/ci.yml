@@ -1,0 +1,89 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint (ruff)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install ruff
+        run: python -m pip install --upgrade pip && pip install "ruff>=0.1.0"
+      - name: ruff check
+        run: ruff check .
+      # ruff format --check is intentionally not enforced yet: large parts
+      # of the codebase predate the formatter. New code is expected to be
+      # formatted; a repo-wide reformat is tracked as a follow-up.
+
+  typecheck:
+    name: Type-check (mypy, advisory)
+    # NOTE: mypy is intentionally non-blocking until the existing baseline
+    # of type errors is cleaned up (see refactor plan). Surfacing issues
+    # in CI today, gating on them in a follow-up.
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install package and mypy
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+      - name: mypy
+        run: mypy wtd
+
+  test:
+    name: Tests (pytest)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+      - name: Install package
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+      - name: pytest
+        run: pytest
+
+  build:
+    name: Build wheel + sdist
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install build
+        run: python -m pip install --upgrade pip build
+      - name: Build distributions
+        run: python -m build
+      - name: Show artifacts
+        run: ls -la dist/
