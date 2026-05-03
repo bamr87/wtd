@@ -17,10 +17,9 @@ import typer
 from rich.prompt import Confirm, Prompt
 
 from wtd import __version__
-from wtd.config import WTDConfig, get_config
+from wtd.config import get_config
 from wtd.core.agent import WTDAgent
 from wtd.core.scanner import TodoScanner
-from wtd.core.tree import TodoTree
 from wtd.core.tree_store import TreeStore, find_repo_root
 from wtd.core.workspace import WorkspaceOrchestrator
 from wtd.ui.output import (
@@ -100,15 +99,17 @@ def main(
 
     # Default behavior: scan and run
     scan_path = path or Path.cwd()
-    
+
     print_banner()
-    
-    asyncio.run(_main_flow(
-        scan_path,
-        interactive=interactive,
-        auto_execute=auto_execute,
-        provider=provider,
-    ))
+
+    asyncio.run(
+        _main_flow(
+            scan_path,
+            interactive=interactive,
+            auto_execute=auto_execute,
+            provider=provider,
+        )
+    )
 
 
 async def _main_flow(
@@ -119,28 +120,29 @@ async def _main_flow(
 ):
     """Main WTD flow."""
     config = get_config()
-    
+
     if provider:
         config.llm_provider = provider
-    
+
     # Step 1: Scan for TODOs
     with console.spinner() as progress:
         task = progress.add_task("Scanning for TODOs...", total=None)
-        
+
         scanner = TodoScanner(path)
         scan_result = await scanner.scan()
-        
+
         progress.remove_task(task)
 
     print_scan_result(scan_result)
 
     if not scan_result.todos:
         console.warning("No TODOs found.")
-        
+
         if Confirm.ask("Would you like to create a new TODO?"):
             todo_text = Prompt.ask("Enter your TODO")
             # Create a manual TODO
             from wtd.core.models import TodoNode, TodoSource
+
             manual_todo = TodoNode(
                 title=todo_text,
                 description=todo_text,
@@ -153,7 +155,7 @@ async def _main_flow(
 
     # Step 2: Initialize agent and analyze context
     agent = WTDAgent(config)
-    
+
     with console.spinner() as progress:
         task = progress.add_task("Analyzing context...", total=None)
         context = await agent.analyze_context(scan_result)
@@ -174,16 +176,20 @@ async def _main_flow(
 
     # Step 5: Suggest and set up workspace
     workspace_config = await agent.suggest_workspace(context, scan_result.todos)
-    
-    if workspace_config.files_to_open or workspace_config.terminals or workspace_config.browser_urls:
+
+    if (
+        workspace_config.files_to_open
+        or workspace_config.terminals
+        or workspace_config.browser_urls
+    ):
         if Confirm.ask("Set up workspace with suggested configuration?", default=True):
             orchestrator = WorkspaceOrchestrator(path)
-            
+
             with console.spinner() as progress:
                 task = progress.add_task("Setting up workspace...", total=None)
                 results = await orchestrator.setup_workspace(workspace_config)
                 progress.remove_task(task)
-            
+
             print_workspace_setup(results)
 
     # Step 6: Run interactive dashboard or execute
@@ -191,37 +197,38 @@ async def _main_flow(
         console.info("Launching interactive dashboard...")
         console.print()
         console.print("[dim]Press 'q' to quit, '?' for help[/]")
-        
+
         from wtd.ui.dashboard import run_dashboard
+
         run_dashboard(tree, store=store)
     else:
         # Execute mode
         next_todo = tree.get_next_actionable()
-        
+
         while next_todo:
             console.print()
             console.rule(f"Next: {next_todo.title}")
-            
+
             if auto_execute or Confirm.ask("Execute this TODO?", default=True):
                 with console.spinner() as progress:
                     task = progress.add_task(f"Executing: {next_todo.title}", total=None)
                     result = await agent.execute_todo(next_todo)
                     progress.remove_task(task)
-                
+
                 print_execution_result(next_todo, result)
 
                 # Persist any state changes (status/actions/spawned children) back to tree.json
                 store.apply_tree(agent.tree, source="cli_execute")
                 store.save()
-                
+
                 if result.spawned_todos:
                     # Update tree visualization
                     print_todo_tree(tree)
             else:
                 break
-            
+
             next_todo = tree.get_next_actionable()
-        
+
         if not next_todo:
             console.success("All TODOs completed! 🎉")
 
@@ -239,7 +246,7 @@ def scan(
     🔍 Scan for TODOs in the current directory or specified path.
     """
     scan_path = path or Path.cwd()
-    
+
     async def _scan():
         scanner = TodoScanner(scan_path)
         result = await scanner.scan()
@@ -273,7 +280,7 @@ def dashboard(
         # Scan
         scanner = TodoScanner(scan_path)
         scan_result = await scanner.scan()
-        
+
         # Persist + load tree from tree.json
         repo_root = find_repo_root(scan_path)
         store = TreeStore(repo_root).load()
@@ -281,9 +288,10 @@ def dashboard(
         store.save()
 
         tree = store.to_todotree(node_ids=node_ids, include_done=True)
-        
+
         # Run dashboard
         from wtd.ui.dashboard import run_dashboard
+
         run_dashboard(tree, store=store)
 
     asyncio.run(_dashboard())
@@ -311,15 +319,15 @@ def execute(
 
     async def _execute():
         config = get_config()
-        
+
         # Scan
         scanner = TodoScanner(scan_path)
         scan_result = await scanner.scan()
-        
+
         if not scan_result.todos:
             console.warning("No TODOs found.")
             return
-        
+
         # Persist + load tree from tree.json
         repo_root = find_repo_root(scan_path)
         store = TreeStore(repo_root).load()
@@ -329,16 +337,16 @@ def execute(
         agent = WTDAgent(config)
         tree = store.to_todotree(node_ids=node_ids, include_done=True)
         agent.tree = tree
-        
+
         # Get next actionable
         next_todo = tree.get_next_actionable()
-        
+
         if not next_todo:
             console.success("No actionable TODOs!")
             return
-        
+
         console.info(f"Next TODO: {next_todo.title}")
-        
+
         if auto or Confirm.ask("Execute?", default=True):
             result = await agent.execute_todo(next_todo)
             print_execution_result(next_todo, result)
@@ -372,7 +380,7 @@ def status(
         store.save()
 
         tree = store.to_todotree(node_ids=node_ids, include_done=True)
-        
+
         print_todo_tree(tree)
 
     asyncio.run(_status())
@@ -406,11 +414,11 @@ def config(
 
     if show or (not provider and not model):
         from rich.table import Table
-        
+
         table = Table(title="WTD Configuration", show_header=True)
         table.add_column("Setting", style="cyan")
         table.add_column("Value", style="green")
-        
+
         table.add_row("LLM Provider", cfg.llm_provider)
         table.add_row("Ollama Model", cfg.ollama_model)
         table.add_row("Ollama Host", cfg.ollama_host)
@@ -420,7 +428,7 @@ def config(
         table.add_row("Timeout (seconds)", str(cfg.timeout_seconds))
         table.add_row("Database Path", str(cfg.db_path))
         table.add_row("Theme", cfg.theme)
-        
+
         console.print(table)
         return
 
@@ -429,30 +437,46 @@ def config(
 
 @app.command()
 def serve(
-    host: str = typer.Option(
-        "127.0.0.1",
+    host: Optional[str] = typer.Option(
+        None,
         "--host",
         "-h",
-        help="Host to bind to",
+        help="Host to bind to (default: WTD_API_HOST or 127.0.0.1)",
     ),
-    port: int = typer.Option(
-        8787,
+    port: Optional[int] = typer.Option(
+        None,
         "--port",
         "-p",
-        help="Port to bind to",
+        help="Port to bind to (default: WTD_API_PORT or 8787)",
     ),
 ):
     """
     🌐 Start the WTD API server.
+
+    Binds to 127.0.0.1 by default. The REST API can trigger workspace
+    actions, so do not expose it on a public interface without setting up
+    authentication first.
     """
     import uvicorn
+
     from wtd.api.app import create_app
-    
-    console.info(f"Starting WTD API server on http://{host}:{port}")
+
+    cfg = get_config()
+    bind_host = host or cfg.api_host
+    bind_port = port if port is not None else cfg.api_port
+
+    if bind_host not in ("127.0.0.1", "localhost", "::1"):
+        console.warning(
+            f"Binding WTD API to {bind_host}: the API can trigger workspace "
+            "actions and currently has no authentication. Make sure this is "
+            "intentional and the network is trusted."
+        )
+
+    console.info(f"Starting WTD API server on http://{bind_host}:{bind_port}")
     console.print("[dim]Press Ctrl+C to stop[/]")
-    
+
     api_app = create_app()
-    uvicorn.run(api_app, host=host, port=port)
+    uvicorn.run(api_app, host=bind_host, port=bind_port)
 
 
 # ============================================================================
@@ -487,8 +511,8 @@ def routines_list(
     📋 List all routines.
     """
     from wtd.core.routines import RoutineManager
-    from wtd.ui.routines_output import print_routine_summary, print_all_routines
-    
+    from wtd.ui.routines_output import print_all_routines, print_routine_summary
+
     manager = RoutineManager()
     print_routine_summary(manager)
     print_all_routines(manager, show_archived)
@@ -500,18 +524,18 @@ def routines_due():
     ⏰ Show routines that are due now.
     """
     from wtd.core.routines import RoutineManager
-    from wtd.ui.routines_output import print_routine_summary, print_due_routines
-    
+    from wtd.ui.routines_output import print_due_routines, print_routine_summary
+
     manager = RoutineManager()
     print_routine_summary(manager)
-    
+
     due = manager.get_due_routines()
     overdue = manager.get_overdue_routines()
-    
+
     if overdue:
         console.print()
         console.print(f"[bold red]🚨 {len(overdue)} Overdue Routine(s)![/]")
-    
+
     print_due_routines(due)
 
 
@@ -522,10 +546,10 @@ def routines_review():
     """
     from wtd.core.routines import RoutineManager
     from wtd.ui.routines_output import print_routines_needing_review
-    
+
     manager = RoutineManager()
     routines = manager.get_routines_needing_review()
-    
+
     console.header("🔍 Routine Review")
     print_routines_needing_review(routines)
 
@@ -541,20 +565,20 @@ def routines_sync(
 ):
     """
     🔄 Sync routines from markdown files.
-    
+
     Scans for routines.md files and imports routine definitions.
     """
     from wtd.core.routines import RoutineManager
     from wtd.ui.routines_output import print_sync_result
-    
+
     scan_path = path or Path.cwd()
     manager = RoutineManager()
-    
+
     with console.spinner() as progress:
         task = progress.add_task("Syncing routines...", total=None)
         stats = manager.sync_from_files(scan_path)
         progress.remove_task(task)
-    
+
     print_sync_result(stats)
 
 
@@ -575,10 +599,11 @@ def routines_complete(
     ✅ Mark a routine as completed for this cycle.
     """
     from uuid import UUID
+
     from wtd.core.routines import RoutineManager
-    
+
     manager = RoutineManager()
-    
+
     # Try to find by ID or title
     routine = None
     try:
@@ -589,14 +614,14 @@ def routines_complete(
             if routine_id.lower() in r.title.lower():
                 routine = r
                 break
-    
+
     if routine is None:
         console.error(f"Routine not found: {routine_id}")
         raise typer.Exit(1)
-    
+
     manager.complete_routine(routine.id, notes)
     console.success(f"Completed: {routine.title}")
-    
+
     if routine.next_due:
         console.info(f"Next due: {routine.next_due.strftime('%Y-%m-%d %H:%M')}")
 
@@ -618,10 +643,11 @@ def routines_skip(
     ⏭️  Skip a routine for this cycle.
     """
     from uuid import UUID
+
     from wtd.core.routines import RoutineManager
-    
+
     manager = RoutineManager()
-    
+
     # Try to find by ID or title
     routine = None
     try:
@@ -631,11 +657,11 @@ def routines_skip(
             if routine_id.lower() in r.title.lower():
                 routine = r
                 break
-    
+
     if routine is None:
         console.error(f"Routine not found: {routine_id}")
         raise typer.Exit(1)
-    
+
     manager.skip_routine(routine.id, reason)
     console.warning(f"Skipped: {routine.title}")
     console.muted("Note: Frequently skipping a routine will flag it for review")
@@ -658,10 +684,11 @@ def routines_snooze(
     💤 Snooze a routine for a specified time.
     """
     from uuid import UUID
+
     from wtd.core.routines import RoutineManager
-    
+
     manager = RoutineManager()
-    
+
     routine = None
     try:
         routine = manager.get(UUID(routine_id))
@@ -670,11 +697,11 @@ def routines_snooze(
             if routine_id.lower() in r.title.lower():
                 routine = r
                 break
-    
+
     if routine is None:
         console.error(f"Routine not found: {routine_id}")
         raise typer.Exit(1)
-    
+
     manager.snooze_routine(routine.id, hours)
     console.info(f"Snoozed '{routine.title}' for {hours} hours")
 
@@ -690,10 +717,11 @@ def routines_pause(
     ⏸️  Pause a routine indefinitely.
     """
     from uuid import UUID
+
     from wtd.core.routines import RoutineManager
-    
+
     manager = RoutineManager()
-    
+
     routine = None
     try:
         routine = manager.get(UUID(routine_id))
@@ -702,11 +730,11 @@ def routines_pause(
             if routine_id.lower() in r.title.lower():
                 routine = r
                 break
-    
+
     if routine is None:
         console.error(f"Routine not found: {routine_id}")
         raise typer.Exit(1)
-    
+
     routine.pause()
     manager._save()
     console.warning(f"Paused: {routine.title}")
@@ -724,10 +752,11 @@ def routines_resume(
     ▶️  Resume a paused routine.
     """
     from uuid import UUID
+
     from wtd.core.routines import RoutineManager
-    
+
     manager = RoutineManager()
-    
+
     routine = None
     try:
         routine = manager.get(UUID(routine_id))
@@ -736,15 +765,15 @@ def routines_resume(
             if routine_id.lower() in r.title.lower():
                 routine = r
                 break
-    
+
     if routine is None:
         console.error(f"Routine not found: {routine_id}")
         raise typer.Exit(1)
-    
+
     routine.resume()
     manager._save()
     console.success(f"Resumed: {routine.title}")
-    
+
     if routine.next_due:
         console.info(f"Next due: {routine.next_due.strftime('%Y-%m-%d %H:%M')}")
 
@@ -758,12 +787,12 @@ def routines_trigger(
 ):
     """
     ⚡ Trigger conditional routines.
-    
+
     Use this to manually trigger event-based routines like on-release or on-deploy.
     """
     from wtd.core.routines import RoutineManager, RoutineTrigger
     from wtd.ui.routines_output import print_due_routines
-    
+
     # Map trigger name
     trigger_map = {
         "on-release": RoutineTrigger.ON_RELEASE,
@@ -774,16 +803,16 @@ def routines_trigger(
         "on-merge": RoutineTrigger.ON_MERGE,
         "on-startup": RoutineTrigger.ON_STARTUP,
     }
-    
+
     trigger = trigger_map.get(trigger_name.lower())
     if trigger is None:
         console.error(f"Unknown trigger: {trigger_name}")
         console.info(f"Valid triggers: {', '.join(trigger_map.keys())}")
         raise typer.Exit(1)
-    
+
     manager = RoutineManager()
     triggered = manager.trigger_conditional(trigger)
-    
+
     if triggered:
         console.success(f"Triggered {len(triggered)} routine(s) for '{trigger_name}'")
         print_due_routines(triggered)
@@ -793,4 +822,3 @@ def routines_trigger(
 
 if __name__ == "__main__":
     app()
-

@@ -16,33 +16,24 @@ from wtd.core.models import (
 )
 from wtd.core.tree import TodoTree
 
-
 # System prompts for different contexts
 CONTEXT_PROMPTS = {
     TodoContext.BUGFIX: """You are a debugging expert. Analyze the bug, identify root cause, and create a systematic fix plan.
 Focus on: reproduction steps, root cause analysis, fix implementation, testing verification.""",
-
     TodoContext.WRITE: """You are a technical writer. Create compelling, well-structured content.
 Focus on: outline, research, drafting, editing, publishing preparation.""",
-
     TodoContext.PLAN: """You are a strategic planner. Break down complex goals into actionable milestones.
 Focus on: requirements gathering, timeline estimation, resource allocation, risk assessment.""",
-
     TodoContext.LEARN: """You are an educational guide. Create effective learning paths.
 Focus on: prerequisites, core concepts, practical exercises, knowledge validation.""",
-
     TodoContext.BUILD: """You are a software architect. Design and implement robust solutions.
 Focus on: design, implementation, integration, documentation.""",
-
     TodoContext.REFACTOR: """You are a code quality expert. Improve code without changing behavior.
 Focus on: identifying smells, planning changes, safe refactoring, verification.""",
-
     TodoContext.TEST: """You are a QA engineer. Ensure comprehensive test coverage.
 Focus on: test strategy, test cases, automation, coverage analysis.""",
-
     TodoContext.DEPLOY: """You are a DevOps engineer. Ensure smooth deployments.
 Focus on: preparation, staging, production rollout, monitoring, rollback plan.""",
-
     TodoContext.UNKNOWN: """You are a productivity assistant. Help break down and complete tasks efficiently.
 Focus on: understanding the goal, breaking into subtasks, prioritization, execution.""",
 }
@@ -66,12 +57,12 @@ class OllamaClient(LLMClient):
         """Generate using Ollama."""
         try:
             import ollama
-            
+
             messages = []
             if system:
                 messages.append({"role": "system", "content": system})
             messages.append({"role": "user", "content": prompt})
-            
+
             response = ollama.chat(
                 model=self.config.ollama_model,
                 messages=messages,
@@ -91,19 +82,72 @@ class OpenAIClient(LLMClient):
         """Generate using OpenAI."""
         try:
             from openai import AsyncOpenAI
-            
+
             client = AsyncOpenAI(api_key=self.config.openai_api_key)
-            
+
             messages = []
             if system:
                 messages.append({"role": "system", "content": system})
             messages.append({"role": "user", "content": prompt})
-            
+
             response = await client.chat.completions.create(
                 model=self.config.openai_model,
                 messages=messages,
             )
             return response.choices[0].message.content or ""
+        except ImportError:
+            return (
+                "Error: the 'openai' package is not installed. "
+                "Install with: pip install 'wtd[openai]'"
+            )
+        except Exception as e:
+            return f"Error: {e}"
+
+
+class AnthropicClient(LLMClient):
+    """Anthropic (Claude) LLM client."""
+
+    # Conservative default; callers can override via config.
+    DEFAULT_MAX_TOKENS = 1024
+
+    def __init__(self, config: WTDConfig):
+        self.config = config
+
+    async def generate(self, prompt: str, system: str = "") -> str:
+        """Generate using Anthropic's async client."""
+        try:
+            from anthropic import AsyncAnthropic
+
+            if not self.config.anthropic_api_key:
+                return (
+                    "Error: WTD_ANTHROPIC_API_KEY is not set. "
+                    "Set it in your environment or .env file."
+                )
+
+            client = AsyncAnthropic(api_key=self.config.anthropic_api_key)
+
+            kwargs: dict[str, Any] = {
+                "model": self.config.anthropic_model,
+                "max_tokens": self.DEFAULT_MAX_TOKENS,
+                "messages": [{"role": "user", "content": prompt}],
+            }
+            if system:
+                kwargs["system"] = system
+
+            response = await client.messages.create(**kwargs)
+
+            # Concatenate any text blocks in the response.
+            parts: list[str] = []
+            for block in getattr(response, "content", []) or []:
+                text = getattr(block, "text", None)
+                if text:
+                    parts.append(text)
+            return "".join(parts)
+        except ImportError:
+            return (
+                "Error: the 'anthropic' package is not installed. "
+                "Install with: pip install 'wtd[anthropic]'"
+            )
         except Exception as e:
             return f"Error: {e}"
 
@@ -111,11 +155,13 @@ class OpenAIClient(LLMClient):
 def get_llm_client(config: WTDConfig | None = None) -> LLMClient:
     """Get the appropriate LLM client based on configuration."""
     config = config or get_config()
-    
+
     if config.llm_provider == "ollama":
         return OllamaClient(config)
     elif config.llm_provider == "openai":
         return OpenAIClient(config)
+    elif config.llm_provider == "anthropic":
+        return AnthropicClient(config)
     else:
         # Default to Ollama
         return OllamaClient(config)
@@ -124,7 +170,7 @@ def get_llm_client(config: WTDConfig | None = None) -> LLMClient:
 class WTDAgent:
     """
     The WTD AI Agent.
-    
+
     Orchestrates TODO detection, context analysis, subtask generation,
     and execution planning.
     """
@@ -143,9 +189,12 @@ class WTDAgent:
             return scan_result.context
 
         # Use AI for context detection when confidence is low
-        todos_text = "\n".join([
-            f"- {t.title}" for t in scan_result.todos[:20]  # Limit for context
-        ])
+        todos_text = "\n".join(
+            [
+                f"- {t.title}"
+                for t in scan_result.todos[:20]  # Limit for context
+            ]
+        )
 
         prompt = f"""Analyze these TODO items and determine the primary context.
 
@@ -180,7 +229,7 @@ Respond with ONLY the context word, nothing else."""
     ) -> list[dict[str, Any]]:
         """
         Generate subtasks for a TODO using AI.
-        
+
         Returns a list of subtask definitions ready to spawn.
         """
         if not todo.can_spawn_children(self.config.max_recursion_depth):
@@ -217,9 +266,9 @@ Respond with ONLY the JSON array, no other text."""
                 response = response.split("```")[1]
                 if response.startswith("json"):
                     response = response[4:]
-            
+
             subtasks = json.loads(response)
-            
+
             # Validate and convert
             result = []
             for st in subtasks[:max_subtasks]:
@@ -229,15 +278,16 @@ Respond with ONLY the JSON array, no other text."""
                     "medium": TodoPriority.MEDIUM,
                     "low": TodoPriority.LOW,
                 }
-                result.append({
-                    "title": st.get("title", "Untitled"),
-                    "description": st.get("description", ""),
-                    "priority": priority_map.get(
-                        st.get("priority", "medium").lower(),
-                        TodoPriority.MEDIUM
-                    ),
-                })
-            
+                result.append(
+                    {
+                        "title": st.get("title", "Untitled"),
+                        "description": st.get("description", ""),
+                        "priority": priority_map.get(
+                            st.get("priority", "medium").lower(), TodoPriority.MEDIUM
+                        ),
+                    }
+                )
+
             return result
         except (json.JSONDecodeError, KeyError, TypeError):
             return []
@@ -285,7 +335,7 @@ Respond with ONLY the JSON array, no other text."""
     async def plan_execution(self, todo: TodoNode) -> list[dict[str, Any]]:
         """
         Plan the execution steps for a TODO.
-        
+
         Returns a list of action definitions.
         """
         system_prompt = CONTEXT_PROMPTS.get(todo.context, CONTEXT_PROMPTS[TodoContext.UNKNOWN])
@@ -295,7 +345,7 @@ Respond with ONLY the JSON array, no other text."""
 TODO: {todo.title}
 Description: {todo.description}
 Context: {todo.context.value}
-Source: {todo.source.file_path if todo.source else 'None'}
+Source: {todo.source.file_path if todo.source else "None"}
 
 Generate a sequence of actions to complete this TODO.
 Available action types:
@@ -322,7 +372,7 @@ Respond with ONLY the JSON array."""
                 response = response.split("```")[1]
                 if response.startswith("json"):
                     response = response[4:]
-            
+
             return json.loads(response)
         except (json.JSONDecodeError, KeyError):
             return []
@@ -352,10 +402,11 @@ Respond with either the question or "CLEAR", nothing else."""
     async def execute_todo(self, todo: TodoNode) -> ExecutionResult:
         """
         Execute a TODO (or plan its execution).
-        
+
         For MVP, this plans but doesn't auto-execute unless configured.
         """
         import time
+
         start = time.time()
 
         # Plan execution
@@ -389,4 +440,3 @@ Respond with either the question or "CLEAR", nothing else."""
         self.tree = TodoTree()
         self.tree.add_todos(scan_result.todos)
         return self.tree
-
