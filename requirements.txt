@@ -1,10 +1,10 @@
 # Dependencies are declared in pyproject.toml.
 #
 # To install:
-#     pip install -e .              # core
-#     pip install -e ".[openai]"    # with OpenAI provider
-#     pip install -e ".[anthropic]" # with Anthropic provider
-#     pip install -e ".[all]"       # all providers
+#     pip install -e .              # core (Claude Code OAuth + Anthropic API lanes)
+#     pip install -e ".[openai]"    # with legacy OpenAI provider
+#     pip install -e ".[ollama]"    # with legacy Ollama provider
+#     pip install -e ".[all]"       # all legacy providers
 #     pip install -e ".[dev]"       # development (tests, lint, type-check)
 #
 # This file is kept as a pointer for tools that look for requirements.txt.

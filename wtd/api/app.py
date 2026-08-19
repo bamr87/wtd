@@ -46,10 +46,15 @@ def create_app() -> FastAPI:
             allow_headers=["Authorization", "Content-Type"],
         )
 
-    # Global state (in production, use proper state management)
-    app.state.trees: dict[str, TodoTree] = {}
-    app.state.agents: dict[str, WTDAgent] = {}
-    app.state.stores: dict[str, TreeStore] = {}
+    # Global state (in production, use proper state management).
+    # Annotated locals, then attached: attribute annotations on a non-self
+    # object are not valid Python typing syntax.
+    trees: dict[str, TodoTree] = {}
+    agents: dict[str, WTDAgent] = {}
+    stores: dict[str, TreeStore] = {}
+    app.state.trees = trees
+    app.state.agents = agents
+    app.state.stores = stores
 
     # Request/Response models
     class ScanRequest(BaseModel):
@@ -335,6 +340,121 @@ def create_app() -> FastAPI:
             del app.state.agents[session_id]
 
         return {"deleted": True}
+
+    # ------------------------------------------------------------------
+    # Fleet endpoints — monitor and drive the AI agent fleet
+    # ------------------------------------------------------------------
+    class FleetRunRequest(BaseModel):
+        apply: bool = Field(
+            default=False,
+            description=(
+                "Request write mode. Effective only when WTD_FLEET_APPLY=true; "
+                "the API can narrow to dry-run but never widen to writes."
+            ),
+        )
+        repos: list[str] | None = None
+        roles: list[str] | None = None
+        max_runs: int | None = Field(default=None, ge=1, le=50)
+        skip_discovery: bool = False
+
+    class FleetDiscoverRequest(BaseModel):
+        repos: list[str] | None = None
+
+    @app.get("/v1/fleet/status")
+    async def fleet_status_endpoint():
+        """Fleet health: providers, roster, queue, budgets, recent runs."""
+        from wtd.fleet.monitor import fleet_status
+
+        return fleet_status()
+
+    @app.get("/v1/fleet/queue")
+    async def fleet_queue_endpoint(include_done: bool = False):
+        """The cross-repo work queue."""
+        from wtd.fleet.models import WorkStatus
+        from wtd.fleet.state import FleetState
+
+        cfg = get_config()
+        state = FleetState(cfg.fleet_state_path).load()
+        items = list(state.items.values())
+        if not include_done:
+            items = [
+                i
+                for i in items
+                if i.status
+                in (WorkStatus.QUEUED, WorkStatus.DEFERRED, WorkStatus.SCHEDULED)
+            ]
+        items.sort(key=lambda i: i.created_at)
+        return {
+            "total": len(items),
+            "items": [i.model_dump(mode="json") for i in items[:200]],
+        }
+
+    @app.get("/v1/fleet/runs")
+    async def fleet_runs_endpoint(limit: int = 20):
+        """Recent agent runs from the ledger."""
+        from wtd.fleet.state import FleetState
+
+        cfg = get_config()
+        state = FleetState(cfg.fleet_state_path).load()
+        return {
+            "runs": [
+                r.model_dump(mode="json")
+                for r in state.recent_runs(min(max(limit, 1), 100))
+            ]
+        }
+
+    @app.post("/v1/fleet/discover")
+    async def fleet_discover_endpoint(request: FleetDiscoverRequest):
+        """Run work discovery across the roster and enqueue new items."""
+        from wtd.fleet.orchestrator import FleetOrchestrator
+
+        orchestrator = FleetOrchestrator()
+        try:
+            new = await orchestrator.discover(request.repos)
+            pending = orchestrator.state.pending(
+                max_attempts=orchestrator.settings.max_attempts
+            )
+            return {"discovered_new": new, "queue_pending": len(pending)}
+        finally:
+            await orchestrator.aclose()
+
+    @app.post("/v1/fleet/run")
+    async def fleet_run_endpoint(request: FleetRunRequest):
+        """Run one fleet cycle.
+
+        Write mode requires BOTH the request flag and WTD_FLEET_APPLY=true —
+        the unauthenticated local API must not be able to escalate a
+        dry-run deployment into one that writes to GitHub.
+        """
+        from wtd.fleet.orchestrator import FleetOrchestrator
+
+        cfg = get_config()
+        effective_apply = request.apply and cfg.fleet_apply
+
+        orchestrator = FleetOrchestrator()
+        try:
+            report = await orchestrator.cycle(
+                apply=effective_apply,
+                repos=request.repos,
+                roles=request.roles,
+                max_runs=request.max_runs,
+                skip_discovery=request.skip_discovery,
+            )
+        finally:
+            await orchestrator.aclose()
+
+        return {
+            "enabled": report.enabled,
+            "apply": report.apply,
+            "discovered_new": report.discovered_new,
+            "scheduled": report.scheduled,
+            "completed": report.completed,
+            "failed": report.failed,
+            "actions_applied": report.actions_applied,
+            "queue_pending": report.queue_pending,
+            "notes": report.notes,
+            "runs": [r.model_dump(mode="json") for r in report.runs],
+        }
 
     return app
 

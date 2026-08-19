@@ -1,0 +1,36 @@
+# wtd.yml — fleet configuration (copy to wtd.yml, or run `wtd fleet init`)
+#
+# This file is committable: it describes the fleet's shape. Secrets
+# (tokens, keys) live in the environment or .env — see env.example.
+fleet:
+  # The roster: repositories the fleet watches and works.
+  repos:
+    - repo: bamr87/wtd
+      roles: [triage, reviewer, bug-hunter, janitor]
+    - repo: bamr87/gitorio
+      roles: [triage, reviewer]
+    # - repo: owner/blog-repo
+    #   roles: [author, doc-writer]
+    #   articles: true          # opt-in weekly article drafts
+
+  # Which roles may run at all (default: all seven built-ins).
+  # roles_enabled: [triage, bug-hunter, reviewer, janitor, doc-writer, contributor, author]
+
+  # Deterministic work scanners.
+  scan:
+    issues: true    # unlabeled -> triage; bug-labeled -> bug-hunter
+    pulls: true     # open non-draft PRs -> reviewer
+    ci: true        # standing workflow failures -> janitor
+    docs: true      # missing/thin README -> doc-writer
+
+  # Per-cycle caps (safety rails for the autonomous loop).
+  max_runs_per_cycle: 8       # agent invocations per cycle
+  max_writes_per_cycle: 5     # GitHub mutations per cycle (apply mode)
+  max_discovered_per_run: 5   # todos an agent may add per run
+  max_attempts: 3             # retries before an item is marked failed
+
+  # Daily token budgets per provider lane — the load balancer's capacity.
+  budgets:
+    claude_code_daily_tokens: 1500000   # subscription lane (default)
+    anthropic_daily_tokens: 500000      # API lane (fallback)
+    anthropic_daily_usd: 10             # estimated-spend cap for the API lane

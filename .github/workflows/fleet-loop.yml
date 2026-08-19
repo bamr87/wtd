@@ -1,0 +1,86 @@
+name: Fleet Loop
+
+# Serverless harness for the WTD fleet: one orchestrator cycle per firing.
+# The standalone daemon is `wtd fleet loop`; this workflow is the zero-server
+# alternative for running the same cycle on a schedule.
+#
+# DEFAULT-OFF (house convention): every scheduled firing is a no-op until the
+# repository variable WTD_FLEET_ENABLED is set to 'true'. Manual dispatches
+# run regardless, but write to GitHub only when the 'apply' input is true AND
+# the kill switch is armed.
+#
+# Auth (house convention): CLAUDE_CODE_OAUTH_TOKEN (from `claude setup-token`)
+# preferred; ANTHROPIC_API_KEY used as the fallback lane. The fleet's own
+# balancer decides which lane serves each run.
+
+on:
+  schedule:
+    - cron: "23 */4 * * *" # every 4 hours (offset to dodge top-of-hour load)
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: "Write to GitHub (comments/labels/issues/PRs). Otherwise dry-run."
+        type: boolean
+        default: false
+      max_runs:
+        description: "Cap agent runs this cycle"
+        type: string
+        default: "8"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fleet-loop
+  cancel-in-progress: false
+
+jobs:
+  cycle:
+    # Scheduled firings honour the kill switch; manual dispatches always run
+    # (they still dry-run unless BOTH the input and the switch allow writes).
+    if: github.event_name == 'workflow_dispatch' || vars.WTD_FLEET_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      # The secrets context is not usable in step `if:` conditions — map the
+      # presence check through job env instead.
+      HAS_CLAUDE_OAUTH: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN != '' }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install wtd
+        run: |
+          python -m pip install --upgrade pip
+          pip install .
+
+      - name: Install Claude Code CLI (default lane)
+        if: env.HAS_CLAUDE_OAUTH == 'true'
+        run: |
+          curl -fsSL https://claude.ai/install.sh | bash
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Restore fleet state
+        uses: actions/cache@v5
+        with:
+          path: ~/.wtd/fleet
+          key: fleet-state-${{ github.run_id }}
+          restore-keys: |
+            fleet-state-
+
+      - name: Run one fleet cycle
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.FLEET_TOKEN || github.token }}
+          # Writes require the kill switch AND (for manual runs) the input.
+          WTD_FLEET_APPLY: ${{ vars.WTD_FLEET_ENABLED == 'true' && (github.event_name == 'schedule' || inputs.apply) }}
+        run: |
+          wtd fleet run --max-runs "${{ inputs.max_runs || '8' }}"
+          wtd fleet status

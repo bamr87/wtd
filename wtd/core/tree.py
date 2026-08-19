@@ -141,7 +141,7 @@ class TodoTree:
 
     def get_descendants(self, node_id: UUID) -> list[TodoNode]:
         """Get all descendants of a node (all children recursively)."""
-        descendants = []
+        descendants: list[TodoNode] = []
         node = self._nodes.get(node_id)
         if node is None:
             return descendants

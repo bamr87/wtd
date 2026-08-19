@@ -1,10 +1,8 @@
 # 🚀 WTD – What To Do
 
-> **The Ultimate Recursive TODO Engine**
+> **The autonomous AI agent fleet platform**
 
-Turn every TODO into a self-replicating, AI-orchestrated action factory.
-
-WTD is not a list — it is a **recursive agency engine** that reads a TODO, decides the shortest path to completion, spawns the exact subtasks needed, and executes them with zero human friction.
+WTD turns every TODO — a code comment, an unlabeled GitHub issue, an unreviewed pull request, a failing workflow, a missing README — into queued work for a fleet of Claude-powered agents that **look for work, do the work, and add new todos** as they go.
 
 ```
 ╦ ╦╔╦╗╔╦╗
@@ -12,239 +10,186 @@ WTD is not a list — it is a **recursive agency engine** that reads a TODO, dec
 ╚╩╝ ╩ ═╩╝
 ```
 
-## ✨ Features
+It is a **standalone application**: a CLI, a daemon loop, and a REST API with local JSON state — no server infrastructure required. Everything is wired through **Claude Code OAuth by default** (your Claude subscription) with the **Anthropic API as fallback**, and a token-capacity load balancer decides which lane serves each agent run.
 
-- **🔍 Smart Scanning** - Automatically finds TODOs in code comments, markdown files, issues, and notes
-- **🧠 Context Detection** - AI determines if you're fixing a bug, writing docs, planning, or building
-- **🌳 Recursive TODO Tree** - Tasks spawn subtasks until the root is truly done
-- **🖥️ Workspace Orchestration** - Opens the perfect IDE layout, terminals, and browser tabs
-- **📊 Interactive Dashboard** - Beautiful terminal UI with real-time progress tracking
-- **🌐 REST API** - Full API for integrations and automation
-- **🔒 Local-First** - Your data stays on your machine (optional cloud sync)
+## ✨ What the fleet does
 
-## 🚀 Quick Start
+| Agent role | SDLC work it handles | Actions it may take |
+|---|---|---|
+| **triage** | new/unlabeled issues | comment, label |
+| **bug-hunter** | bug-labeled issues, latent bugs | analysis comment, file issue |
+| **reviewer** | open pull requests | review comment |
+| **janitor** | standing CI failures | diagnosis issue, comment |
+| **doc-writer** | missing or thin documentation | draft PR |
+| **contributor** | TODO/FIXME debt in code | small draft PR |
+| **author** | articles / blog drafts | draft PR |
 
-### Installation
+Agents also report **discovered work** (new todos) on every run, which the platform validates, dedupes, and enqueues — the flywheel that keeps the fleet finding its own work.
+
+## 🧭 How it works
+
+```
+        ┌────────────────────────── one cycle ──────────────────────────┐
+        │                                                               │
+ roster ─▶ DISCOVER ─▶ QUEUE (dedup) ─▶ SCHEDULE ─▶ DISPATCH ─▶ MONITOR │
+ (wtd.yml)  issues       work items      priority +   Claude     ledger │
+            PRs, CI,     ("todos")       per-repo     Code OAuth  runs, │
+            docs gaps         ▲          fairness       ▼ fallback budgets
+                              │                     Anthropic API       │
+                              └──── agents add discovered todos ────────┘
+```
+
+1. **Discover** — deterministic scanners sweep the roster: issues, PRs, workflow runs, docs gaps.
+2. **Queue** — findings become work items with stable dedup keys; rescans converge instead of duplicating.
+3. **Schedule** — a pure scheduler matches items to agent roles: priority bands, oldest first, repos interleaved round-robin so one noisy repo can't starve the rest.
+4. **Balance** — each provider lane has a daily token budget; the balancer picks the first lane with headroom (subscription first, API spillover), benches rate-limited lanes, and tracks burn.
+5. **Dispatch** — the agent gets bounded evidence and must reply in a structured JSON contract; the platform validates every requested action against the role's grants before touching GitHub.
+6. **Monitor** — every run lands in a ledger; `wtd fleet status` shows queue, budgets, lanes, and outcomes.
+
+## 🚀 Quick start
 
 ```bash
-# Clone the repository
-cd wtd
-
-# Create virtual environment
-python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-
-# Install dependencies
+# Install
 pip install -e .
 
-# Or install from requirements
-pip install -r requirements.txt
+# 1. Auth (pick at least one lane)
+claude setup-token          # default lane: Claude Code OAuth (subscription)
+export CLAUDE_CODE_OAUTH_TOKEN=...
+export ANTHROPIC_API_KEY=sk-ant-...   # fallback lane: Anthropic API
+
+# 2. GitHub (read for discovery; write scopes only needed for --apply)
+export GITHUB_TOKEN=ghp_...
+
+# 3. Configure the fleet
+wtd fleet init              # writes a starter wtd.yml + agents/
+$EDITOR wtd.yml             # add your repos to fleet.repos
+
+# 4. Fly
+wtd fleet status            # lanes, roster, queue, budgets
+wtd fleet run               # ONE cycle, dry-run (agents think, nothing is written)
+wtd fleet run --apply       # let the agents act
+wtd fleet loop --apply      # the autonomous daemon (Ctrl+C to stop)
 ```
 
-### Usage
-
-Just type `wtd` in any directory:
-
-```bash
-# Scan current directory and start working
-wtd
-
-# Scan a specific path
-wtd /path/to/project
-
-# Just scan without interactive mode
-wtd scan
-
-# Open the dashboard
-wtd dashboard
-
-# Execute the next TODO
-wtd execute
-
-# Show progress status
-wtd status
-
-# Start the API server
-wtd serve
-```
+Dry-run is the default everywhere: without `--apply` (or `WTD_FLEET_APPLY=true`) agents plan and their intended actions are recorded, but **nothing is written to GitHub**.
 
 ## 📖 Commands
 
 | Command | Description |
 |---------|-------------|
-| `wtd` | Scan, analyze, and start working |
-| `wtd scan` | Scan for TODOs only |
-| `wtd dashboard` | Open interactive dashboard |
-| `wtd execute` | Execute next actionable TODO |
-| `wtd status` | Show progress status |
-| `wtd config` | View/edit configuration |
-| `wtd serve` | Start REST API server |
+| `wtd fleet status` | Fleet health: provider lanes, roster, queue, budgets, recent runs |
+| `wtd fleet agents` | List agent roles (built-ins + `agents/*.md` overrides) |
+| `wtd fleet discover` | Scan the roster and enqueue new work (no agents run) |
+| `wtd fleet plan` | Show what the next cycle would run |
+| `wtd fleet run [--apply]` | Run one cycle: discover → schedule → dispatch |
+| `wtd fleet loop [--apply]` | The autonomous loop (interval from config) |
+| `wtd fleet queue` | Show the cross-repo work queue |
+| `wtd fleet budget` | Today's token budgets and burn per lane |
+| `wtd fleet init` | Write starter `wtd.yml` + `agents/` here |
+| `wtd` | Classic mode: scan the local repo's TODOs into a recursive tree |
+| `wtd scan` / `wtd dashboard` / `wtd execute` / `wtd status` | Local TODO tree tools |
+| `wtd routines …` | Recurring TODO management |
+| `wtd serve` | REST API (`/v1/fleet/*` + local tree endpoints) |
+
+## 🔌 Providers: Claude-first, by design
+
+The default `WTD_LLM_PROVIDER=auto` resolves this chain:
+
+1. **`claude-code`** — headless Claude Code (`claude -p`), authenticated by `CLAUDE_CODE_OAUTH_TOKEN` (or an interactive `claude` login). Runs on your Claude subscription.
+2. **`anthropic`** — the Anthropic API via the official SDK (`ANTHROPIC_API_KEY`), default model `claude-opus-5`, streaming + adaptive thinking, with server-side refusal fallbacks enabled on Opus 5.
+
+Failover is automatic: rate limits, timeouts, and transient errors on one lane roll to the next, and the balancer's budgets decide which lane a run *starts* on. Legacy providers (`ollama`, `openai`) remain available when selected explicitly, but are never part of the auto chain.
 
 ## ⚙️ Configuration
 
-WTD can be configured via environment variables or a `.env` file:
+Secrets live in the environment (see [`env.example`](env.example)); the fleet's shape lives in committable [`wtd.yml`](wtd.yml.example):
+
+```yaml
+fleet:
+  repos:
+    - repo: you/your-app
+      roles: [triage, reviewer, bug-hunter, janitor]
+    - repo: you/your-blog
+      roles: [author]
+      articles: true
+  max_runs_per_cycle: 8
+  max_writes_per_cycle: 5
+  budgets:
+    claude_code_daily_tokens: 1500000
+    anthropic_daily_tokens: 500000
+    anthropic_daily_usd: 10
+```
+
+Key environment switches:
 
 ```bash
-# LLM Provider (ollama, openai, anthropic)
-WTD_LLM_PROVIDER=ollama
-WTD_OLLAMA_MODEL=llama3.2
-WTD_OLLAMA_HOST=http://localhost:11434
-
-# OpenAI (optional)
-WTD_OPENAI_API_KEY=your-key-here
-WTD_OPENAI_MODEL=gpt-4-turbo-preview
-
-# Anthropic (optional)
-WTD_ANTHROPIC_API_KEY=your-key-here
-WTD_ANTHROPIC_MODEL=claude-3-opus-20240229
-
-# Recursion Settings
-WTD_MAX_RECURSION_DEPTH=7
-WTD_FITNESS_DECAY_RATE=0.15
-
-# Execution
-WTD_AUTO_EXECUTE=false
-WTD_TIMEOUT_SECONDS=90
-
-# UI
-WTD_THEME=dark
+WTD_FLEET_ENABLED=true      # master kill switch
+WTD_FLEET_APPLY=false       # THE write gate (dry-run by default)
+WTD_FLEET_CONCURRENCY=2     # concurrent agent runs
+WTD_MODEL=claude-opus-5     # default model for both lanes
 ```
 
-## 🧠 How It Works
+## 🛡️ Safety rails
 
-### 1. Scan
-WTD scans your codebase for tasks in:
-- Code comments (TODO, FIXME, HACK, XXX, BUG, NOTE)
-- Markdown task lists (checkbox items)
-- GitHub issues (coming soon)
-- Plain text notes
+The fleet is autonomous, so the guardrails are structural, not aspirational:
 
-### 2. Analyze
-The AI agent analyzes your TODOs and determines the context:
-- 🐛 **Bugfix** - Fix bugs and errors
-- ✍️ **Write** - Create documentation or content
-- 📋 **Plan** - Design and architecture
-- 📚 **Learn** - Research and study
-- 🔨 **Build** - Implement features
-- 🔧 **Refactor** - Improve code quality
-- 🧪 **Test** - Write and run tests
-- 🚀 **Deploy** - Ship to production
+- **Dry-run by default** — writes require an explicit `--apply` / `WTD_FLEET_APPLY=true`.
+- **Kill switch** — `WTD_FLEET_ENABLED=false` stops everything, including discovery.
+- **Least privilege** — each role declares the only actions it may request; everything else an agent asks for is rejected and logged.
+- **Loop guards** — the fleet never acts on its own issues/PRs/comments (marker `<!-- wtd-fleet:… -->` + author checks), so agents can't feed themselves.
+- **Dedup everywhere** — stable work-item keys, marker-checked comments and issues; re-running never double-posts.
+- **Hard caps** — per-cycle run cap, per-cycle write cap, per-run action cap (3), per-run discovered-todo cap, retry cap.
+- **Path safety** — proposed PRs can't escape the repo, and can never write `.github/workflows/` (that would hand the agent its own credentials).
+- **Token budgets** — daily per-lane budgets + an estimated-USD cap on the API lane; exhausted budgets defer work instead of overspending.
+- **Prompt-injection posture** — repository content is fenced as untrusted in every prompt, and roles are instructed to ignore embedded instructions.
 
-### 3. Execute
-WTD creates a recursive TODO tree:
-```
-● Root TODO [build]
-  ◐ Design API [plan]
-    ● Define endpoints
-    ○ Write schemas
-  ○ Implement handlers [build]
-  ○ Add tests [test]
-```
+## 🖥️ Running it as a service
 
-Each TODO can spawn subtasks, and completing all subtasks collapses the parent.
+**Daemon**: `wtd fleet loop --apply` (systemd, tmux, whatever you run daemons with).
 
-### 4. Orchestrate
-Based on context, WTD sets up your perfect workspace:
-- Opens relevant files in VSCode/Cursor
-- Creates terminal splits for dev/test
-- Opens documentation in browser
-
-## 🌐 API
-
-WTD includes a full REST API:
+**Docker**:
 
 ```bash
-# Start the server
-wtd serve
-
-# Endpoints
-POST /v1/wtd/scan          # Scan for TODOs
-POST /v1/wtd/execute       # Execute a TODO
-GET  /v1/wtd/dashboard/:id # Get workspace config
-GET  /v1/wtd/tree/:id      # Get TODO tree
-POST /v1/wtd/spawn         # Spawn subtasks
+docker build -t wtd .
+docker run --rm -e CLAUDE_CODE_OAUTH_TOKEN -e ANTHROPIC_API_KEY -e GITHUB_TOKEN \
+  -v $PWD/wtd.yml:/app/wtd.yml:ro -v wtd-state:/root/.wtd wtd fleet loop --apply
 ```
 
-API documentation available at `http://localhost:8787/docs`
+**GitHub Actions** (serverless): [`.github/workflows/fleet-loop.yml`](.github/workflows/fleet-loop.yml) runs one cycle every 4 hours — default-OFF until the repo variable `WTD_FLEET_ENABLED` is set to `true`, OAuth-first secrets, state cached between runs.
 
-## 🎨 Dashboard
+**REST API**: `wtd serve` → `GET /v1/fleet/status`, `GET /v1/fleet/queue`, `GET /v1/fleet/runs`, `POST /v1/fleet/discover`, `POST /v1/fleet/run` (the API can narrow to dry-run but can never escalate to writes; docs at `http://localhost:8787/docs`).
 
-The interactive dashboard provides:
-- Real-time TODO tree visualization
-- Progress tracking with completion percentage
-- One-click task execution
-- Keyboard shortcuts for power users
+## 🤖 Custom agents
 
-### Keyboard Shortcuts
-| Key | Action |
-|-----|--------|
-| `q` | Quit |
-| `r` | Refresh |
-| `e` | Execute selected |
-| `c` | Complete selected |
-| `s` | Spawn subtasks |
-| `?` | Help |
+Drop `agents/<name>.md` files (YAML frontmatter + system prompt) into your project or `~/.wtd/agents/` to override built-ins or add specialists — see `wtd fleet init` for a template. Roles declare which work kinds they handle, which actions they may request, and their token cost envelope for the balancer.
 
-## 🔌 LLM Support
+## 🌳 The classic recursive TODO engine
 
-WTD supports multiple LLM providers:
+The original local-first engine is still here and still the substrate: `wtd` scans the current repo (TODO/FIXME comments, markdown checklists), builds the recursive tree in `tree.json`, and can break tasks down with the same Claude-first provider chain. See `wtd --help`.
 
-### Ollama (Default - Local)
+## 🧪 Development
+
 ```bash
-# Install Ollama
-curl -fsSL https://ollama.ai/install.sh | sh
-
-# Pull a model
-ollama pull llama3.2
-
-# WTD will use Ollama by default
-wtd
+pip install -e ".[dev]"
+pytest            # 148 tests, all offline (fake GitHub + fake providers)
+ruff check .
+mypy wtd          # advisory
 ```
 
-### OpenAI
-```bash
-export WTD_LLM_PROVIDER=openai
-export WTD_OPENAI_API_KEY=your-key
-wtd
-```
+The load balancer, scheduler, outcome validator, and discovery scanners are pure and fully unit-tested; the dispatcher and orchestrator are integration-tested against an in-memory GitHub.
 
-### Anthropic
-```bash
-export WTD_LLM_PROVIDER=anthropic
-export WTD_ANTHROPIC_API_KEY=your-key
-wtd
-```
+## 📚 More
 
-## 📊 KFIs (Key Feature Indicators)
-
-| Metric | Target | Description |
-|--------|--------|-------------|
-| Time to First Action | ≤ 90s | From `wtd` to measurable progress |
-| Context Accuracy | ≥ 95% | Correct context detection |
-| Max Recursion Depth | 7 levels | Prevent infinite spawn |
-| Human Keystrokes | ≤ 5 | Per completed TODO |
-
-## 🛣️ Roadmap
-
-| Milestone | Objective | Target |
-|-----------|-----------|--------|
-| Alpha | Scan + workspace setup | Q1 2026 |
-| Beta | Recursive tree + auto-execution | Q2 2026 |
-| 1.0 | Full agency: root TODO resolves itself | Q3 2026 |
-
-## 🤝 Contributing
-
-Contributions welcome! Please read our contributing guidelines.
+- [`docs/FLEET.md`](docs/FLEET.md) — full architecture: subsystems, data flow, contracts, design decisions
+- [`PRD.md`](PRD.md) — the original product vision (v0.1)
+- [`CHANGELOG.md`](CHANGELOG.md) — release history
 
 ## 📄 License
 
-MIT License - see LICENSE for details.
+MIT License — see [LICENSE](LICENSE).
 
 ---
 
-**Reality WTD'd.**  
-Just type `wtd`.  
-The machine does the rest.
+**Reality WTD'd.** The fleet finds the work. The fleet does the work. The fleet finds more work.
 
 *Ship it.* 🚀
-

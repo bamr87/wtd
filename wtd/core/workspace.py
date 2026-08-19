@@ -31,7 +31,7 @@ class WorkspaceOrchestrator:
         
         Returns status of each action.
         """
-        results = {
+        results: dict[str, Any] = {
             "vscode": None,
             "files": [],
             "terminals": [],

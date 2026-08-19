@@ -74,7 +74,8 @@ def main(
         None,
         "--provider",
         "-p",
-        help="LLM provider (ollama, openai, anthropic)",
+        help="LLM provider (auto = Claude Code OAuth → Anthropic API; "
+        "or claude-code, anthropic, ollama, openai)",
     ),
     path: Optional[Path] = typer.Option(
         None,
@@ -122,7 +123,14 @@ async def _main_flow(
     config = get_config()
 
     if provider:
-        config.llm_provider = provider
+        valid_providers = {"auto", "claude-code", "anthropic", "ollama", "openai"}
+        if provider not in valid_providers:
+            console.error(
+                f"Unknown provider '{provider}'. "
+                f"Valid: {', '.join(sorted(valid_providers))}"
+            )
+            return
+        config.llm_provider = provider  # type: ignore[assignment]
 
     # Step 1: Scan for TODOs
     with console.spinner() as progress:
@@ -420,8 +428,15 @@ def config(
         table.add_column("Value", style="green")
 
         table.add_row("LLM Provider", cfg.llm_provider)
-        table.add_row("Ollama Model", cfg.ollama_model)
-        table.add_row("Ollama Host", cfg.ollama_host)
+        table.add_row("Model", cfg.model)
+        table.add_row(
+            "Claude Code OAuth token",
+            "set" if cfg.claude_code_oauth_token else "(not set — uses local login)",
+        )
+        table.add_row("Anthropic API key", "set" if cfg.anthropic_api_key else "(not set)")
+        table.add_row("GitHub token", "set" if cfg.github_token else "(not set)")
+        table.add_row("Fleet enabled", str(cfg.fleet_enabled))
+        table.add_row("Fleet apply", str(cfg.fleet_apply))
         table.add_row("Max Recursion Depth", str(cfg.max_recursion_depth))
         table.add_row("Fitness Decay Rate", str(cfg.fitness_decay_rate))
         table.add_row("Auto Execute", str(cfg.auto_execute))
@@ -818,6 +833,276 @@ def routines_trigger(
         print_due_routines(triggered)
     else:
         console.info(f"No routines configured for trigger: {trigger_name}")
+
+
+# ============================================================================
+# Fleet Subcommand Group — the autonomous AI agent fleet platform
+# ============================================================================
+
+fleet_app = typer.Typer(
+    name="fleet",
+    help="🚁 Orchestrate, monitor, and load-balance the AI agent fleet",
+    rich_markup_mode="rich",
+)
+app.add_typer(fleet_app, name="fleet")
+
+
+def _with_orchestrator(work):
+    """Run an async orchestrator task with clean client shutdown."""
+    from wtd.fleet.orchestrator import FleetOrchestrator
+
+    async def _run():
+        orchestrator = FleetOrchestrator()
+        try:
+            return await work(orchestrator)
+        finally:
+            await orchestrator.aclose()
+
+    return asyncio.run(_run())
+
+
+@fleet_app.callback(invoke_without_command=True)
+def fleet_default(ctx: typer.Context):
+    """Show fleet status when no subcommand is given."""
+    if ctx.invoked_subcommand is None:
+        fleet_status_cmd()
+
+
+@fleet_app.command("status")
+def fleet_status_cmd():
+    """📡 Show fleet health: providers, roster, queue, budgets, recent runs."""
+    from wtd.fleet.monitor import fleet_status
+    from wtd.ui.fleet_output import print_fleet_status
+
+    print_fleet_status(fleet_status())
+
+
+@fleet_app.command("agents")
+def fleet_agents():
+    """🤖 List agent roles (built-ins + agents/*.md overrides)."""
+    from wtd.fleet.roles import load_roles
+    from wtd.fleet.settings import load_settings
+    from wtd.ui.fleet_output import print_roles
+
+    settings = load_settings()
+    print_roles(load_roles(enabled=settings.roles_enabled or None))
+
+
+@fleet_app.command("queue")
+def fleet_queue(
+    all_items: bool = typer.Option(
+        False, "--all", "-a", help="Include done/failed/skipped items"
+    ),
+):
+    """📋 Show the cross-repo work queue."""
+    from wtd.fleet.models import WorkStatus
+    from wtd.fleet.state import FleetState
+    from wtd.ui.fleet_output import print_queue
+
+    cfg = get_config()
+    state = FleetState(cfg.fleet_state_path).load()
+    items = list(state.items.values())
+    if not all_items:
+        items = [
+            i
+            for i in items
+            if i.status in (WorkStatus.QUEUED, WorkStatus.DEFERRED, WorkStatus.SCHEDULED)
+        ]
+    items.sort(key=lambda i: (i.status.value, i.repo, i.created_at))
+    print_queue(items)
+
+
+@fleet_app.command("discover")
+def fleet_discover(
+    repo: list[str] = typer.Option(
+        None, "--repo", "-r", help="Limit to specific owner/repo (repeatable)"
+    ),
+):
+    """🔍 Scan the roster for new work and enqueue it (no agents run)."""
+
+    async def _work(orchestrator):
+        new = await orchestrator.discover(repo or None)
+        console.success(f"Discovery complete: {new} new work item(s) enqueued.")
+        pending = orchestrator.state.pending(
+            max_attempts=orchestrator.settings.max_attempts
+        )
+        console.info(f"Queue now has {len(pending)} pending item(s).")
+
+    _with_orchestrator(_work)
+
+
+@fleet_app.command("plan")
+def fleet_plan(
+    repo: list[str] = typer.Option(None, "--repo", "-r", help="Filter repos"),
+    role: list[str] = typer.Option(None, "--role", help="Filter roles"),
+    max_runs: Optional[int] = typer.Option(None, "--max-runs", "-n"),
+):
+    """🗺️  Show what the next cycle would run (no agents, no writes)."""
+    from wtd.ui.fleet_output import print_plan
+
+    async def _work(orchestrator):
+        plan = orchestrator.plan(
+            repos=repo or None, roles=role or None, max_runs=max_runs
+        )
+        print_plan(plan)
+
+    _with_orchestrator(_work)
+
+
+@fleet_app.command("run")
+def fleet_run(
+    apply: bool = typer.Option(
+        False,
+        "--apply",
+        help="Actually write to GitHub (comments, labels, issues, PRs). "
+        "Default is dry-run.",
+    ),
+    repo: list[str] = typer.Option(None, "--repo", "-r", help="Filter repos"),
+    role: list[str] = typer.Option(None, "--role", help="Filter roles"),
+    max_runs: Optional[int] = typer.Option(None, "--max-runs", "-n"),
+    skip_discovery: bool = typer.Option(
+        False, "--skip-discovery", help="Work the existing queue only"
+    ),
+):
+    """▶️  Run ONE fleet cycle: discover → schedule → dispatch agents."""
+    from wtd.ui.fleet_output import print_cycle_report
+
+    async def _work(orchestrator):
+        report = await orchestrator.cycle(
+            apply=apply or None,
+            repos=repo or None,
+            roles=role or None,
+            max_runs=max_runs,
+            skip_discovery=skip_discovery,
+        )
+        print_cycle_report(report)
+
+    _with_orchestrator(_work)
+
+
+@fleet_app.command("loop")
+def fleet_loop(
+    apply: bool = typer.Option(False, "--apply", help="Write mode (default dry-run)"),
+    interval: Optional[int] = typer.Option(
+        None, "--interval", "-i", help="Seconds between cycles (default from config)"
+    ),
+    cycles: Optional[int] = typer.Option(
+        None, "--cycles", "-c", help="Stop after N cycles (default: forever)"
+    ),
+):
+    """🔁 Run the autonomous loop: cycle, sleep, repeat. Ctrl+C to stop."""
+    from wtd.ui.fleet_output import print_cycle_report
+
+    async def _work(orchestrator):
+        console.info(
+            f"Fleet loop starting (interval "
+            f"{interval or orchestrator.config.fleet_interval_seconds}s, "
+            f"{'APPLY' if apply else 'dry-run'} mode). Ctrl+C to stop."
+        )
+        await orchestrator.loop(
+            apply=apply or None,
+            interval_seconds=interval,
+            max_cycles=cycles,
+            on_report=print_cycle_report,
+        )
+
+    try:
+        _with_orchestrator(_work)
+    except KeyboardInterrupt:
+        console.info("Fleet loop stopped.")
+
+
+@fleet_app.command("budget")
+def fleet_budget():
+    """💰 Show today's token budgets and burn per provider lane."""
+    from dataclasses import asdict
+
+    from wtd.fleet.balancer import CapacityBalancer, default_lanes
+    from wtd.fleet.settings import load_settings
+    from wtd.ui.fleet_output import print_lanes
+
+    cfg = get_config()
+    settings = load_settings(cfg)
+    balancer = CapacityBalancer(
+        default_lanes(settings), cfg.fleet_state_path / "capacity.json"
+    )
+    print_lanes([asdict(s) for s in balancer.snapshot()])
+
+
+@fleet_app.command("init")
+def fleet_init(
+    force: bool = typer.Option(False, "--force", help="Overwrite existing files"),
+):
+    """🧰 Write a starter wtd.yml and agents/ directory here."""
+    wtd_yml = Path.cwd() / "wtd.yml"
+    agents_dir = Path.cwd() / "agents"
+
+    if wtd_yml.exists() and not force:
+        console.warning(f"{wtd_yml} already exists (use --force to overwrite).")
+    else:
+        wtd_yml.write_text(STARTER_WTD_YML, encoding="utf-8")
+        console.success(f"Wrote {wtd_yml}")
+
+    agents_dir.mkdir(exist_ok=True)
+    readme = agents_dir / "README.md"
+    if not readme.exists() or force:
+        readme.write_text(STARTER_AGENTS_README, encoding="utf-8")
+        console.success(f"Wrote {readme}")
+
+    console.info("Next steps:")
+    console.print("  1. Edit wtd.yml — add your repos to fleet.repos")
+    console.print("  2. Export a GitHub token (GITHUB_TOKEN) for discovery")
+    console.print("  3. wtd fleet status   # check provider lanes")
+    console.print("  4. wtd fleet run      # first dry-run cycle")
+    console.print("  5. wtd fleet run --apply   # let the agents act")
+
+
+STARTER_WTD_YML = """\
+# wtd.yml — fleet configuration (see docs/FLEET.md)
+fleet:
+  repos:
+    # - repo: your-user/your-repo
+    #   roles: [triage, reviewer, doc-writer]   # optional; default: all enabled
+    #   articles: false                          # opt-in weekly article drafts
+  # roles_enabled: [triage, bug-hunter, reviewer, janitor, doc-writer, contributor, author]
+  scan:
+    issues: true
+    pulls: true
+    ci: true
+    docs: true
+  max_runs_per_cycle: 8
+  max_writes_per_cycle: 5
+  budgets:
+    claude_code_daily_tokens: 1500000
+    anthropic_daily_tokens: 500000
+    anthropic_daily_usd: 10
+"""
+
+STARTER_AGENTS_README = """\
+# agents/
+
+Custom agent role definitions. Each `<name>.md` file overrides or extends
+the built-in fleet roles (`wtd fleet agents` lists them).
+
+Format: YAML frontmatter + the system prompt as the body.
+
+```markdown
+---
+name: security-auditor
+description: Reviews changes for security issues.
+kinds: [review_pr]
+actions: [comment]
+max_tokens: 6000
+---
+You are a security-focused reviewer. Given a pull request diff, look for
+injection risks, secret leakage, unsafe deserialization, and permission
+widening. Comment only when you find something concrete.
+```
+
+Fields: `name`, `description`, `kinds` (work kinds handled), `actions`
+(comment | add_labels | create_issue | propose_pr), `model`,
+`max_tokens`, `est_tokens`.
+"""
 
 
 if __name__ == "__main__":
