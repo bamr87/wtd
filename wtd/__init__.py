@@ -1,10 +1,13 @@
 """
-WTD – What To Do: The Ultimate Recursive TODO Engine
+WTD – What To Do: an autonomous AI agent fleet platform.
 
-Turn every TODO into a self-replicating, AI-orchestrated action factory.
+Every TODO — a code comment, a GitHub issue, a failing workflow, a missing
+README — becomes queued work for a fleet of Claude-powered agents that
+discover it, act on it, and discover more. Claude Code OAuth is the default
+lane; the Anthropic API is the fallback.
 """
 
-__version__ = "0.1.1"
+__version__ = "0.2.0"
 __author__ = "WTD Team"
 
 from wtd.core.agent import WTDAgent

@@ -4,15 +4,15 @@ build-backend = "hatchling.build"
 
 [project]
 name = "wtd"
-version = "0.1.1"
-description = "WTD – What To Do: The Ultimate Recursive TODO Engine"
+version = "0.2.0"
+description = "WTD – What To Do: a standalone, autonomous AI agent fleet platform for the whole SDLC"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.10"
 authors = [
     { name = "WTD Team" }
 ]
-keywords = ["todo", "ai", "automation", "productivity", "cli"]
+keywords = ["todo", "ai", "agents", "automation", "claude", "sdlc", "orchestration", "cli"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Environment :: Console",
@@ -23,8 +23,9 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Topic :: Utilities",
 ]
-# Core dependencies are intentionally minimal so that `pip install wtd`
-# stays small. Provider SDKs (openai, anthropic) are optional extras.
+# Core dependencies. The default provider chain is Claude Code OAuth
+# (subscription, via the claude CLI) with the Anthropic API as fallback —
+# so the anthropic SDK is core. Legacy providers (ollama, openai) are extras.
 dependencies = [
     "typer[all]>=0.9.0",
     "rich>=13.7.0",
@@ -32,7 +33,8 @@ dependencies = [
     "httpx>=0.26.0",
     "pydantic>=2.5.0",
     "pydantic-settings>=2.1.0",
-    "ollama>=0.1.6",
+    "anthropic>=0.40.0",
+    "pyyaml>=6.0.1",
     "gitpython>=3.1.40",
     "watchfiles>=0.21.0",
     "fastapi>=0.109.0",
@@ -46,12 +48,16 @@ dependencies = [
 openai = [
     "openai>=1.6.0",
 ]
+ollama = [
+    "ollama>=0.1.6",
+]
+# Kept for compatibility with older install docs; anthropic is core now.
 anthropic = [
-    "anthropic>=0.39.0",
+    "anthropic>=0.40.0",
 ]
 all = [
     "openai>=1.6.0",
-    "anthropic>=0.39.0",
+    "ollama>=0.1.6",
 ]
 dev = [
     "pytest>=7.4.0",
@@ -59,16 +65,16 @@ dev = [
     "ruff>=0.1.0",
     "mypy>=1.8.0",
     "openai>=1.6.0",
-    "anthropic>=0.39.0",
+    "ollama>=0.1.6",
 ]
 
 [project.scripts]
 wtd = "wtd.cli:app"
 
 [project.urls]
-Homepage = "https://github.com/wtd/wtd"
-Documentation = "https://wtd.dev/docs"
-Repository = "https://github.com/wtd/wtd"
+Homepage = "https://github.com/bamr87/wtd"
+Documentation = "https://github.com/bamr87/wtd/blob/main/docs/FLEET.md"
+Repository = "https://github.com/bamr87/wtd"
 
 [tool.hatch.build.targets.wheel]
 packages = ["wtd"]
@@ -79,7 +85,8 @@ target-version = "py310"
 
 # Modules below are excluded from lint enforcement until the formatting /
 # whitespace cleanup pass scheduled in the refactor plan (Phase 0/8).
-# New code (tests/, wtd/config.py, wtd/api/app.py, wtd/cli.py, wtd/core/agent.py)
+# New code (tests/, wtd/config.py, wtd/api/app.py, wtd/cli.py, wtd/core/agent.py,
+# wtd/providers/, wtd/fleet/, wtd/ui/fleet_output.py)
 # is fully linted. The intent is to shrink this list over time, never grow it.
 extend-exclude = [
     "wtd/core/models.py",
@@ -99,9 +106,9 @@ extend-exclude = [
 select = ["E", "F", "I", "N", "W"]
 
 [tool.ruff.lint.per-file-ignores]
-# Multi-line LLM prompt strings exceed the line-length budget; rewriting
-# them is a Phase 3 (LLM rewrite) concern, not part of this PR.
+# Multi-line LLM prompt strings exceed the line-length budget by design.
 "wtd/core/agent.py" = ["E501"]
+"wtd/fleet/roles.py" = ["E501"]
 
 [tool.mypy]
 python_version = "3.10"
@@ -122,4 +129,3 @@ addopts = "-ra --strict-markers"
 filterwarnings = [
     "ignore::DeprecationWarning",
 ]
-

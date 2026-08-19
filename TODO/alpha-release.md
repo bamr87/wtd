@@ -11,10 +11,10 @@ Target: Q1 2026
 
 ## Testing
 
-- [ ] Write unit tests for scanner module
-- [ ] Write integration tests for tree operations
+- [x] Write unit tests for scanner module
+- [x] Write integration tests for tree operations
 - [ ] Add end-to-end tests for CLI commands
-- [ ] Set up CI/CD pipeline with GitHub Actions
+- [x] Set up CI/CD pipeline with GitHub Actions
 
 ## Documentation
 
