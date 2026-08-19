@@ -608,6 +608,10 @@ class RoutineManager:
     def get_routines_needing_reevaluation(self) -> list[Routine]:
         """Get routines that should be re-evaluated."""
         return [r for r in self.routines.values() if r.should_reevaluate()]
+
+    def get_routines_needing_review(self) -> list[Routine]:
+        """Alias used by the CLI review command."""
+        return self.get_routines_needing_reevaluation()
     
     def complete_routine(self, routine_id: UUID, notes: str = "") -> bool:
         """Mark a routine as completed."""
