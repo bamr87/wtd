@@ -41,6 +41,10 @@ jobs:
     if: github.event_name == 'workflow_dispatch' || vars.WTD_FLEET_ENABLED == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      # The secrets context is not usable in step `if:` conditions — map the
+      # presence check through job env instead.
+      HAS_CLAUDE_OAUTH: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN != '' }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -57,7 +61,7 @@ jobs:
           pip install .
 
       - name: Install Claude Code CLI (default lane)
-        if: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN != '' }}
+        if: env.HAS_CLAUDE_OAUTH == 'true'
         run: |
           curl -fsSL https://claude.ai/install.sh | bash
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
