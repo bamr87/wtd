@@ -1,8 +1,12 @@
 """
 WTD AI Agent - The brain of the recursive TODO engine
+
+All model calls route through :mod:`wtd.providers`: Claude Code OAuth by
+default, the Anthropic API as fallback (see ``WTD_LLM_PROVIDER``).
 """
 
 import json
+import logging
 from typing import Any
 
 from wtd.config import WTDConfig, get_config
@@ -15,6 +19,9 @@ from wtd.core.models import (
     WorkspaceConfig,
 )
 from wtd.core.tree import TodoTree
+from wtd.providers import ProviderError, ProviderRouter
+
+logger = logging.getLogger(__name__)
 
 # System prompts for different contexts
 CONTEXT_PROMPTS = {
@@ -39,132 +46,16 @@ Focus on: understanding the goal, breaking into subtasks, prioritization, execut
 }
 
 
-class LLMClient:
-    """Base LLM client interface."""
-
-    async def generate(self, prompt: str, system: str = "") -> str:
-        """Generate a response from the LLM."""
-        raise NotImplementedError
-
-
-class OllamaClient(LLMClient):
-    """Ollama LLM client."""
-
-    def __init__(self, config: WTDConfig):
-        self.config = config
-
-    async def generate(self, prompt: str, system: str = "") -> str:
-        """Generate using Ollama."""
-        try:
-            import ollama
-
-            messages = []
-            if system:
-                messages.append({"role": "system", "content": system})
-            messages.append({"role": "user", "content": prompt})
-
-            response = ollama.chat(
-                model=self.config.ollama_model,
-                messages=messages,
-            )
-            return response["message"]["content"]
-        except Exception as e:
-            return f"Error: {e}"
-
-
-class OpenAIClient(LLMClient):
-    """OpenAI LLM client."""
-
-    def __init__(self, config: WTDConfig):
-        self.config = config
-
-    async def generate(self, prompt: str, system: str = "") -> str:
-        """Generate using OpenAI."""
-        try:
-            from openai import AsyncOpenAI
-
-            client = AsyncOpenAI(api_key=self.config.openai_api_key)
-
-            messages = []
-            if system:
-                messages.append({"role": "system", "content": system})
-            messages.append({"role": "user", "content": prompt})
-
-            response = await client.chat.completions.create(
-                model=self.config.openai_model,
-                messages=messages,
-            )
-            return response.choices[0].message.content or ""
-        except ImportError:
-            return (
-                "Error: the 'openai' package is not installed. "
-                "Install with: pip install 'wtd[openai]'"
-            )
-        except Exception as e:
-            return f"Error: {e}"
-
-
-class AnthropicClient(LLMClient):
-    """Anthropic (Claude) LLM client."""
-
-    # Conservative default; callers can override via config.
-    DEFAULT_MAX_TOKENS = 1024
-
-    def __init__(self, config: WTDConfig):
-        self.config = config
-
-    async def generate(self, prompt: str, system: str = "") -> str:
-        """Generate using Anthropic's async client."""
-        try:
-            from anthropic import AsyncAnthropic
-
-            if not self.config.anthropic_api_key:
-                return (
-                    "Error: WTD_ANTHROPIC_API_KEY is not set. "
-                    "Set it in your environment or .env file."
-                )
-
-            client = AsyncAnthropic(api_key=self.config.anthropic_api_key)
-
-            kwargs: dict[str, Any] = {
-                "model": self.config.anthropic_model,
-                "max_tokens": self.DEFAULT_MAX_TOKENS,
-                "messages": [{"role": "user", "content": prompt}],
-            }
-            if system:
-                kwargs["system"] = system
-
-            response = await client.messages.create(**kwargs)
-
-            # Concatenate any text blocks in the response.
-            parts: list[str] = []
-            for block in getattr(response, "content", []) or []:
-                text = getattr(block, "text", None)
-                if text:
-                    parts.append(text)
-            return "".join(parts)
-        except ImportError:
-            return (
-                "Error: the 'anthropic' package is not installed. "
-                "Install with: pip install 'wtd[anthropic]'"
-            )
-        except Exception as e:
-            return f"Error: {e}"
-
-
-def get_llm_client(config: WTDConfig | None = None) -> LLMClient:
-    """Get the appropriate LLM client based on configuration."""
-    config = config or get_config()
-
-    if config.llm_provider == "ollama":
-        return OllamaClient(config)
-    elif config.llm_provider == "openai":
-        return OpenAIClient(config)
-    elif config.llm_provider == "anthropic":
-        return AnthropicClient(config)
-    else:
-        # Default to Ollama
-        return OllamaClient(config)
+def extract_json_block(response: str) -> str:
+    """Strip a markdown code fence from an LLM response, if present."""
+    response = response.strip()
+    if response.startswith("```"):
+        parts = response.split("```")
+        if len(parts) >= 2:
+            response = parts[1]
+            if response.startswith("json"):
+                response = response[4:]
+    return response.strip()
 
 
 class WTDAgent:
@@ -177,8 +68,24 @@ class WTDAgent:
 
     def __init__(self, config: WTDConfig | None = None):
         self.config = config or get_config()
-        self.llm = get_llm_client(self.config)
+        self.router = ProviderRouter(self.config)
         self.tree = TodoTree()
+        self.last_error: str | None = None
+
+    async def _generate(self, prompt: str, system: str = "") -> str:
+        """Generate text through the provider chain; empty string on failure.
+
+        The local TODO flows treat LLM output as advisory, so a total
+        provider failure degrades to heuristics instead of crashing.
+        """
+        try:
+            result = await self.router.generate(prompt, system)
+        except ProviderError as exc:
+            self.last_error = str(exc)
+            logger.warning("LLM generation failed: %s", exc)
+            return ""
+        self.last_error = None
+        return result.text
 
     async def analyze_context(self, scan_result: ScanResult) -> TodoContext:
         """
@@ -205,7 +112,7 @@ Classify as one of: bugfix, write, plan, learn, build, refactor, test, deploy
 
 Respond with ONLY the context word, nothing else."""
 
-        response = await self.llm.generate(prompt)
+        response = await self._generate(prompt)
         response = response.strip().lower()
 
         # Map response to TodoContext
@@ -257,17 +164,10 @@ Respond in JSON format:
 
 Respond with ONLY the JSON array, no other text."""
 
-        response = await self.llm.generate(prompt, system_prompt)
+        response = await self._generate(prompt, system_prompt)
 
         try:
-            # Extract JSON from response
-            response = response.strip()
-            if response.startswith("```"):
-                response = response.split("```")[1]
-                if response.startswith("json"):
-                    response = response[4:]
-
-            subtasks = json.loads(response)
+            subtasks = json.loads(extract_json_block(response))
 
             # Validate and convert
             result = []
@@ -289,7 +189,7 @@ Respond with ONLY the JSON array, no other text."""
                 )
 
             return result
-        except (json.JSONDecodeError, KeyError, TypeError):
+        except (json.JSONDecodeError, KeyError, TypeError, AttributeError):
             return []
 
     async def suggest_workspace(
@@ -364,16 +264,11 @@ Respond in JSON format:
 
 Respond with ONLY the JSON array."""
 
-        response = await self.llm.generate(prompt, system_prompt)
+        response = await self._generate(prompt, system_prompt)
 
         try:
-            response = response.strip()
-            if response.startswith("```"):
-                response = response.split("```")[1]
-                if response.startswith("json"):
-                    response = response[4:]
-
-            return json.loads(response)
+            actions = json.loads(extract_json_block(response))
+            return actions if isinstance(actions, list) else []
         except (json.JSONDecodeError, KeyError):
             return []
 
@@ -392,10 +287,10 @@ If it's clear enough to work on, respond with "CLEAR".
 
 Respond with either the question or "CLEAR", nothing else."""
 
-        response = await self.llm.generate(prompt)
+        response = await self._generate(prompt)
         response = response.strip()
 
-        if response.upper() == "CLEAR":
+        if not response or response.upper() == "CLEAR":
             return None
         return response
 

@@ -1,11 +1,16 @@
 """
 WTD Configuration Management
+
+WTD is Claude-first: the default provider chain is Claude Code OAuth
+(subscription) with the Anthropic API as fallback. Secrets are read from
+the environment (both ``WTD_``-prefixed and the conventional unprefixed
+names), never from checked-in files.
 """
 
 from pathlib import Path
 from typing import Annotated, Literal
 
-from pydantic import Field, field_validator
+from pydantic import AliasChoices, Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 
@@ -19,37 +24,166 @@ class WTDConfig(BaseSettings):
         extra="ignore",
     )
 
-    # LLM Settings
-    llm_provider: Literal["ollama", "openai", "anthropic"] = Field(
-        default="ollama",
-        description="LLM provider to use",
+    # ------------------------------------------------------------------
+    # LLM / provider settings
+    # ------------------------------------------------------------------
+    llm_provider: Literal["auto", "claude-code", "anthropic", "ollama", "openai"] = Field(
+        default="auto",
+        description=(
+            "Provider selection. 'auto' (default) resolves the chain "
+            "Claude Code OAuth -> Anthropic API. Explicit names disable "
+            "failover."
+        ),
     )
-    ollama_model: str = Field(
-        default="llama3.2",
-        description="Ollama model name",
+    model: str = Field(
+        default="claude-opus-5",
+        description=(
+            "Default model. Full API model ID; the Claude Code lane maps it "
+            "to the matching CLI alias (e.g. claude-opus-5 -> opus)."
+        ),
     )
-    ollama_host: str = Field(
-        default="http://localhost:11434",
-        description="Ollama API host",
+    max_output_tokens: int = Field(
+        default=16000,
+        ge=256,
+        le=128000,
+        description="Default max output tokens per generation.",
     )
-    openai_api_key: str | None = Field(
-        default=None,
-        description="OpenAI API key",
-    )
-    openai_model: str = Field(
-        default="gpt-4-turbo-preview",
-        description="OpenAI model name",
-    )
-    anthropic_api_key: str | None = Field(
-        default=None,
-        description="Anthropic API key",
-    )
-    anthropic_model: str = Field(
-        default="claude-3-opus-20240229",
-        description="Anthropic model name",
+    llm_timeout_seconds: int = Field(
+        default=600,
+        ge=30,
+        le=3600,
+        description="Timeout for a single LLM call (either lane).",
     )
 
-    # Recursion Settings
+    # Claude Code lane (default)
+    claude_code_oauth_token: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices(
+            "WTD_CLAUDE_CODE_OAUTH_TOKEN", "CLAUDE_CODE_OAUTH_TOKEN"
+        ),
+        description=(
+            "Claude Code OAuth token (from `claude setup-token`). Optional "
+            "on machines with an interactive `claude` login."
+        ),
+    )
+    claude_cli_path: str = Field(
+        default="claude",
+        description="Path or name of the claude CLI binary.",
+    )
+
+    # Anthropic API lane (fallback)
+    anthropic_api_key: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("WTD_ANTHROPIC_API_KEY", "ANTHROPIC_API_KEY"),
+        description="Anthropic API key for the fallback lane.",
+    )
+    anthropic_refusal_fallbacks: bool = Field(
+        default=True,
+        description=(
+            "Enable server-side refusal fallbacks (fallbacks='default') on "
+            "Opus 5 / Fable 5 requests to the Anthropic API."
+        ),
+    )
+
+    # Legacy providers (explicit opt-in only)
+    ollama_model: str = Field(default="llama3.2", description="Ollama model name")
+    ollama_host: str = Field(
+        default="http://localhost:11434", description="Ollama API host"
+    )
+    openai_api_key: str | None = Field(default=None, description="OpenAI API key")
+    openai_model: str = Field(
+        default="gpt-4-turbo-preview", description="OpenAI model name"
+    )
+
+    # ------------------------------------------------------------------
+    # GitHub (fleet work discovery + actions)
+    # ------------------------------------------------------------------
+    github_token: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("WTD_GITHUB_TOKEN", "GITHUB_TOKEN", "GH_TOKEN"),
+        description="GitHub token for fleet discovery and (with apply) writes.",
+    )
+    github_api_url: str = Field(
+        default="https://api.github.com",
+        description="GitHub REST API base URL (override for GHES).",
+    )
+
+    # ------------------------------------------------------------------
+    # Fleet orchestration
+    # ------------------------------------------------------------------
+    fleet_enabled: bool = Field(
+        default=True,
+        description="Master kill switch for the fleet subsystem.",
+    )
+    fleet_apply: bool = Field(
+        default=False,
+        description=(
+            "When false (default) fleet runs are dry-run: agents think, but "
+            "nothing is written to GitHub. Set true (or pass --apply) to act."
+        ),
+    )
+    fleet_repos: Annotated[list[str], NoDecode] = Field(
+        default_factory=list,
+        description=(
+            "Comma-separated owner/repo roster. Usually set in wtd.yml "
+            "instead; this env form is for one-off runs."
+        ),
+    )
+    fleet_config: Path | None = Field(
+        default=None,
+        description="Path to wtd.yml (default: ./wtd.yml then ~/.wtd/wtd.yml).",
+    )
+    fleet_state_dir: Path | None = Field(
+        default=None,
+        description="Fleet state directory (queue, ledger). Default: <config_dir>/fleet.",
+    )
+    fleet_interval_seconds: int = Field(
+        default=900,
+        ge=60,
+        description="Sleep between orchestrator cycles in `wtd fleet loop`.",
+    )
+    fleet_concurrency: int = Field(
+        default=2,
+        ge=1,
+        le=16,
+        description="Concurrent agent runs per cycle.",
+    )
+    fleet_max_runs_per_cycle: int = Field(
+        default=8,
+        ge=1,
+        description="Cap on agent runs per orchestrator cycle.",
+    )
+    fleet_max_writes_per_cycle: int = Field(
+        default=5,
+        ge=0,
+        description="Cap on GitHub write actions per cycle (apply mode).",
+    )
+    fleet_claude_code_daily_tokens: int = Field(
+        default=1_500_000,
+        ge=0,
+        description="Daily token budget for the Claude Code (subscription) lane.",
+    )
+    fleet_anthropic_daily_tokens: int = Field(
+        default=500_000,
+        ge=0,
+        description="Daily token budget for the Anthropic API lane.",
+    )
+    fleet_anthropic_daily_usd: float = Field(
+        default=10.0,
+        ge=0.0,
+        description="Daily estimated-spend cap (USD) for the Anthropic API lane.",
+    )
+    bot_marker: str = Field(
+        default="wtd-fleet",
+        description=(
+            "Marker embedded in everything the fleet writes to GitHub; used "
+            "for dedup and self-loop guards."
+        ),
+    )
+
+    # ------------------------------------------------------------------
+    # Recursion settings (local TODO tree)
+    # ------------------------------------------------------------------
     max_recursion_depth: int = Field(
         default=7,
         ge=1,
@@ -63,7 +197,9 @@ class WTDConfig(BaseSettings):
         description="Fitness decay per recursion level",
     )
 
-    # Execution Settings
+    # ------------------------------------------------------------------
+    # Execution settings
+    # ------------------------------------------------------------------
     auto_execute: bool = Field(
         default=False,
         description="Auto-execute generated tasks without confirmation",
@@ -75,7 +211,9 @@ class WTDConfig(BaseSettings):
         description="Timeout for first action (KFI target: 90s)",
     )
 
-    # Storage Settings
+    # ------------------------------------------------------------------
+    # Storage settings
+    # ------------------------------------------------------------------
     db_path: Path = Field(
         default=Path.home() / ".wtd" / "wtd.db",
         description="SQLite database path",
@@ -85,7 +223,9 @@ class WTDConfig(BaseSettings):
         description="Configuration directory",
     )
 
-    # UI Settings
+    # ------------------------------------------------------------------
+    # UI settings
+    # ------------------------------------------------------------------
     theme: Literal["dark", "light", "auto"] = Field(
         default="dark",
         description="Terminal UI theme",
@@ -95,7 +235,9 @@ class WTDConfig(BaseSettings):
         description="Show timestamps in output",
     )
 
-    # API / Server Settings
+    # ------------------------------------------------------------------
+    # API / server settings
+    # ------------------------------------------------------------------
     api_host: str = Field(
         default="127.0.0.1",
         description=(
@@ -124,10 +266,22 @@ class WTDConfig(BaseSettings):
         """Ensure required directories exist."""
         self.config_dir.mkdir(parents=True, exist_ok=True)
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
+        self.fleet_state_path.mkdir(parents=True, exist_ok=True)
 
-    @field_validator("api_cors_origins", mode="before")
+    @property
+    def fleet_state_path(self) -> Path:
+        """The fleet state directory, always resolved to a concrete path."""
+        return self.fleet_state_dir or (self.config_dir / "fleet")
+
+    @model_validator(mode="after")
+    def _default_fleet_state_dir(self) -> "WTDConfig":
+        if self.fleet_state_dir is None:
+            self.fleet_state_dir = self.config_dir / "fleet"
+        return self
+
+    @field_validator("api_cors_origins", "fleet_repos", mode="before")
     @classmethod
-    def _split_cors_origins(cls, value: object) -> object:
+    def _split_csv(cls, value: object) -> object:
         """Allow comma-separated values from env vars (in addition to JSON)."""
         if isinstance(value, str):
             stripped = value.strip()
