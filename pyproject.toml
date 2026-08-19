@@ -112,10 +112,11 @@ select = ["E", "F", "I", "N", "W"]
 
 [tool.mypy]
 python_version = "3.10"
-# NOTE: strict mode is the eventual goal but the current codebase is not yet
-# strict-clean. Keep CI green by enforcing the basics first; tighten over
-# time (see refactor plan, Phase 0/1).
+# The codebase is clean at this setting (0 errors), so CI GATES on mypy —
+# see .github/workflows/ci.yml. Full `strict = true` is still the eventual
+# goal; tighten a flag at a time, keeping the error count at zero.
 strict = false
+check_untyped_defs = true
 ignore_missing_imports = true
 warn_unused_ignores = true
 warn_redundant_casts = true

@@ -1,16 +1,17 @@
 """
 WTD Database Models - SQLAlchemy models for persistence
+
+Uses SQLAlchemy 2.0 typed declarative mappings (``Mapped`` +
+``mapped_column``) so attribute access carries real Python types
+(``str``, ``datetime | None``, ...) instead of ``Column[...]``.
 """
 
 from datetime import datetime
-from typing import Optional
 from uuid import uuid4
 
 from sqlalchemy import (
     Boolean,
-    Column,
     DateTime,
-    Enum,
     Float,
     ForeignKey,
     Integer,
@@ -18,68 +19,91 @@ from sqlalchemy import (
     Text,
     create_engine,
 )
-from sqlalchemy.orm import DeclarativeBase, relationship, sessionmaker
+from sqlalchemy.engine import Engine
+from sqlalchemy.orm import (
+    DeclarativeBase,
+    Mapped,
+    Session,
+    mapped_column,
+    relationship,
+    sessionmaker,
+)
 
 
 class Base(DeclarativeBase):
     """SQLAlchemy declarative base."""
+
     pass
 
 
 class SessionModel(Base):
     """WTD Session model."""
-    
+
     __tablename__ = "sessions"
-    
-    id = Column(String(36), primary_key=True, default=lambda: str(uuid4()))
-    created_at = Column(DateTime, default=datetime.now)
-    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
-    root_path = Column(String(500))
-    context = Column(String(50))
-    is_active = Column(Boolean, default=True)
-    
+
+    id: Mapped[str] = mapped_column(
+        String(36), primary_key=True, default=lambda: str(uuid4())
+    )
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.now, onupdate=datetime.now
+    )
+    root_path: Mapped[str | None] = mapped_column(String(500))
+    context: Mapped[str | None] = mapped_column(String(50))
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+
     # Relationships
-    todos = relationship("TodoModel", back_populates="session", cascade="all, delete-orphan")
+    todos: Mapped[list["TodoModel"]] = relationship(
+        "TodoModel", back_populates="session", cascade="all, delete-orphan"
+    )
 
 
 class TodoModel(Base):
     """TODO item model."""
-    
+
     __tablename__ = "todos"
-    
-    id = Column(String(36), primary_key=True, default=lambda: str(uuid4()))
-    session_id = Column(String(36), ForeignKey("sessions.id"), nullable=False)
-    parent_id = Column(String(36), ForeignKey("todos.id"), nullable=True)
-    
+
+    id: Mapped[str] = mapped_column(
+        String(36), primary_key=True, default=lambda: str(uuid4())
+    )
+    session_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("sessions.id"), nullable=False
+    )
+    parent_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("todos.id"), nullable=True
+    )
+
     # Core fields
-    title = Column(String(255), nullable=False)
-    description = Column(Text)
-    status = Column(String(20), default="pending")
-    context = Column(String(20), default="unknown")
-    priority = Column(String(20), default="medium")
-    
+    title: Mapped[str] = mapped_column(String(255), nullable=False)
+    description: Mapped[str | None] = mapped_column(Text)
+    status: Mapped[str] = mapped_column(String(20), default="pending")
+    context: Mapped[str] = mapped_column(String(20), default="unknown")
+    priority: Mapped[str] = mapped_column(String(20), default="medium")
+
     # Recursion tracking
-    depth = Column(Integer, default=0)
-    fitness_score = Column(Float, default=1.0)
-    
+    depth: Mapped[int] = mapped_column(Integer, default=0)
+    fitness_score: Mapped[float] = mapped_column(Float, default=1.0)
+
     # Source information
-    source_file = Column(String(500))
-    source_line = Column(Integer)
-    source_type = Column(String(50))
-    raw_text = Column(Text)
-    
+    source_file: Mapped[str | None] = mapped_column(String(500))
+    source_line: Mapped[int | None] = mapped_column(Integer)
+    source_type: Mapped[str | None] = mapped_column(String(50))
+    raw_text: Mapped[str | None] = mapped_column(Text)
+
     # Execution
-    result = Column(Text)
-    error = Column(Text)
-    
+    result: Mapped[str | None] = mapped_column(Text)
+    error: Mapped[str | None] = mapped_column(Text)
+
     # Timestamps
-    created_at = Column(DateTime, default=datetime.now)
-    started_at = Column(DateTime)
-    completed_at = Column(DateTime)
-    
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    started_at: Mapped[datetime | None] = mapped_column(DateTime)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime)
+
     # Relationships
-    session = relationship("SessionModel", back_populates="todos")
-    children = relationship(
+    session: Mapped["SessionModel"] = relationship(
+        "SessionModel", back_populates="todos"
+    )
+    children: Mapped[list["TodoModel"]] = relationship(
         "TodoModel",
         backref="parent",
         remote_side=[id],
@@ -88,28 +112,27 @@ class TodoModel(Base):
     )
 
 
-def get_engine(db_path: str = "sqlite:///~/.wtd/wtd.db"):
+def get_engine(db_path: str = "sqlite:///~/.wtd/wtd.db") -> Engine:
     """Create database engine."""
     import os
-    
+
     # Expand user path
     if db_path.startswith("sqlite:///~"):
         db_path = db_path.replace("~", os.path.expanduser("~"))
-    
+
     # Ensure directory exists
     if db_path.startswith("sqlite:///"):
         path = db_path.replace("sqlite:///", "")
         os.makedirs(os.path.dirname(path), exist_ok=True)
-    
+
     engine = create_engine(db_path, echo=False)
     Base.metadata.create_all(engine)
     return engine
 
 
-def get_session(engine=None):
+def get_session(engine: Engine | None = None) -> Session:
     """Create database session."""
     if engine is None:
         engine = get_engine()
-    Session = sessionmaker(bind=engine)
-    return Session()
-
+    session_factory = sessionmaker(bind=engine)
+    return session_factory()

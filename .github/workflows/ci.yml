@@ -33,12 +33,11 @@ jobs:
       # formatted; a repo-wide reformat is tracked as a follow-up.
 
   typecheck:
-    name: Type-check (mypy, advisory)
-    # NOTE: mypy is intentionally non-blocking until the existing baseline
-    # of type errors is cleaned up (see refactor plan). Surfacing issues
-    # in CI today, gating on them in a follow-up.
+    name: Type-check (mypy)
+    # The former baseline of type errors is cleared, so this now GATES:
+    # every one of those errors was a real defect waiting to happen (the
+    # dashboard widget could not even be constructed). Keep it at zero.
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7

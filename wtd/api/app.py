@@ -46,10 +46,15 @@ def create_app() -> FastAPI:
             allow_headers=["Authorization", "Content-Type"],
         )
 
-    # Global state (in production, use proper state management)
-    app.state.trees: dict[str, TodoTree] = {}
-    app.state.agents: dict[str, WTDAgent] = {}
-    app.state.stores: dict[str, TreeStore] = {}
+    # Global state (in production, use proper state management).
+    # Annotated locals, then attached: attribute annotations on a non-self
+    # object are not valid Python typing syntax.
+    trees: dict[str, TodoTree] = {}
+    agents: dict[str, WTDAgent] = {}
+    stores: dict[str, TreeStore] = {}
+    app.state.trees = trees
+    app.state.agents = agents
+    app.state.stores = stores
 
     # Request/Response models
     class ScanRequest(BaseModel):

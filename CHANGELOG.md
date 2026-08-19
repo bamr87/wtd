@@ -53,10 +53,10 @@ The platform release: WTD grows from a local recursive TODO engine into a
   gated on the `WTD_FLEET_ENABLED` repo variable, OAuth-first secrets).
 - **Docs**: README rewritten around the platform; `docs/FLEET.md`
   architecture + ADR-lite decisions; `env.example` reorganized.
-- **Tests**: 112 new tests (148 total) — balancer, scheduler, outcome
+- **Tests**: 116 new tests (152 total) — balancer, scheduler, outcome
   validation, discovery (mock GitHub transport), dispatcher and orchestrator
   integration (fake provider + fake GitHub), provider router failover, role
-  registry. All offline.
+  registry, dashboard widget. All offline.
 
 ### Changed
 - **Default provider flipped from Ollama to the Claude chain** (`auto`).
@@ -71,12 +71,26 @@ The platform release: WTD grows from a local recursive TODO engine into a
 - Secrets are read from conventional unprefixed env vars too:
   `CLAUDE_CODE_OAUTH_TOKEN`, `ANTHROPIC_API_KEY`, `GITHUB_TOKEN`/`GH_TOKEN`.
 - Project metadata: repository URLs point at `bamr87/wtd`; version 0.2.0.
+- `wtd/db/models.py` migrated to SQLAlchemy 2.0 typed declarative mappings
+  (`Mapped` / `mapped_column`), so the repository layer reads real Python
+  types (`str`, `datetime | None`) instead of `Column[...]`; nullability is
+  now declared per column. Verified with a full save/read round-trip.
+- The mypy baseline is cleared (30 errors → 0) and **CI now gates on
+  type-checking** instead of running it advisory-only; `check_untyped_defs`
+  is enabled since the tree is clean at that level too.
 
 ### Fixed
 - `wtd routines review` crashed: the CLI called a method
   (`get_routines_needing_review`) that didn't exist on `RoutineManager`.
 - `wtd fleet loop --interval 0`-style falsy-zero intervals no longer fall
   back to the 900s default (orchestrator loop interval handling).
+- **`wtd dashboard` could never open**: `TodoTreeWidget` defined a helper
+  named `_add_node`, shadowing Textual's `Tree._add_node` internal (called
+  as `self._add_node(parent, label, data)` from `Tree.__init__`). The
+  clashing two-argument override made constructing the widget raise
+  `TypeError`. Renamed to `_add_todo_node`, with regression tests.
+- `create_app()` used attribute annotations on a non-`self` object
+  (`app.state.trees: dict[...] = {}`), which is not valid typing syntax.
 
 ## [0.1.1] - 2025-12-20
 
