@@ -5,6 +5,33 @@ All notable changes to **WTD (What To Do)** will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- **Fleet harmonization layer** — a shared `fleet/v1` manifest so several
+  repositories running their own autonomous AI loops can be viewed, audited,
+  and operated through one tool:
+  - `wtd/fleet/manifest.py` — the spec: lanes (kind/harness/triggers/switch),
+    a token contract, guardrails, and metering. Vocabulary is adopted from the
+    prior art in the fleet rather than invented (the hub's `tokens:` shape,
+    irony-works' `harness`/`guardrails`/`metering`, lifehacker.dev's
+    `*_ENABLED` switch discipline).
+  - `wtd/fleet/adopt.py` — derives a manifest by reading a repo's workflows,
+    from a local checkout or over the GitHub API, so adoption is generated
+    rather than hand-written.
+  - `wtd/fleet/conventions.py` — the house rules as executable checks
+    (switch-required, never-merge, pr-only, oauth-first, cross-repo-token,
+    metering, cadence-collision) producing a per-repo score and grade.
+  - `wtd/fleet/textscan.py` — reads what a workflow *does*, not what it talks
+    about. A prompt forbidding merges, a grep detecting them, and a real merge
+    command all contain `gh pr merge`; conflating them produced three false
+    findings out of four on the first audit run. Technique borrowed from
+    gitorio's Fleet Ops comment-stripper.
+  - CLI: `wtd fleet map | audit | adopt`, plus `fleet.manifest.yml` for wtd.
+  - `docs/FLEET-SPEC.md` — the spec, the rule table, and the adoption steps.
+- 52 new tests (204 total), including regression cases for each false-positive
+  shape found against the real repositories.
+
 ## [0.2.0] - 2026-08-19
 
 The platform release: WTD grows from a local recursive TODO engine into a

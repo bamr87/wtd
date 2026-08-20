@@ -10,6 +10,7 @@ Usage:
 """
 
 import asyncio
+import re
 from pathlib import Path
 from typing import Optional
 
@@ -1027,6 +1028,135 @@ def fleet_budget():
         default_lanes(settings), cfg.fleet_state_path / "capacity.json"
     )
     print_lanes([asdict(s) for s in balancer.snapshot()])
+
+
+def _collect_manifests(repos, paths, use_github):
+    """Gather manifests for the requested repos, from disk or GitHub."""
+    import asyncio
+    from pathlib import Path as _Path
+
+    from wtd.fleet.adopt import derive_manifest, derive_manifest_from_github
+    from wtd.fleet.manifest import MANIFEST_FILENAME, ManifestError, load_manifest
+    from wtd.fleet.settings import load_settings
+
+    cfg = get_config()
+    slugs = list(repos) if repos else load_settings(cfg).repo_slugs()
+    if not slugs and not paths:
+        console.error("No repos to inspect. Set fleet.repos in wtd.yml, or pass --repo/--path.")
+        raise typer.Exit(1)
+
+    manifests = []
+    # Local checkouts first: a committed manifest always wins over inference.
+    for raw in paths or []:
+        root = _Path(raw).expanduser().resolve()
+        if not root.is_dir():
+            console.warning(f"skipping {root}: not a directory")
+            continue
+        committed = root / MANIFEST_FILENAME
+        slug = f"local/{root.name}"
+        if committed.is_file():
+            try:
+                manifests.append(load_manifest(committed))
+                continue
+            except ManifestError as exc:
+                console.warning(f"{committed}: {exc}; falling back to inference")
+        manifests.append(derive_manifest(root, slug))
+
+    if slugs and use_github:
+        async def _fetch():
+            from wtd.fleet.github import GitHubClient
+
+            client = GitHubClient(cfg.github_token, api_url=cfg.github_api_url)
+            try:
+                return [await derive_manifest_from_github(client, s) for s in slugs]
+            finally:
+                await client.aclose()
+
+        manifests.extend(asyncio.run(_fetch()))
+    return manifests
+
+
+@fleet_app.command("map")
+def fleet_map(
+    repo: list[str] = typer.Option(None, "--repo", "-r", help="owner/name (repeatable)"),
+    path: list[str] = typer.Option(
+        None, "--path", "-P", help="Local checkout to inspect (repeatable)"
+    ),
+    no_github: bool = typer.Option(
+        False, "--no-github", help="Only inspect --path checkouts"
+    ),
+):
+    """🗺  Show every AI lane across the fleet in one view."""
+    from wtd.ui.harmony_output import print_fleet_map
+
+    print_fleet_map(_collect_manifests(repo, path, not no_github))
+
+
+@fleet_app.command("audit")
+def fleet_audit(
+    repo: list[str] = typer.Option(None, "--repo", "-r", help="owner/name (repeatable)"),
+    path: list[str] = typer.Option(None, "--path", "-P", help="Local checkout (repeatable)"),
+    no_github: bool = typer.Option(False, "--no-github", help="Only inspect --path checkouts"),
+    verbose: bool = typer.Option(False, "--verbose", "-v", help="Include info findings"),
+    strict: bool = typer.Option(
+        False, "--strict", help="Exit non-zero when any critical finding is found"
+    ),
+):
+    """⚖  Audit every repo against the fleet's shared conventions."""
+    from wtd.fleet.conventions import audit_fleet
+    from wtd.ui.harmony_output import print_audit
+
+    reports = audit_fleet(_collect_manifests(repo, path, not no_github))
+    print_audit(reports, verbose=verbose)
+    if strict and any(r.by_severity("critical") for r in reports):
+        raise typer.Exit(1)
+
+
+@fleet_app.command("adopt")
+def fleet_adopt(
+    path: str = typer.Argument(..., help="Local repo checkout to read"),
+    repo: Optional[str] = typer.Option(
+        None, "--repo", "-r", help="owner/name to stamp (default: inferred from git remote)"
+    ),
+    write: bool = typer.Option(
+        False, "--write", help="Write fleet.manifest.yml into the repo"
+    ),
+):
+    """🧬 Derive a repo's fleet manifest from its workflows."""
+    import subprocess
+
+    from wtd.fleet.adopt import derive_manifest
+    from wtd.fleet.manifest import MANIFEST_FILENAME
+    from wtd.ui.harmony_output import print_manifest
+
+    root = Path(path).expanduser().resolve()
+    if not root.is_dir():
+        console.error(f"Not a directory: {root}")
+        raise typer.Exit(1)
+
+    slug = repo
+    if not slug:
+        try:
+            url = subprocess.run(
+                ["git", "-C", str(root), "remote", "get-url", "origin"],
+                capture_output=True, text=True, timeout=10, check=False,
+            ).stdout.strip()
+            match = re.search(r"[:/]([^/:]+/[^/]+?)(?:\.git)?$", url)
+            slug = match.group(1) if match else f"local/{root.name}"
+        except (OSError, subprocess.SubprocessError):
+            slug = f"local/{root.name}"
+
+    manifest = derive_manifest(root, slug)
+    if write:
+        target = root / MANIFEST_FILENAME
+        target.write_text(manifest.to_yaml(), encoding="utf-8")
+        console.success(f"Wrote {target}")
+        console.muted(
+            f"{len(manifest.lanes)} lane(s) detected — review it: inference is a "
+            "starting point, not the last word."
+        )
+    else:
+        print_manifest(manifest)
 
 
 @fleet_app.command("init")

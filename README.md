@@ -86,6 +86,9 @@ Dry-run is the default everywhere: without `--apply` (or `WTD_FLEET_APPLY=true`)
 | `wtd fleet queue` | Show the cross-repo work queue |
 | `wtd fleet budget` | Today's token budgets and burn per lane |
 | `wtd fleet init` | Write starter `wtd.yml` + `agents/` here |
+| `wtd fleet map` | Every AI lane across every repo, in one table |
+| `wtd fleet audit` | Conformance against the fleet's shared conventions |
+| `wtd fleet adopt <path>` | Derive a repo's `fleet.manifest.yml` from its workflows |
 | `wtd` | Classic mode: scan the local repo's TODOs into a recursive tree |
 | `wtd scan` / `wtd dashboard` / `wtd execute` / `wtd status` | Local TODO tree tools |
 | `wtd routines …` | Recurring TODO management |
@@ -178,9 +181,24 @@ mypy wtd          # advisory
 
 The load balancer, scheduler, outcome validator, and discovery scanners are pure and fully unit-tested; the dispatcher and orchestrator are integration-tested against an in-memory GitHub.
 
+## 🧭 Harmonizing a multi-repo fleet
+
+When several repositories each grow their own autonomous loops, they drift into different dialects — and you lose the one view that matters: *which loops run tonight, and which of them can I stop?*
+
+The **fleet manifest** (`fleet.manifest.yml`, spec `fleet/v1`) is the common denominator: a small descriptor of a repo's lanes, their kill switches, the credentials they need, and the guardrails they promise. Each repo keeps its own engine; the manifest is how one tool sees them all.
+
+```bash
+wtd fleet adopt ../some-repo --write   # derive it from the repo's workflows
+wtd fleet map                          # every lane, every repo, one table
+wtd fleet audit --strict               # fail CI on a critical convention breach
+```
+
+The audit encodes what the repos already say in prose: every scheduled AI loop needs an off switch, no agent merges its own work, nothing pushes straight to the default branch, Claude auth is OAuth-first with an API-key fallback. Full spec and rule table: [`docs/FLEET-SPEC.md`](docs/FLEET-SPEC.md).
+
 ## 📚 More
 
 - [`docs/FLEET.md`](docs/FLEET.md) — full architecture: subsystems, data flow, contracts, design decisions
+- [`docs/FLEET-SPEC.md`](docs/FLEET-SPEC.md) — the `fleet/v1` manifest spec + the shared-convention rules
 - [`PRD.md`](PRD.md) — the original product vision (v0.1)
 - [`CHANGELOG.md`](CHANGELOG.md) — release history
 
