@@ -1,0 +1,30 @@
+# wtd.yml — the live fleet roster (see docs/FLEET.md)
+#
+# Secrets never live here: CLAUDE_CODE_OAUTH_TOKEN / ANTHROPIC_API_KEY /
+# GITHUB_TOKEN come from the environment (or repo secrets in CI).
+fleet:
+  repos:
+    - repo: bamr87/wtd
+      roles: [triage, bug-hunter, reviewer, janitor, doc-writer]
+    - repo: bamr87/gitorio
+      roles: [triage, bug-hunter, reviewer, janitor]
+    - repo: bamr87/bamr87
+      roles: [triage, bug-hunter, reviewer, janitor]
+
+  scan:
+    issues: true
+    pulls: true
+    ci: true
+    docs: true
+
+  # Per-cycle safety rails. Writes are capped low on purpose: an
+  # autonomous loop should trickle, not flood.
+  max_runs_per_cycle: 8
+  max_writes_per_cycle: 8
+  max_discovered_per_run: 5
+  max_attempts: 3
+
+  budgets:
+    claude_code_daily_tokens: 1500000
+    anthropic_daily_tokens: 500000
+    anthropic_daily_usd: 10
