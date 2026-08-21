@@ -32,6 +32,17 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - 52 new tests (204 total), including regression cases for each false-positive
   shape found against the real repositories.
 
+### Fixed
+- Documentation drift corrected against the tree: the README advertised 148
+  tests (the suite is 204) and both the README and `CLAUDE.md` still described
+  `mypy` as advisory, though CI has gated on it since 0.2.0.
+- `docs/FLEET.md` D5 now records that dedup is **two-layered** — the local
+  queue is a cache, the GitHub marker comment is the durable record — which is
+  what lets independent harnesses share a fleet without double-posting.
+  Evidenced by the first unattended Actions cycle: a cold state cache
+  rediscovered already-completed work, dispatched six agents, and the marker
+  check refused all six writes.
+
 ## [0.2.0] - 2026-08-19
 
 The platform release: WTD grows from a local recursive TODO engine into a
