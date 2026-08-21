@@ -174,9 +174,9 @@ The original local-first engine is still here and still the substrate: `wtd` sca
 
 ```bash
 pip install -e ".[dev]"
-pytest            # 148 tests, all offline (fake GitHub + fake providers)
+pytest            # 204 tests, all offline (fake GitHub + fake providers)
 ruff check .
-mypy wtd          # advisory
+mypy wtd          # gates CI
 ```
 
 The load balancer, scheduler, outcome validator, and discovery scanners are pure and fully unit-tested; the dispatcher and orchestrator are integration-tested against an in-memory GitHub.

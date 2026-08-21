@@ -18,7 +18,7 @@ wtd serve                 # REST API on 127.0.0.1:8787
 pytest
 # lint / typecheck:
 ruff check .
-mypy wtd                  # advisory (not yet strict-clean)
+mypy wtd                  # gates CI (baseline is clean)
 ```
 
 ## Architecture in seven lines
