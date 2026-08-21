@@ -21,14 +21,15 @@ ruff check .
 mypy wtd                  # advisory (not yet strict-clean)
 ```
 
-## Architecture in six lines
+## Architecture in seven lines
 
 1. `wtd/providers/` — the model lanes: `claude-code` (headless `claude -p`, OAuth/subscription, default) → `anthropic` (SDK, `claude-opus-5`, fallback); router fails over on retryable errors; legacy ollama/openai are explicit opt-ins only.
 2. `wtd/fleet/discovery.py` scans the roster (wtd.yml) into `WorkItem`s with **stable dedup keys** — rescans converge, never duplicate.
 3. `wtd/fleet/scheduler.py` (pure) matches items to roles: priority bands + per-repo round-robin fairness; `balancer.py` (pure) picks the provider lane by daily token budget with reservations and cooldowns.
 4. `wtd/fleet/dispatcher.py` runs one agent: bounded untrusted-fenced context → JSON **output contract** → `outcome.py` validates every action against the role's grants → apply-gated GitHub writes with dedup markers.
 5. `wtd/fleet/orchestrator.py` is the autonomous mechanism: `cycle()` (discover → schedule → dispatch → persist) and `loop()` (the daemon). Dry-run is the default posture; `--apply`/`WTD_FLEET_APPLY=true` is the only write gate.
-6. The classic recursive TODO engine (`wtd/core/`) remains the local substrate (`wtd scan`, tree.json).
+6. `wtd/fleet/manifest.py` + `adopt.py` + `conventions.py` are the **harmonization layer**: one `fleet/v1` descriptor every repo publishes, derived automatically from its workflows, audited against the fleet's shared conventions (`wtd fleet map|audit|adopt`). Read `docs/FLEET-SPEC.md`.
+7. The classic recursive TODO engine (`wtd/core/`) remains the local substrate (`wtd scan`, tree.json).
 
 ## Golden rules
 
@@ -37,6 +38,7 @@ mypy wtd                  # advisory (not yet strict-clean)
 - **`.github/workflows/` is unwritable by agents — no exceptions** (it would execute with the fleet's own secrets). The guard lives in `outcome.py::_safe_rel_path`.
 - **Everything the fleet writes carries the marker** (`<!-- wtd-fleet:<dedup_key> -->`) and everything it reads checks for it — that's what keeps the loop from feeding itself.
 - **Keep pure things pure.** balancer/scheduler/outcome/discovery item-building take no I/O and stay clock-injected; new logic there needs unit tests in the same style (see `tests/`).
+- **Read behaviour, not prose.** Workflow scanning goes through `wtd/fleet/textscan.py`: a prompt forbidding merges and a grep detecting them both contain `gh pr merge`, and conflating them produced three false findings out of four. Prefer missing a behaviour to inventing one.
 - **Verify, don't recall**: check current `claude` CLI flags and `anthropic` SDK params against their docs before changing provider code; model IDs and API shapes drift.
 
 ## Conventions
