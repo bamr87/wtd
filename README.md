@@ -83,6 +83,8 @@ Dry-run is the default everywhere: without `--apply` (or `WTD_FLEET_APPLY=true`)
 | `wtd fleet plan` | Show what the next cycle would run |
 | `wtd fleet run [--apply]` | Run one cycle: discover → schedule → dispatch |
 | `wtd fleet loop [--apply]` | The autonomous loop (interval from config) |
+| `wtd fleet daily [--apply]` | The daily pass: docs drift → review every PR (Opus 5) → merge what is green |
+| `wtd fleet merge-check` | Read-only: why each open PR would, or would not, be merged |
 | `wtd fleet queue` | Show the cross-repo work queue |
 | `wtd fleet budget` | Today's token budgets and burn per lane |
 | `wtd fleet init` | Write starter `wtd.yml` + `agents/` here |
@@ -115,6 +117,15 @@ fleet:
     - repo: you/your-blog
       roles: [author]
       articles: true
+    - repo: you/docs-site
+      roles: [reviewer, doc-writer]
+      merge: true             # opt in to the merge gate for this repo
+  daily:                      # the once-a-day pass (`wtd fleet daily`)
+    docs: true                # docs-drift sweep across the roster
+    review: true              # queue every open PR for the Opus 5 reviewer
+  merge:
+    enabled: false            # off by default; --apply is still required too
+    method: squash
   max_runs_per_cycle: 8
   max_writes_per_cycle: 5
   budgets:
@@ -128,6 +139,7 @@ Key environment switches:
 ```bash
 WTD_FLEET_ENABLED=true      # master kill switch
 WTD_FLEET_APPLY=false       # THE write gate (dry-run by default)
+WTD_FLEET_MERGE_ENABLED=false       # the merge gate's own switch (default for wtd.yml)
 WTD_FLEET_CONCURRENCY=2     # concurrent agent runs
 WTD_MODEL=claude-opus-5     # default model for both lanes
 ```
@@ -143,6 +155,7 @@ The fleet is autonomous, so the guardrails are structural, not aspirational:
 - **Dedup everywhere** — stable work-item keys, marker-checked comments and issues; re-running never double-posts.
 - **Hard caps** — per-cycle run cap, per-cycle write cap, per-run action cap (3), per-run discovered-todo cap, retry cap.
 - **Path safety** — proposed PRs can't escape the repo, and can never write `.github/workflows/` (that would hand the agent its own credentials).
+- **Merging is two-key and four-locked** — an Opus 5 reviewer may *recommend* a merge; a pure gate re-verifies CI, mergeability, review state, and policy before anything is merged, and refuses fleet-authored PRs unless a repo opts in. See [the merge gate](docs/FLEET.md#the-merge-gate).
 - **Token budgets** — daily per-lane budgets + an estimated-USD cap on the API lane; exhausted budgets defer work instead of overspending.
 - **Prompt-injection posture** — repository content is fenced as untrusted in every prompt, and roles are instructed to ignore embedded instructions.
 
@@ -158,9 +171,9 @@ docker run --rm -e CLAUDE_CODE_OAUTH_TOKEN -e ANTHROPIC_API_KEY -e GITHUB_TOKEN 
   -v $PWD/wtd.yml:/app/wtd.yml:ro -v wtd-state:/root/.wtd wtd fleet loop --apply
 ```
 
-**GitHub Actions** (serverless): [`.github/workflows/fleet-loop.yml`](.github/workflows/fleet-loop.yml) runs one cycle every 4 hours — default-OFF until the repo variable `WTD_FLEET_ENABLED` is set to `true`, OAuth-first secrets, state cached between runs.
+**GitHub Actions** (serverless): [`.github/workflows/fleet-loop.yml`](.github/workflows/fleet-loop.yml) runs one cycle every 4 hours — default-OFF until the repo variable `WTD_FLEET_ENABLED` is set to `true`, OAuth-first secrets, state cached between runs. [`.github/workflows/fleet-daily.yml`](.github/workflows/fleet-daily.yml) adds the daily pass (docs drift → PR review → merge gate) at 07:17 UTC, with `WTD_FLEET_MERGE_ENABLED` as the merge gate's own switch.
 
-**REST API**: `wtd serve` → `GET /v1/fleet/status`, `GET /v1/fleet/queue`, `GET /v1/fleet/runs`, `POST /v1/fleet/discover`, `POST /v1/fleet/run` (the API can narrow to dry-run but can never escalate to writes; docs at `http://localhost:8787/docs`).
+**REST API**: `wtd serve` → `GET /v1/fleet/status`, `GET /v1/fleet/queue`, `GET /v1/fleet/runs`, `POST /v1/fleet/discover`, `POST /v1/fleet/run`, `POST /v1/fleet/daily` (the API can narrow to dry-run but can never escalate to writes; docs at `http://localhost:8787/docs`).
 
 ## 🤖 Custom agents
 

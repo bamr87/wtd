@@ -27,6 +27,32 @@ lanes:
   guardrails:
     never_merges: true
     opens_pull_requests: false
+- id: fleet-daily
+  kind: orchestrator
+  harness: wtd-fleet
+  implementation: .github/workflows/fleet-daily.yml
+  description: Fleet Daily — docs-drift sweep, Opus 5 PR review, merge gate
+  triggers:
+  - kind: schedule
+    cron: 17 7 * * *
+  - kind: dispatch
+  switch: WTD_FLEET_ENABLED
+  uses_tokens:
+  - ANTHROPIC_API_KEY
+  - CLAUDE_CODE_OAUTH_TOKEN
+  - FLEET_TOKEN
+  guardrails:
+    # Declared, not derived: this lane's merge happens inside the installed
+    # `wtd` package, so a scanner reading the workflow text sees no merge
+    # command and would infer never_merges: true. It is the fleet's one
+    # sanctioned merge lane, and `wtd fleet audit` should say so out loud.
+    # Four locks stand between it and a merge: WTD_FLEET_APPLY,
+    # WTD_FLEET_MERGE_ENABLED, `merge: true` on the repo in wtd.yml, and the
+    # deterministic gate in wtd/fleet/mergegate.py. It never merges the
+    # fleet's own pull requests unless allow_fleet_authored is turned on.
+    never_merges: false
+    opens_pull_requests: true
+    dedup_marker: wtd-fleet
 - id: fleet-loop
   kind: orchestrator
   harness: wtd-fleet
@@ -51,6 +77,7 @@ tokens:
   purpose: Fallback Claude auth, used only when the OAuth token is absent.
   used_by:
   - claude
+  - fleet-daily
   - fleet-loop
 - name: CLAUDE_CODE_OAUTH_TOKEN
   scope: fleet
@@ -58,12 +85,14 @@ tokens:
   purpose: 'Preferred Claude auth (house convention: OAuth first). Produced by `claude setup-token`.'
   used_by:
   - claude
+  - fleet-daily
   - fleet-loop
 - name: FLEET_TOKEN
   scope: fleet
   required: true
   purpose: 'Cross-repo PAT: lets a lane see and act on other repositories.'
   used_by:
+  - fleet-daily
   - fleet-loop
 metering:
   daily_token_budget: 1500000

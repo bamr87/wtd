@@ -145,6 +145,85 @@ class GitHubClient:
     ) -> list[dict[str, Any]]:
         return await self.get(f"/repos/{repo}/pulls/{number}/files", per_page=per_page)
 
+    async def get_pull(self, repo: str, number: int) -> dict[str, Any]:
+        """One pull request, including ``mergeable``/``mergeable_state``.
+
+        Those two fields are absent from the list endpoint and computed
+        lazily by GitHub, so a freshly pushed PR reports ``None`` until the
+        background job finishes — the merge gate treats that as "retry",
+        never as "fine".
+        """
+        return await self.get(f"/repos/{repo}/pulls/{number}")
+
+    async def list_pull_reviews(
+        self, repo: str, number: int, *, per_page: int = 50
+    ) -> list[dict[str, Any]]:
+        return await self.get(f"/repos/{repo}/pulls/{number}/reviews", per_page=per_page)
+
+    async def list_check_runs(
+        self, repo: str, ref: str, *, per_page: int = 100
+    ) -> list[dict[str, Any]]:
+        """Check runs for a commit (the modern CI signal)."""
+        data = await self.get(f"/repos/{repo}/commits/{ref}/check-runs", per_page=per_page)
+        return (data or {}).get("check_runs", [])
+
+    async def get_combined_status(self, repo: str, ref: str) -> dict[str, Any]:
+        """The legacy commit-status rollup, still used by many integrations."""
+        return await self.get(f"/repos/{repo}/commits/{ref}/status")
+
+    async def list_commits(
+        self,
+        repo: str,
+        *,
+        path: str | None = None,
+        since: str | None = None,
+        sha: str | None = None,
+        per_page: int = 30,
+    ) -> list[dict[str, Any]]:
+        """Commits on the default (or given) branch, optionally path-filtered."""
+        params: dict[str, Any] = {"per_page": per_page}
+        if path:
+            params["path"] = path
+        if since:
+            params["since"] = since
+        if sha:
+            params["sha"] = sha
+        # Via _request, not get(): a "path" query parameter would collide
+        # with get()'s own positional `path` argument.
+        data = await self._request("GET", f"/repos/{repo}/commits", params=params)
+        return data if isinstance(data, list) else []
+
+    async def merge_inputs(self, repo: str, number: int) -> dict[str, Any]:
+        """Everything the merge gate needs about one PR, in one call site.
+
+        Fetched together so the decision describes a single moment: the
+        pull request, the CI signals on its head commit, and its reviews.
+        """
+        pull = await self.get_pull(repo, number)
+        head_sha = str((pull.get("head") or {}).get("sha", ""))
+        check_runs: list[dict[str, Any]] = []
+        combined: dict[str, Any] = {}
+        if head_sha:
+            try:
+                check_runs = await self.list_check_runs(repo, head_sha)
+            except GitHubError:
+                check_runs = []
+            try:
+                combined = await self.get_combined_status(repo, head_sha)
+            except GitHubError:
+                combined = {}
+        try:
+            reviews = await self.list_pull_reviews(repo, number)
+        except GitHubError:
+            reviews = []
+        return {
+            "pull": pull,
+            "head_sha": head_sha,
+            "check_runs": check_runs,
+            "combined_status": combined,
+            "reviews": reviews,
+        }
+
     async def list_issue_comments(
         self, repo: str, number: int, *, per_page: int = 50
     ) -> list[dict[str, Any]]:
@@ -271,6 +350,32 @@ class GitHubClient:
             head=head,
             base=base,
             draft=draft,
+        )
+
+    async def merge_pull(
+        self,
+        repo: str,
+        number: int,
+        *,
+        sha: str,
+        method: str = "squash",
+        commit_title: str | None = None,
+        commit_message: str | None = None,
+    ) -> dict[str, Any]:
+        """Merge a pull request, but only if its head is still ``sha``.
+
+        Passing ``sha`` makes the merge conditional server-side: if anyone
+        pushed between the gate's verdict and this call, GitHub refuses
+        with 409 rather than merging code nothing reviewed.
+        """
+        self._require_auth()
+        payload: dict[str, Any] = {"sha": sha, "merge_method": method}
+        if commit_title:
+            payload["commit_title"] = commit_title
+        if commit_message:
+            payload["commit_message"] = commit_message
+        return await self._request(
+            "PUT", f"/repos/{repo}/pulls/{number}/merge", json_body=payload
         )
 
     async def propose_pr(

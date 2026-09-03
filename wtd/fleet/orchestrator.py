@@ -14,6 +14,11 @@ One **cycle**:
 ``loop()`` repeats cycles forever with a sleep interval — that is the
 standalone daemon. A single ``cycle()`` is also directly invokable for
 cron/GitHub Actions harnesses.
+
+``daily()`` is the once-a-day pass on top of that mechanism: the docs-drift
+sweep across the roster, a review of every open pull request by the Opus 5
+reviewer, and the merge gate for the ones that came back approved and green
+(:mod:`wtd.fleet.daily`).
 """
 
 from __future__ import annotations
@@ -24,8 +29,10 @@ from dataclasses import dataclass, field
 
 from wtd.config import WTDConfig, get_config
 from wtd.fleet.balancer import CapacityBalancer, LaneSnapshot, default_lanes
+from wtd.fleet.daily import DailyHarness, DailyReport, gather_daily
 from wtd.fleet.discovery import discover_all
 from wtd.fleet.dispatcher import CycleBudget, Dispatcher
+from wtd.fleet.docsdrift import utc_day
 from wtd.fleet.github import GitHubClient, GitHubError
 from wtd.fleet.models import AgentRunRecord, WorkStatus
 from wtd.fleet.roles import load_roles
@@ -191,6 +198,83 @@ class FleetOrchestrator:
         )
         report.lanes = self.balancer.snapshot()
         return report
+
+    # ------------------------------------------------------------------
+    def harness(self, *, now=None) -> DailyHarness:
+        return DailyHarness(
+            self.github,
+            self.settings,
+            self.state,
+            bot_marker=self.config.bot_marker,
+            now=now,
+        )
+
+    async def daily(
+        self,
+        *,
+        apply: bool | None = None,
+        repos: list[str] | None = None,
+        max_runs: int | None = None,
+        run_agents: bool = True,
+        discover: bool = False,
+    ) -> tuple[DailyReport, CycleReport | None]:
+        """The daily pass: docs sweep → review sweep → agents → merge gate.
+
+        Ordering matters. The sweeps queue work first so the cycle that
+        follows can act on it in the same run, and the merge sweep goes
+        last so a review that lands an approval this morning can merge the
+        same morning — while yesterday's approvals, whose CI has since gone
+        green, merge without another model call.
+        """
+        report = DailyReport(day=utc_day(), apply=False)
+
+        if not self.config.fleet_enabled:
+            report.notes.append("fleet disabled via WTD_FLEET_ENABLED — nothing run")
+            return report, None
+
+        apply = self.config.fleet_apply if apply is None else apply
+        if apply and not self.config.github_token:
+            apply = False
+            report.notes.append(
+                "apply requested but no GitHub token configured — dry-run instead"
+            )
+        report.apply = apply
+
+        if not self.settings.repos:
+            report.notes.append(
+                "no repos on the roster (set fleet.repos in wtd.yml or WTD_FLEET_REPOS)"
+            )
+            return report, None
+
+        harness = self.harness()
+        report.docs, report.reviews = await gather_daily(
+            harness,
+            repos=repos,
+            docs=self.settings.daily.docs,
+            review=self.settings.daily.review,
+        )
+        self.state.save()
+
+        cycle_report: CycleReport | None = None
+        if run_agents:
+            cycle_report = await self.cycle(
+                apply=apply,
+                repos=repos,
+                max_runs=max_runs,
+                skip_discovery=not discover,
+            )
+
+        report.merges = await harness.merge_sweep(repos, apply=apply)
+        if not any(
+            self.settings.merge_policy_for(slug).enabled
+            for slug in (repos or self.settings.repo_slugs())
+        ):
+            report.notes.append(
+                "merging is off for every repo in scope "
+                "(fleet.merge.enabled + per-repo 'merge: true' both required)"
+            )
+        self.state.save()
+        return report, cycle_report
 
     # ------------------------------------------------------------------
     async def loop(

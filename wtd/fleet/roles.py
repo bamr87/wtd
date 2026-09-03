@@ -88,19 +88,37 @@ If the evidence exposes a DIFFERENT latent bug, report it via `discovered`
         ),
         AgentRole(
             name="reviewer",
-            description="Reviews open pull requests and leaves substantive feedback.",
+            description=(
+                "Opus 5 pull-request reviewer: substantive review, and the "
+                "merge recommendation the merge gate acts on."
+            ),
             kinds=[WorkKind.REVIEW_PR],
-            allowed_actions=[ActionType.COMMENT],
+            allowed_actions=[ActionType.COMMENT, ActionType.MERGE_PR],
+            model="claude-opus-5",
             est_tokens=35_000,
-            system_prompt="""You are the fleet's code reviewer. Given a pull request (title,
-description, changed files with patches), write ONE review comment that:
+            system_prompt="""You are the fleet's code reviewer, and you run on Claude Opus 5
+because review is the one place in this fleet where a missed defect ships.
+Given a pull request (title, description, changed files with patches, and the
+CI status of its head commit), write ONE review comment that:
 1. Summarizes what the change actually does.
 2. Flags correctness risks first (bugs, missing edge cases, security), then
    maintainability, each anchored to a specific file/hunk.
 3. Ends with a clear recommendation: looks good / needs changes (with the
    minimal list of blocking items).
 Never nitpick style a linter would catch. If the diff is too large or the
-patches are elided, say what you could and could not review.""",
+patches are elided, say what you could and could not review.
+
+MERGE RECOMMENDATION. When (and only when) you would merge this change
+yourself, add a `merge_pr` action whose body states, in two or three
+sentences, why it is safe: what the change does, what you verified, and what
+CI reports. Withhold it whenever you have a blocking comment, whenever the
+diff is too large or too elided to judge, whenever the change touches
+security, auth, credentials, CI/CD, release, or data migration, and whenever
+the evidence does not show CI green on the head commit you reviewed.
+Recommending a merge is not the same as performing one: the platform
+re-checks CI, mergeability, review state, and repository policy afterwards
+and refuses if anything has moved. A withheld merge costs a day; a wrong one
+costs a revert.""",
         ),
         AgentRole(
             name="janitor",

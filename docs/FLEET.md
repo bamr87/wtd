@@ -32,7 +32,10 @@ wtd/fleet/                the platform
   context.py              per-kind bounded evidence builders
   outcome.py              structured-output parsing + action validation
   dispatcher.py           one run end-to-end (apply-gated writes)
-  orchestrator.py         cycle() + loop(): the autonomous mechanism
+  orchestrator.py         cycle() + loop() + daily(): the autonomous mechanism
+  docsdrift.py            pure: have the docs kept up with the code?
+  mergegate.py            pure: may this pull request be merged, and why not?
+  daily.py                the daily sweeps: docs drift, PR review, merge
   monitor.py              status aggregation for CLI/API
 ```
 
@@ -48,9 +51,9 @@ Dedup keys make the whole system convergent: rescans refresh evidence on existin
 |---|---|---|
 | `triage_issue` | open issue with no labels | triage |
 | `fix_bug` | issue labeled `bug` | bug-hunter |
-| `review_pr` | open non-draft PR not authored by the fleet | reviewer |
+| `review_pr` | open non-draft PR not authored by the fleet; the daily sweep adds every open PR, keyed by head commit | reviewer (Opus 5) |
 | `investigate_ci` | latest run of a workflow on the default branch failed | janitor |
-| `write_docs` | README missing or under 300 chars | doc-writer |
+| `write_docs` | README missing/thin, or the daily docs-drift sweep | doc-writer |
 | `improve_code` | TODO/FIXME debt (agent-discovered or local scan) | contributor |
 | `write_article` | weekly cadence on opted-in repos | author |
 | `custom` | humans / agents | any role that claims it |
@@ -136,6 +139,46 @@ Write-time guards, on top of outcome validation:
 
 Apply resolution: a cycle writes only when apply is requested (flag or `WTD_FLEET_APPLY=true`) **and** a GitHub token exists; otherwise it downgrades to dry-run with an explicit note in the report. The REST API can only narrow toward dry-run, never escalate.
 
+## The daily harness
+
+`wtd fleet daily` (and `.github/workflows/fleet-daily.yml`) is the once-a-day pass on top of the 4-hourly cycle. The per-cycle scanners answer *what is broken right now*; the daily sweep answers *what has quietly gone stale since yesterday*, and it is the only place merging can happen.
+
+Three sweeps, in this order, because the order is what makes the loop close in one run:
+
+1. **Docs drift** (`docsdrift.py`, pure + `daily.py` for the four reads) — for every repository, compare when the code last changed with when the documentation last changed. Four cheap GitHub reads per repo: newest commit, newest commit touching each `doc_paths` entry, commits since then, README size. Drift is only called when the docs lag by *both* `stale_after_days` (default 14) and `min_commits_since_docs` (default 5), so a quiet repository is never nagged and a busy one that documents as it goes is left alone. A stale verdict becomes one `write_docs` item per repo per UTC day — the date is in the dedup anchor, which is what makes the check *daily* rather than once-ever.
+2. **Pull-request review** — every open pull request is queued for the `reviewer` role, keyed by `pr#<n>@<head sha>`. A push earns a fresh review; an untouched branch costs nothing. Drafts are reviewed by default (`daily.review_drafts`) because early feedback is cheaper than late feedback — they simply can never be merged.
+3. **Merge gate** — pull requests carrying a standing approval are re-evaluated and merged if they are still green. This pass makes no model calls, which is the point: "CI went green overnight" should not cost another review.
+
+## The merge gate
+
+Merging is the fleet's most consequential action, so it is the one place with a **two-key** design: the model supplies judgement, pure code supplies the facts, and both must agree.
+
+- **Key 1 — the reviewer's verdict.** The `reviewer` role runs on `claude-opus-5` (pinned on the role, not inherited from the platform default) and may request a `merge_pr` action with a written rationale. Its prompt tells it to withhold that recommendation whenever it has a blocking comment, whenever the diff is too large or elided to judge, whenever the change touches security, auth, credentials, CI/CD, release, or data migration, and whenever CI is not green on the commit it read. Its review context now includes the CI summary of the head commit, so this is a judgement on evidence rather than a guess.
+- **Key 2 — the gate** (`mergegate.py`, pure, no I/O, no clock). Given the pull request, its check runs, its commit statuses, and its reviews, `evaluate_merge` collects **every** blocker rather than short-circuiting, so "why didn't this merge?" has a complete answer in one line.
+
+A merge needs all of: the pull request open and not a draft; `mergeable` true and `mergeable_state` not `dirty`/`blocked`/`behind`; no blocking label; nobody's latest review requesting changes; CI green; and the approval pinned to the current head commit.
+
+**CI green has a specific meaning**: every check run completed with `success`/`neutral`/`skipped`, every commit status `success`, and *at least one signal exists*. A commit nothing has checked is not green — that is why a repository whose workflows sit in `action_required` (awaiting approval) is held rather than merged.
+
+**The approval is pinned to a commit.** The reviewer approves `abc1234`, not "the PR". A push afterwards invalidates it — the gate reports `head moved since the review` — and the next sweep queues a fresh review for the new head. The merge call itself passes that SHA to GitHub, so a race between verdict and merge fails server-side with 409 instead of merging unreviewed code.
+
+Four independent locks stand in front of all of it:
+
+| Lock | Where | Default |
+|---|---|---|
+| `--apply` / `WTD_FLEET_APPLY` | the fleet's existing write gate | off |
+| `fleet.merge.enabled` / `WTD_FLEET_MERGE_ENABLED` | wtd.yml layers over env, but an explicit env `false` wins — a kill switch may only narrow | off |
+| `merge: true` on the repo | wtd.yml roster entry | off |
+| the gate's own verdict | `mergegate.evaluate_merge` | refuses |
+
+`wtd fleet merge-check` renders the gate's verdict for every open pull request without writing anything — the operator's window into why the fleet is holding a merge.
+
+### The one deviation from the house conventions
+
+The fleet's shared conventions include `never-merge` (critical): *no lane merges its own work*. This lane deliberately deviates, and says so: `fleet.manifest.yml` declares `never_merges: false` for `fleet-daily`, so `wtd fleet audit` reports the critical finding against this repository instead of hiding it. The declaration has to be hand-written because the merge lives inside the installed `wtd` package — a scanner reading the workflow text sees no merge command and would infer the wrong thing.
+
+The narrower half of the convention is still enforced in code: `allow_fleet_authored` defaults to **false**, so a pull request the fleet itself opened (recognized by the `<!-- wtd-fleet:… -->` marker in its body) is reviewed but never auto-merged. Turning that on for a repository is a deliberate, written-down exception — not a default.
+
 ## Monitoring
 
 Every run is an `AgentRunRecord` on an append-only JSONL ledger: role, item, lane, model, tokens, cost, duration, outcome, actions (with applied/error/result URL), discovered count. `monitor.fleet_status()` aggregates provider-chain availability, roster, queue breakdowns, lane snapshots, and recent runs into one document, rendered by `wtd fleet status` and served at `GET /v1/fleet/status`.
@@ -145,7 +188,8 @@ Every run is an `AgentRunRecord` on an append-only JSONL ledger: role, item, lan
 1. **Workstation daemon** — `wtd fleet loop --apply`.
 2. **Container** — `Dockerfile` ships both lanes (claude CLI + anthropic SDK); mount `wtd.yml` and a state volume.
 3. **GitHub Actions** — `.github/workflows/fleet-loop.yml`: one cycle every 4 hours, default-OFF until the `WTD_FLEET_ENABLED` repo variable is `true`, OAuth-first secrets, fleet state cached between runs.
-4. **API** — `wtd serve` exposes `/v1/fleet/*` for integrations; localhost-bound by default.
+4. **GitHub Actions, daily** — `.github/workflows/fleet-daily.yml`: the daily harness at 07:17 UTC, same kill switch, plus `WTD_FLEET_MERGE_ENABLED` for the merge gate. The state cache matters more here than in the loop: it carries the standing review approvals, which is how yesterday's "approved, but CI was still running" merges today.
+5. **API** — `wtd serve` exposes `/v1/fleet/*` for integrations; localhost-bound by default.
 
 ## Design decisions (ADR-lite)
 
@@ -155,6 +199,9 @@ Every run is an `AgentRunRecord` on an append-only JSONL ledger: role, item, lan
 - **D4: structured outcomes over free-form agent output.** A fleet you can't parse is a fleet you can't govern; the contract also makes dry-run meaningful (planned actions are inspectable).
 - **D5: dedup keys as identity, in two layers.** Idempotence everywhere: rescans, re-runs, and agent rediscovery all converge on the same keys. The local queue is only a *cache* of what has been done; the durable record is the marker comment on GitHub (`<!-- wtd-fleet:<key> -->`), which is why independent harnesses — a workstation daemon and the Actions cycle keep entirely separate state — still cannot double-post. Proven in production on the first unattended Actions run: a cold state cache rediscovered work an earlier manual cycle had already completed, dispatched six agents, and the marker check refused all six writes. The cost of that safety is that the refusal lands *after* the model call, so a cold start spends a cycle's tokens to produce nothing — acceptable because cold starts are rare (the state cache restores on every subsequent run), but it is the reason the marker check must never be relaxed into a local-state-only check.
 - **D6: `.github/workflows/` is unwritable by agents, always.** A workflow write is privilege escalation (it would execute with the fleet's secrets); no role, prompt, or config can lift this.
+
+- **D7: merging is two-key, and the second key is not a model.** An agent may *recommend* a merge; only pure, re-run-at-apply-time code decides. The alternative — trusting the reviewer's verdict directly — fails on the ordinary case where CI finishes after the review, and gives a prompt-injected reviewer a merge button. Pinning the approval to a head commit is what makes "reviewed and green" a statement about one specific tree rather than a mood about a branch.
+- **D8: no CI signal is not green.** The tempting reading of an empty check list is "nothing objected". On the first live run against gitorio, every pull request's workflows sat at `action_required` (awaiting approval) and reported zero check runs — under the tempting reading, fourteen unverified pull requests would have qualified for merge.
 
 ## Extending the fleet
 

@@ -16,12 +16,35 @@ fleet:
   # Which roles may run at all (default: all seven built-ins).
   # roles_enabled: [triage, bug-hunter, reviewer, janitor, doc-writer, contributor, author]
 
-  # Deterministic work scanners.
+  # Deterministic work scanners (every cycle).
   scan:
     issues: true    # unlabeled -> triage; bug-labeled -> bug-hunter
     pulls: true     # open non-draft PRs -> reviewer
     ci: true        # standing workflow failures -> janitor
     docs: true      # missing/thin README -> doc-writer
+
+  # The once-a-day pass: `wtd fleet daily` (and fleet-daily.yml in Actions).
+  # The scanners above ask "what is broken now"; this asks "what went stale".
+  daily:
+    docs: true              # docs-drift sweep: one todo per stale repo per day
+    review: true            # queue every open PR for the Opus 5 reviewer
+    review_drafts: true     # drafts get early feedback; they are never merged
+    stale_after_days: 14        # docs must lag code by this long...
+    min_commits_since_docs: 5   # ...AND by this many commits, to count as drift
+    doc_paths: [README.md, docs]
+
+  # The merge gate. A merge needs ALL of: --apply (or WTD_FLEET_APPLY),
+  # merge.enabled here, `merge: true` on the repo above, and the gate's own
+  # verdict — CI green on the reviewed commit, mergeable, no changes
+  # requested, no blocking label, approval pinned to the current head.
+  merge:
+    enabled: false                  # default-OFF, like every switch here
+    method: squash                  # squash | merge | rebase
+    require_checks: true            # a commit with NO CI signal is not green
+    require_review_approval: true   # only PRs the Opus 5 reviewer approved
+    allow_fleet_authored: false     # the fleet does not merge its own PRs
+    blocked_labels: [do-not-merge, wip, hold, blocked]
+    max_per_cycle: 2
 
   # Per-cycle caps (safety rails for the autonomous loop).
   max_runs_per_cycle: 8       # agent invocations per cycle

@@ -83,3 +83,33 @@ async def test_cors_allowlist_is_honoured(monkeypatch: pytest.MonkeyPatch) -> No
         "*",
         "https://evil.example",
     )
+
+
+@pytest.mark.asyncio
+async def test_daily_endpoint_cannot_escalate_to_writes(monkeypatch) -> None:
+    """The API may narrow a deployment to dry-run, never widen it to writes."""
+    from wtd.fleet.daily import DailyReport
+    from wtd.fleet.orchestrator import FleetOrchestrator
+
+    seen: dict = {}
+
+    async def fake_daily(self, **kwargs):
+        seen.update(kwargs)
+        return DailyReport(day="2026-09-03", apply=bool(kwargs["apply"])), None
+
+    async def fake_close(self):
+        return None
+
+    monkeypatch.setattr(FleetOrchestrator, "daily", fake_daily)
+    monkeypatch.setattr(FleetOrchestrator, "aclose", fake_close)
+
+    app = create_app()
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://testserver"
+    ) as client:
+        # WTD_FLEET_APPLY is unset in tests, so the request's apply is dropped.
+        resp = await client.post("/v1/fleet/daily", json={"apply": True})
+
+    assert resp.status_code == 200
+    assert seen["apply"] is False
+    assert resp.json()["apply"] is False

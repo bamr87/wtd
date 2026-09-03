@@ -80,6 +80,7 @@ class ActionType(str, Enum):
     ADD_LABELS = "add_labels"  # label the item's issue/PR
     CREATE_ISSUE = "create_issue"  # file a new issue in the item's repo
     PROPOSE_PR = "propose_pr"  # open a draft PR with file changes
+    MERGE_PR = "merge_pr"  # merge the item's PR — only through the merge gate
 
 
 class ProposedAction(BaseModel):

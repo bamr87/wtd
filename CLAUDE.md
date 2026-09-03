@@ -27,7 +27,7 @@ mypy wtd                  # gates CI (baseline is clean)
 2. `wtd/fleet/discovery.py` scans the roster (wtd.yml) into `WorkItem`s with **stable dedup keys** — rescans converge, never duplicate.
 3. `wtd/fleet/scheduler.py` (pure) matches items to roles: priority bands + per-repo round-robin fairness; `balancer.py` (pure) picks the provider lane by daily token budget with reservations and cooldowns.
 4. `wtd/fleet/dispatcher.py` runs one agent: bounded untrusted-fenced context → JSON **output contract** → `outcome.py` validates every action against the role's grants → apply-gated GitHub writes with dedup markers.
-5. `wtd/fleet/orchestrator.py` is the autonomous mechanism: `cycle()` (discover → schedule → dispatch → persist) and `loop()` (the daemon). Dry-run is the default posture; `--apply`/`WTD_FLEET_APPLY=true` is the only write gate.
+5. `wtd/fleet/orchestrator.py` is the autonomous mechanism: `cycle()` (discover → schedule → dispatch → persist), `loop()` (the daemon), and `daily()` (the once-a-day pass in `daily.py`: docs-drift sweep → review every open PR with the Opus 5 `reviewer` → the merge gate in `mergegate.py`). Dry-run is the default posture; `--apply`/`WTD_FLEET_APPLY=true` is the only write gate, and merging needs three more locks on top of it.
 6. `wtd/fleet/manifest.py` + `adopt.py` + `conventions.py` are the **harmonization layer**: one `fleet/v1` descriptor every repo publishes, derived automatically from its workflows, audited against the fleet's shared conventions (`wtd fleet map|audit|adopt`). Read `docs/FLEET-SPEC.md`.
 7. The classic recursive TODO engine (`wtd/core/`) remains the local substrate (`wtd scan`, tree.json).
 
@@ -36,6 +36,7 @@ mypy wtd                  # gates CI (baseline is clean)
 - **Dry-run stays the default.** Never make writes reachable without the explicit apply gate, and never let the REST API escalate beyond the env's apply setting.
 - **Agents never hold credentials or tools.** The platform performs all GitHub writes after validation; don't move mutations into prompts.
 - **`.github/workflows/` is unwritable by agents — no exceptions** (it would execute with the fleet's own secrets). The guard lives in `outcome.py::_safe_rel_path`.
+- **Merging is two-key, never one.** An agent may *recommend* a merge (`merge_pr`); only `mergegate.evaluate_merge` — pure, re-run against live state at apply time — decides. Never let a model's verdict alone reach `merge_pull`, and never treat a commit with no checks as green.
 - **Everything the fleet writes carries the marker** (`<!-- wtd-fleet:<dedup_key> -->`) and everything it reads checks for it — that's what keeps the loop from feeding itself.
 - **Keep pure things pure.** balancer/scheduler/outcome/discovery item-building take no I/O and stay clock-injected; new logic there needs unit tests in the same style (see `tests/`).
 - **Read behaviour, not prose.** Workflow scanning goes through `wtd/fleet/textscan.py`: a prompt forbidding merges and a grep detecting them both contain `gh pr merge`, and conflating them produced three false findings out of four. Prefer missing a behaviour to inventing one.

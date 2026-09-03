@@ -360,6 +360,19 @@ def create_app() -> FastAPI:
     class FleetDiscoverRequest(BaseModel):
         repos: list[str] | None = None
 
+    class FleetDailyRequest(BaseModel):
+        apply: bool = Field(
+            default=False,
+            description=(
+                "Request write mode. Effective only when WTD_FLEET_APPLY=true; "
+                "the API can narrow to dry-run but never widen to writes."
+            ),
+        )
+        repos: list[str] | None = None
+        max_runs: int | None = Field(default=None, ge=1, le=50)
+        run_agents: bool = True
+        discover: bool = False
+
     @app.get("/v1/fleet/status")
     async def fleet_status_endpoint():
         """Fleet health: providers, roster, queue, budgets, recent runs."""
@@ -454,6 +467,79 @@ def create_app() -> FastAPI:
             "queue_pending": report.queue_pending,
             "notes": report.notes,
             "runs": [r.model_dump(mode="json") for r in report.runs],
+        }
+
+    @app.post("/v1/fleet/daily")
+    async def fleet_daily_endpoint(request: FleetDailyRequest):
+        """Run the daily pass: docs drift → PR review → merge gate.
+
+        Same escalation rule as ``/v1/fleet/run``: writes need the request
+        flag AND ``WTD_FLEET_APPLY=true``, and merging needs the merge
+        policy on top of that.
+        """
+        from wtd.fleet.orchestrator import FleetOrchestrator
+
+        cfg = get_config()
+        effective_apply = request.apply and cfg.fleet_apply
+
+        orchestrator = FleetOrchestrator()
+        try:
+            report, cycle = await orchestrator.daily(
+                apply=effective_apply,
+                repos=request.repos,
+                max_runs=request.max_runs,
+                run_agents=request.run_agents,
+                discover=request.discover,
+            )
+        finally:
+            await orchestrator.aclose()
+
+        return {
+            "day": report.day,
+            "apply": report.apply,
+            "notes": report.notes,
+            "docs": [
+                {
+                    "repo": check.repo,
+                    "needs_update": check.assessment.needs_update,
+                    "reasons": check.assessment.reasons,
+                    "drift_days": check.assessment.drift_days,
+                    "queued": check.queued,
+                    "error": check.error,
+                }
+                for check in report.docs
+            ],
+            "reviews": [
+                {
+                    "repo": target.repo,
+                    "number": target.number,
+                    "head_sha": target.head_sha,
+                    "draft": target.draft,
+                    "queued": target.queued,
+                    "reason": target.reason,
+                }
+                for target in report.reviews
+            ],
+            "merges": [
+                {
+                    "repo": attempt.repo,
+                    "number": attempt.number,
+                    "merged": attempt.merged,
+                    "allowed": attempt.decision.allowed,
+                    "ci": attempt.decision.ci.describe(),
+                    "blockers": attempt.decision.blockers,
+                    "error": attempt.error,
+                }
+                for attempt in report.merges
+            ],
+            "cycle": None
+            if cycle is None
+            else {
+                "scheduled": cycle.scheduled,
+                "completed": cycle.completed,
+                "failed": cycle.failed,
+                "actions_applied": cycle.actions_applied,
+            },
         }
 
     return app

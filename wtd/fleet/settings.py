@@ -12,13 +12,34 @@ Search order for the file: ``WTD_FLEET_CONFIG`` → ``./wtd.yml`` →
 
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
 from wtd.config import WTDConfig, get_config
+from wtd.fleet.docsdrift import DEFAULT_DOC_PATHS, DocsPolicy
+from wtd.fleet.mergegate import (
+    DEFAULT_BLOCKED_LABELS,
+    MERGE_METHODS,
+    MergePolicy,
+)
 
 _REPO_SLUG_ERROR = "fleet repo entries must be 'owner/name' slugs, got: {value!r}"
+
+#: The merge gate's environment switch. wtd.yml layers over env everywhere
+#: else, but a kill switch may only ever NARROW: an explicit
+#: ``WTD_FLEET_MERGE_ENABLED=false`` wins over a committed
+#: ``fleet.merge.enabled: true``, so an operator can stop merging without
+#: editing (or being able to edit) the repository's config.
+MERGE_ENV_VAR = "WTD_FLEET_MERGE_ENABLED"
+_TRUTHY = {"1", "true", "yes", "on"}
+
+
+def env_forbids_merging() -> bool:
+    """True when the environment explicitly turns the merge gate off."""
+    raw = os.environ.get(MERGE_ENV_VAR)
+    return raw is not None and raw.strip().lower() not in _TRUTHY
 
 
 @dataclass
@@ -28,6 +49,8 @@ class RepoConfig:
     slug: str  # "owner/name"
     roles: list[str] = field(default_factory=list)  # empty = all enabled roles
     articles: bool = False  # opt-in for the author role's cadence
+    #: Per-repo opt-in for the merge gate. Off unless a human writes it down.
+    merge: bool = False
 
     @property
     def owner(self) -> str:
@@ -48,10 +71,60 @@ class ScanConfig:
 
 
 @dataclass
+class DailyConfig:
+    """The once-a-day sweep: docs drift across the roster, PR review, merge.
+
+    Separate from :class:`ScanConfig` because the cadence is the point.
+    The per-cycle scanners answer "what is broken right now"; the daily
+    sweep answers "what has quietly gone stale since yesterday".
+    """
+
+    docs: bool = True
+    review: bool = True
+    #: Review draft pull requests too. The per-cycle scanner skips drafts
+    #: (they are works in progress); the daily sweep looks at them because
+    #: early feedback is cheaper than late feedback. Drafts are never
+    #: merged — the gate refuses them.
+    review_drafts: bool = True
+    #: Docs-drift thresholds (see :mod:`wtd.fleet.docsdrift`).
+    stale_after_days: int = 14
+    min_commits_since_docs: int = 5
+    doc_paths: list[str] = field(default_factory=lambda: list(DEFAULT_DOC_PATHS))
+
+    def docs_policy(self, min_readme_chars: int = 300) -> DocsPolicy:
+        return DocsPolicy(
+            min_readme_chars=min_readme_chars,
+            stale_after_days=self.stale_after_days,
+            min_commits_since_docs=self.min_commits_since_docs,
+            doc_paths=tuple(self.doc_paths),
+        )
+
+
+@dataclass
+class MergeConfig:
+    """Fleet-wide merge policy. Every field is a lock, all default shut."""
+
+    enabled: bool = False
+    method: str = "squash"
+    require_checks: bool = True
+    require_review_approval: bool = True
+    #: Merging the fleet's OWN pull requests. The house convention says an
+    #: agent never merges its own work; turning this on for a repository is
+    #: a deliberate, documented exception, not a default.
+    allow_fleet_authored: bool = False
+    blocked_labels: list[str] = field(
+        default_factory=lambda: list(DEFAULT_BLOCKED_LABELS)
+    )
+    max_per_cycle: int = 2
+
+
+@dataclass
 class FleetSettings:
     repos: list[RepoConfig] = field(default_factory=list)
     roles_enabled: list[str] = field(default_factory=list)  # empty = all built-ins
     scan: ScanConfig = field(default_factory=ScanConfig)
+    daily: DailyConfig = field(default_factory=DailyConfig)
+    merge: MergeConfig = field(default_factory=MergeConfig)
     max_runs_per_cycle: int = 8
     max_writes_per_cycle: int = 5
     max_discovered_per_run: int = 5
@@ -70,6 +143,25 @@ class FleetSettings:
             if repo.slug == slug:
                 return repo
         return None
+
+    def merge_policy_for(self, slug: str) -> MergePolicy:
+        """The merge policy in force for one repository.
+
+        Two independent switches must agree before a merge is even
+        considered: the fleet-wide ``merge.enabled`` and the repository's
+        own ``merge: true``. Apply mode is the third, enforced by the
+        dispatcher, and the gate itself is the fourth.
+        """
+        repo = self.repo(slug)
+        return MergePolicy(
+            enabled=self.merge.enabled and bool(repo and repo.merge),
+            method=self.merge.method,
+            require_checks=self.merge.require_checks,
+            require_review_approval=self.merge.require_review_approval,
+            allow_fleet_authored=self.merge.allow_fleet_authored,
+            blocked_labels=tuple(self.merge.blocked_labels),
+            max_per_cycle=self.merge.max_per_cycle,
+        )
 
 
 def _parse_repo_entry(entry: Any) -> RepoConfig:
@@ -92,6 +184,7 @@ def _parse_repo_entry(entry: Any) -> RepoConfig:
         slug=slug,
         roles=[str(r) for r in roles],
         articles=bool(extra.get("articles", False)),
+        merge=bool(extra.get("merge", False)),
     )
 
 
@@ -109,6 +202,7 @@ def load_settings(config: WTDConfig | None = None) -> FleetSettings:
     config = config or get_config()
 
     settings = FleetSettings(
+        merge=MergeConfig(enabled=config.fleet_merge_enabled),
         repos=[_parse_repo_entry(slug) for slug in config.fleet_repos],
         max_runs_per_cycle=config.fleet_max_runs_per_cycle,
         max_writes_per_cycle=config.fleet_max_writes_per_cycle,
@@ -144,6 +238,44 @@ def load_settings(config: WTDConfig | None = None) -> FleetSettings:
         for key in ("issues", "pulls", "ci", "docs", "local_todos"):
             if key in scan:
                 setattr(settings.scan, key, bool(scan[key]))
+
+    daily = fleet.get("daily") or {}
+    if isinstance(daily, dict):
+        for key in ("docs", "review", "review_drafts"):
+            if key in daily:
+                setattr(settings.daily, key, bool(daily[key]))
+        for key in ("stale_after_days", "min_commits_since_docs"):
+            if key in daily:
+                setattr(settings.daily, key, int(daily[key]))
+        if "doc_paths" in daily:
+            settings.daily.doc_paths = [str(p) for p in (daily.get("doc_paths") or [])]
+
+    merge = fleet.get("merge") or {}
+    if isinstance(merge, dict):
+        for key in (
+            "enabled",
+            "require_checks",
+            "require_review_approval",
+            "allow_fleet_authored",
+        ):
+            if key in merge:
+                setattr(settings.merge, key, bool(merge[key]))
+        if "method" in merge:
+            method = str(merge["method"])
+            if method not in MERGE_METHODS:
+                raise ValueError(
+                    f"fleet.merge.method must be one of {MERGE_METHODS}, got {method!r}"
+                )
+            settings.merge.method = method
+        if "max_per_cycle" in merge:
+            settings.merge.max_per_cycle = int(merge["max_per_cycle"])
+        if "blocked_labels" in merge:
+            settings.merge.blocked_labels = [
+                str(label) for label in (merge.get("blocked_labels") or [])
+            ]
+
+    if settings.merge.enabled and env_forbids_merging():
+        settings.merge.enabled = False
 
     for key in (
         "max_runs_per_cycle",

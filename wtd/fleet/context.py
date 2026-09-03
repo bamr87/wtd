@@ -85,11 +85,20 @@ class ContextBuilder:
             f"Repository: {item.repo}",
             f"Pull request #{number}: {item.title}",
             f"Author: {item.evidence.get('author', 'unknown')}"
-            + (" (bot)" if item.evidence.get("is_bot_author") else ""),
+            + (" (bot)" if item.evidence.get("is_bot_author") else "")
+            + (" (opened by this fleet)" if item.evidence.get("fleet_authored") else ""),
             f"Base ← Head: {item.evidence.get('base')} ← {item.evidence.get('head')}",
+            f"Draft: {'yes' if item.evidence.get('draft') else 'no'}",
             f"URL: {item.url or '(none)'}",
             _fence("pr description", str(item.description or "")),
         ]
+        # CI state on the head commit. A reviewer asked to recommend a merge
+        # must see whether the change is green; without this the model would
+        # be guessing at the one fact the merge gate cares most about.
+        head_sha = str(item.evidence.get("head_sha") or "")
+        if head_sha:
+            ci = await self._ci_summary(item.repo, head_sha)
+            parts.append(f"CI on head {head_sha[:8]}: {ci}")
         if number:
             try:
                 files = await self.client.list_pull_files(item.repo, int(number))
@@ -112,6 +121,22 @@ class ContextBuilder:
             if len(files) > _MAX_FILES_IN_REVIEW:
                 parts.append(f"…and {len(files) - _MAX_FILES_IN_REVIEW} more files not shown.")
         return "\n\n".join(parts)
+
+    async def _ci_summary(self, repo: str, sha: str) -> str:
+        """One line describing every check and status on a commit."""
+        from wtd.fleet.mergegate import summarize_ci
+
+        try:
+            check_runs = await self.client.list_check_runs(repo, sha)
+        except GitHubError:
+            check_runs = []
+        try:
+            combined = await self.client.get_combined_status(repo, sha)
+        except GitHubError:
+            combined = {}
+        summary = summarize_ci(check_runs, combined)
+        verdict = "GREEN" if summary.green else "NOT GREEN"
+        return f"{verdict} — {summary.describe()}"
 
     # ------------------------------------------------------------------
     async def _ci_context(self, item: WorkItem) -> str:

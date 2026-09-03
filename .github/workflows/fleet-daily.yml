@@ -1,0 +1,100 @@
+name: Fleet Daily
+
+# The daily pass over the whole roster, on top of the 4-hourly Fleet Loop:
+#
+#   1. docs drift  — every repo is checked once a day for documentation that
+#                    has fallen behind its code; stale ones get a doc-writer
+#                    todo (one per repo per day, deduped by date).
+#   2. PR review   — every open pull request is queued for the Opus 5
+#                    `reviewer` role, keyed by head commit: a push earns a
+#                    fresh review, an untouched branch costs nothing.
+#   3. merge gate  — pull requests the reviewer approved are merged, but only
+#                    after deterministic re-verification (CI green on the
+#                    reviewed commit, mergeable, no changes requested).
+#
+# DEFAULT-OFF (house convention), twice over: scheduled firings no-op until
+# the repository variable WTD_FLEET_ENABLED is 'true', and merging needs its
+# own variable WTD_FLEET_MERGE_ENABLED plus `merge: true` on the repo in
+# wtd.yml. Without them this workflow reviews and reports, and writes nothing.
+
+on:
+  schedule:
+    - cron: "17 7 * * *" # 07:17 UTC daily (off the hour, off the loop's :23)
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: "Write to GitHub (reviews, docs PRs, merges). Otherwise dry-run."
+        type: boolean
+        default: false
+      repo:
+        description: "Limit to one owner/repo (blank = the whole roster)"
+        type: string
+        default: ""
+      max_runs:
+        description: "Cap agent runs this pass"
+        type: string
+        default: "12"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fleet-daily
+  cancel-in-progress: false
+
+jobs:
+  daily:
+    # Scheduled firings honour the kill switch; manual dispatches always run
+    # (they still dry-run unless BOTH the input and the switch allow writes).
+    if: github.event_name == 'workflow_dispatch' || vars.WTD_FLEET_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      # The secrets context is not usable in step `if:` conditions — map the
+      # presence check through job env instead.
+      HAS_CLAUDE_OAUTH: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN != '' }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install wtd
+        run: |
+          python -m pip install --upgrade pip
+          pip install .
+
+      - name: Install Claude Code CLI (default lane)
+        if: env.HAS_CLAUDE_OAUTH == 'true'
+        run: |
+          curl -fsSL https://claude.ai/install.sh | bash
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Restore fleet state
+        # The queue carries the standing review approvals, so yesterday's
+        # "approved but CI was still running" can merge today.
+        uses: actions/cache@v6
+        with:
+          path: ~/.wtd/fleet
+          key: fleet-state-${{ github.run_id }}
+          restore-keys: |
+            fleet-state-
+
+      - name: Run the daily pass
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.FLEET_TOKEN || github.token }}
+          # Writes require the kill switch AND (for manual runs) the input.
+          WTD_FLEET_APPLY: ${{ vars.WTD_FLEET_ENABLED == 'true' && (github.event_name == 'schedule' || inputs.apply) }}
+          # Merging requires its own switch on top of all of that.
+          WTD_FLEET_MERGE_ENABLED: ${{ vars.WTD_FLEET_MERGE_ENABLED == 'true' }}
+        run: |
+          wtd fleet daily \
+            --max-runs "${{ inputs.max_runs || '12' }}" \
+            ${{ inputs.repo && format('--repo {0}', inputs.repo) || '' }}
+          wtd fleet merge-check

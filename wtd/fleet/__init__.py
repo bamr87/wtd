@@ -13,7 +13,10 @@ Subsystems:
 - :mod:`wtd.fleet.context`      per-kind evidence builders
 - :mod:`wtd.fleet.outcome`      structured agent-output validation
 - :mod:`wtd.fleet.dispatcher`   one agent run end-to-end (apply-gated)
-- :mod:`wtd.fleet.orchestrator` the cycle/loop mechanism
+- :mod:`wtd.fleet.docsdrift`    pure: have the docs kept up with the code?
+- :mod:`wtd.fleet.mergegate`    pure: may this pull request be merged, and why not?
+- :mod:`wtd.fleet.daily`        the daily sweeps: docs drift, PR review, merge
+- :mod:`wtd.fleet.orchestrator` the cycle/loop/daily mechanism
 - :mod:`wtd.fleet.monitor`      status aggregation
 """
 

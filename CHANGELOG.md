@@ -8,6 +8,50 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 ## [Unreleased]
 
 ### Added
+- **The daily harness** (`wtd fleet daily`) — a once-a-day pass over the whole
+  roster, on top of the 4-hourly cycle. The per-cycle scanners ask "what is
+  broken now"; this asks "what has gone stale since yesterday", and it is the
+  only place a merge can happen:
+  - `wtd/fleet/docsdrift.py` — pure docs-drift assessment. Four cheap reads per
+    repo (newest commit, newest commit per documentation path, commits since,
+    README size) decide whether the docs still describe the code. Drift needs
+    *both* a time lag and a commit count, so a quiet repo is never nagged and a
+    busy one that documents as it goes is left alone. A stale verdict becomes
+    one `write_docs` todo per repo per UTC day — the date is in the dedup
+    anchor, which is what makes the check daily rather than once-ever.
+  - `wtd/fleet/daily.py` — the three sweeps (docs, review, merge) and their
+    report. Reviews are keyed by `pr#<n>@<head sha>`: a push earns a fresh
+    review, an untouched branch costs nothing.
+  - `wtd/fleet/mergegate.py` — the pure merge decision. It collects *every*
+    blocker instead of short-circuiting, so "why didn't this merge?" has a
+    complete answer in one line. "CI green" means every check completed, none
+    failed, and at least one signal exists — a commit nothing has checked is
+    not green.
+  - The `reviewer` role now runs on `claude-opus-5` (pinned on the role, not
+    inherited from the platform default), sees the CI status of the head commit
+    in its context, and may request the new `merge_pr` action.
+  - `.github/workflows/fleet-daily.yml` (07:17 UTC, default-OFF), the
+    `POST /v1/fleet/daily` endpoint, and `wtd fleet merge-check` — a read-only
+    window into why the gate is holding each open pull request.
+  - 41 new tests (263 total) covering the gate's refusals, the drift
+    thresholds, sweep idempotence, and the dispatcher's merge path.
+- Merging is **two-key and four-locked**: an Opus 5 reviewer *recommends*, pure
+  code re-verified against live GitHub state *decides*, and the approval is
+  pinned to the exact head commit the reviewer read (the merge call passes that
+  SHA, so a race between verdict and merge fails server-side instead of merging
+  unreviewed code). The locks are `--apply`, `fleet.merge.enabled`, the repo's
+  own `merge: true`, and the gate itself. `allow_fleet_authored` defaults to
+  false, so the fleet reviews but does not merge its own pull requests.
+
+### Changed
+- `fleet.manifest.yml` declares `never_merges: false` for the new `fleet-daily`
+  lane, so `wtd fleet audit` now reports one critical `never-merge` finding
+  against this repository. That is deliberate: the fleet's shared convention is
+  that no lane merges its own work, this lane is the sanctioned exception, and
+  an audit that hides its own deviation is worthless. The declaration has to be
+  hand-written because the merge happens inside the installed `wtd` package —
+  a scanner reading the workflow text sees no merge command and would infer the
+  wrong thing.
 - **Fleet harmonization layer** — a shared `fleet/v1` manifest so several
   repositories running their own autonomous AI loops can be viewed, audited,
   and operated through one tool:
@@ -33,6 +77,10 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
   shape found against the real repositories.
 
 ### Fixed
+- `GitHubClient.list_commits` passed its `path` filter through
+  `get(path, **params)`, where it collided with that method's own positional
+  argument — every path-filtered commit query raised `TypeError` instead of
+  reaching GitHub. Found by the first docs-sweep test.
 - Documentation drift corrected against the tree: the README advertised 148
   tests (the suite is 204) and both the README and `CLAUDE.md` still described
   `mypy` as advisory, though CI has gated on it since 0.2.0.
