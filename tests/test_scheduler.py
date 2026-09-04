@@ -2,12 +2,17 @@
 
 from __future__ import annotations
 
+from dataclasses import replace
 from datetime import datetime, timedelta, timezone
 
 from wtd.core.models import TodoPriority
 from wtd.fleet.models import WorkItem, WorkKind, make_dedup_key
 from wtd.fleet.roles import builtin_roles
-from wtd.fleet.scheduler import plan_cycle
+from wtd.fleet.scheduler import (
+    permitted_roles,
+    plan_cycle,
+    unknown_role_names,
+)
 
 _T0 = datetime(2026, 8, 1, tzinfo=timezone.utc)
 
@@ -109,3 +114,99 @@ def test_older_items_first_within_same_priority_and_repo():
     older = item("a/r", WorkKind.TRIAGE_ISSUE, "old", minutes=0)
     plan = plan_cycle([newer, older], roles, max_runs=10)
     assert plan.assignments[0].item.dedup_key == older.dedup_key
+
+
+# ----------------------------------------------------------------------
+# Per-repo role allowlists (wtd.yml `roles:` on a roster entry)
+# ----------------------------------------------------------------------
+def test_repo_allowlist_keeps_other_roles_out():
+    # An operator who writes `roles: [triage]` means it: no reviewer, no
+    # doc-writer, no cost and no blast radius from either.
+    roles = builtin_roles()
+    items = [
+        item("a/r", WorkKind.TRIAGE_ISSUE, "1"),
+        item("a/r", WorkKind.REVIEW_PR, "2"),
+    ]
+    plan = plan_cycle(items, roles, max_runs=10, repo_roles={"a/r": ["triage"]})
+    assert [a.role.name for a in plan.assignments] == ["triage"]
+    assert [i.kind for i in plan.unroutable] == [WorkKind.REVIEW_PR]
+
+
+def test_empty_or_absent_allowlist_means_every_role():
+    roles = builtin_roles()
+    items = [
+        item("a/r", WorkKind.TRIAGE_ISSUE, "1"),
+        item("a/r", WorkKind.REVIEW_PR, "2"),
+    ]
+    for repo_roles in (None, {}, {"a/r": []}, {"other/repo": ["triage"]}):
+        plan = plan_cycle(items, roles, max_runs=10, repo_roles=repo_roles)
+        assert len(plan.assignments) == 2, repo_roles
+        assert plan.unroutable == [], repo_roles
+
+
+def test_allowlist_is_per_repo_not_global():
+    roles = builtin_roles()
+    items = [
+        item("narrow/repo", WorkKind.REVIEW_PR, "1"),
+        item("open/repo", WorkKind.REVIEW_PR, "2"),
+    ]
+    plan = plan_cycle(
+        items, roles, max_runs=10, repo_roles={"narrow/repo": ["triage"]}
+    )
+    assert [a.item.repo for a in plan.assignments] == ["open/repo"]
+    assert [i.repo for i in plan.unroutable] == ["narrow/repo"]
+
+
+def test_role_filter_narrows_further_but_cannot_widen():
+    roles = builtin_roles()
+    items = [
+        item("a/r", WorkKind.TRIAGE_ISSUE, "1"),
+        item("a/r", WorkKind.REVIEW_PR, "2"),
+    ]
+    repo_roles = {"a/r": ["triage"]}
+    # --role reviewer asks for work the roster forbids: nothing runs.
+    plan = plan_cycle(
+        items, roles, max_runs=10, role_names=["reviewer"], repo_roles=repo_roles
+    )
+    assert plan.assignments == []
+    assert len(plan.unroutable) == 2
+
+
+def test_hint_resolves_within_the_permitted_set():
+    # The hint names a forbidden role, but another permitted role handles
+    # the kind — the work is routed, not stranded.
+    roles = builtin_roles()
+    roles["deputy"] = replace(roles["bug-hunter"], name="deputy")
+    hinted = item("a/r", WorkKind.FIX_BUG, "1", role_hint="bug-hunter")
+    plan = plan_cycle([hinted], roles, max_runs=10, repo_roles={"a/r": ["deputy"]})
+    assert [a.role.name for a in plan.assignments] == ["deputy"]
+
+
+def test_unknown_role_name_strands_the_repo_rather_than_widening_it():
+    # A typo must never fail open into "run everything".
+    roles = builtin_roles()
+    items = [item("a/r", WorkKind.TRIAGE_ISSUE, "1")]
+    plan = plan_cycle(items, roles, max_runs=10, repo_roles={"a/r": ["triaje"]})
+    assert plan.assignments == []
+    assert plan.unroutable == items
+
+
+def test_unknown_role_names_reports_typos_per_repo():
+    roles = builtin_roles()
+    found = unknown_role_names(
+        roles,
+        {
+            "a/r": ["triage", "triaje"],
+            "b/r": ["reviewer"],
+            "c/r": ["nope", "also-nope"],
+        },
+    )
+    assert found == {"a/r": ["triaje"], "c/r": ["also-nope", "nope"]}
+    assert unknown_role_names(roles, None) == {}
+
+
+def test_permitted_roles_narrows_only_when_asked():
+    roles = builtin_roles()
+    assert permitted_roles(roles, None) is roles
+    assert permitted_roles(roles, []) is roles
+    assert set(permitted_roles(roles, ["triage", "reviewer"])) == {"triage", "reviewer"}

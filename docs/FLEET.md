@@ -120,7 +120,11 @@ Costs on the subscription lane come from the claude CLI's own reporting; API-lan
 
 ## Scheduling
 
-`scheduler.plan_cycle` is pure: filter to pending items (attempts < cap), resolve each item's role (`role_hint` first, else first role handling the kind), then order by priority band → age, interleaving repositories round-robin inside each band so a noisy repo cannot starve the fleet. `max_runs` truncation reports overflow; unroutable items are surfaced rather than dropped.
+`scheduler.plan_cycle` is pure: filter to pending items (attempts < cap), narrow the role registry to what each repository permits, resolve each item's role within that (`role_hint` first, else the first permitted role handling the kind), then order by priority band → age, interleaving repositories round-robin inside each band so a noisy repo cannot starve the fleet. `max_runs` truncation reports overflow; unroutable items are surfaced rather than dropped.
+
+**A roster entry's `roles: [...]` is an allowlist, and it is enforced here.** Only those agents are dispatched against that repository; an item whose kind no permitted role handles becomes unroutable and is reported, never silently run by someone else. An empty or omitted list keeps the documented default of every enabled role, so narrowing is always opt-in. Three filters stack, and none of them can widen another: `roles_enabled` decides which roles exist at all, the roster decides which of those touch each repo, and a one-off `--role` narrows a single run further.
+
+A name in a roster list that matches no loaded role narrows to nothing rather than failing open — the repo's work goes unroutable, and the orchestrator logs the unmatched names, because a typo that quietly runs *every* agent against a repository is the worse failure.
 
 ## The dispatcher pipeline
 

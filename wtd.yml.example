@@ -4,6 +4,9 @@
 # (tokens, keys) live in the environment or .env — see env.example.
 fleet:
   # The roster: repositories the fleet watches and works.
+  # Each entry's `roles:` is an ALLOWLIST — only those agents are
+  # dispatched against that repo. Omit it (or leave it empty) to allow
+  # every enabled role.
   repos:
     - repo: bamr87/wtd
       roles: [triage, reviewer, bug-hunter, janitor]

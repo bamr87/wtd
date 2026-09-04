@@ -36,7 +36,7 @@ from wtd.fleet.docsdrift import utc_day
 from wtd.fleet.github import GitHubClient, GitHubError
 from wtd.fleet.models import AgentRunRecord, WorkStatus
 from wtd.fleet.roles import load_roles
-from wtd.fleet.scheduler import CyclePlan, plan_cycle
+from wtd.fleet.scheduler import CyclePlan, plan_cycle, unknown_role_names
 from wtd.fleet.settings import FleetSettings, load_settings
 from wtd.fleet.state import FleetState
 from wtd.providers import ProviderRouter
@@ -127,12 +127,22 @@ class FleetOrchestrator:
         max_runs: int | None = None,
     ) -> CyclePlan:
         pending = self.state.pending(max_attempts=self.settings.max_attempts)
+        repo_roles = self.settings.repo_role_allowlist()
+        for repo, names in unknown_role_names(self.roles, repo_roles).items():
+            # Otherwise this is silent: the repo just stops being worked.
+            logger.warning(
+                "wtd.yml lists role(s) %s for %s that match no loaded role; "
+                "work for that repo will be unroutable",
+                ", ".join(names),
+                repo,
+            )
         return plan_cycle(
             pending,
             self.roles,
             max_runs=max_runs or self.settings.max_runs_per_cycle,
             repos=repos,
             role_names=roles,
+            repo_roles=repo_roles,
         )
 
     # ------------------------------------------------------------------

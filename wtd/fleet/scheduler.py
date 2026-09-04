@@ -3,12 +3,16 @@
 Given the pending queue and the loaded roles, ``plan_cycle`` produces the
 ordered assignments for one orchestrator cycle:
 
-1. Resolve a role per item (``role_hint`` first, else first role handling
-   the kind); items nobody handles are reported as unroutable.
-2. Order by priority, then age (oldest first).
-3. Interleave repositories round-robin inside each priority band so one
+1. Narrow the role registry to what the repository permits: a roster
+   entry's ``roles: [...]`` list is an allowlist, and an empty (or absent)
+   list means every enabled role.
+2. Resolve a role per item from that narrowed registry (``role_hint``
+   first, else the first role handling the kind); items no *permitted*
+   role handles are reported as unroutable.
+3. Order by priority, then age (oldest first).
+4. Interleave repositories round-robin inside each priority band so one
    noisy repo cannot starve the rest of the fleet.
-4. Cut off at ``max_runs``.
+5. Cut off at ``max_runs``.
 
 No I/O, no clock, no randomness — everything is testable and the
 orchestrator applies budgets separately at dispatch time.
@@ -62,6 +66,40 @@ def _fair_interleave(items: list[WorkItem]) -> list[WorkItem]:
     return interleaved
 
 
+def permitted_roles(
+    roles: dict[str, AgentRole], allowed: list[str] | None
+) -> dict[str, AgentRole]:
+    """The role registry as one repository sees it.
+
+    ``allowed`` is that repository's roster allowlist. Empty or absent
+    means "every enabled role" — the documented default — so only a
+    non-empty list narrows anything. Names that match no loaded role are
+    simply absent from the result, which strands that repo's work as
+    unroutable rather than quietly widening its blast radius.
+    """
+    if not allowed:
+        return roles
+    permitted = set(allowed)
+    return {name: role for name, role in roles.items() if name in permitted}
+
+
+def unknown_role_names(
+    roles: dict[str, AgentRole], repo_roles: dict[str, list[str]] | None
+) -> dict[str, list[str]]:
+    """Roster role names that match no loaded role, per repository.
+
+    A typo here is silent otherwise: the repo simply stops being worked.
+    Callers surface this; the scheduler itself stays pure.
+    """
+    if not repo_roles:
+        return {}
+    unknown = {
+        repo: sorted(name for name in allowed if name not in roles)
+        for repo, allowed in repo_roles.items()
+    }
+    return {repo: names for repo, names in unknown.items() if names}
+
+
 def plan_cycle(
     items: list[WorkItem],
     roles: dict[str, AgentRole],
@@ -69,17 +107,31 @@ def plan_cycle(
     max_runs: int,
     repos: list[str] | None = None,
     role_names: list[str] | None = None,
+    repo_roles: dict[str, list[str]] | None = None,
 ) -> CyclePlan:
-    """Build the assignment plan for one cycle."""
+    """Build the assignment plan for one cycle.
+
+    ``repo_roles`` maps a repository to the roles its roster entry
+    permits (see :func:`permitted_roles`). ``role_names`` is the caller's
+    one-off ``--role`` filter and narrows further; neither can widen what
+    the roster allows.
+    """
     wanted_repos = set(repos) if repos else None
     wanted_roles = set(role_names) if role_names else None
+
+    # One narrowed registry per repository, not per item.
+    registries: dict[str, dict[str, AgentRole]] = {}
 
     routable: list[tuple[WorkItem, AgentRole]] = []
     unroutable: list[WorkItem] = []
     for item in items:
         if wanted_repos is not None and item.repo not in wanted_repos:
             continue
-        role = role_for_kind(roles, item.kind, item.role_hint)
+        if item.repo not in registries:
+            registries[item.repo] = permitted_roles(
+                roles, (repo_roles or {}).get(item.repo)
+            )
+        role = role_for_kind(registries[item.repo], item.kind, item.role_hint)
         if role is None or (wanted_roles is not None and role.name not in wanted_roles):
             unroutable.append(item)
             continue

@@ -144,6 +144,16 @@ class FleetSettings:
                 return repo
         return None
 
+    def repo_role_allowlist(self) -> dict[str, list[str]]:
+        """Per-repo role allowlists, for the repos that declare one.
+
+        A roster entry's ``roles: [...]`` is an allowlist: only those
+        agents touch that repository. An empty list means "every enabled
+        role", so such repos are simply absent from the mapping and the
+        scheduler leaves them unnarrowed.
+        """
+        return {repo.slug: list(repo.roles) for repo in self.repos if repo.roles}
+
     def merge_policy_for(self, slug: str) -> MergePolicy:
         """The merge policy in force for one repository.
 

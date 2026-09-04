@@ -265,6 +265,23 @@ fleet:
         with pytest.raises(ValueError, match="merge.method"):
             self.load(tmp_path, monkeypatch, body)
 
+    def test_repo_role_allowlist_lists_only_narrowed_repos(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ):
+        body = """
+fleet:
+  repos:
+    - repo: o/narrow
+      roles: [triage, reviewer]
+    - repo: o/open
+      roles: []
+    - o/bare
+"""
+        settings = self.load(tmp_path, monkeypatch, body)
+        # Only a non-empty list narrows anything; the others keep the
+        # documented "every enabled role" default by being absent.
+        assert settings.repo_role_allowlist() == {"o/narrow": ["triage", "reviewer"]}
+
     def test_daily_block_parses(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
         body = """
 fleet:
