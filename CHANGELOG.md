@@ -77,6 +77,18 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
   shape found against the real repositories.
 
 ### Fixed
+- The roster's per-repo `roles:` list is now **enforced**. It was parsed and
+  validated, documented as "which roles run where", and then read by nothing:
+  `plan_cycle` resolved every item against the global registry, so a repo
+  listing `roles: [triage]` still got the reviewer, the doc-writer, and every
+  other enabled role dispatched against it — a cost and blast-radius surprise
+  for an operator who reasonably read the field as "only these agents touch
+  this repo". `plan_cycle` now narrows the registry per repository before
+  resolving, and an item no permitted role handles is reported as unroutable
+  rather than quietly handed to someone else. An empty or omitted list keeps
+  the documented "every enabled role" default, so narrowing stays opt-in, and
+  a name matching no loaded role narrows to nothing (with a warning) rather
+  than failing open. The scheduler stays pure: the mapping is passed in.
 - `GitHubClient.list_commits` passed its `path` filter through
   `get(path, **params)`, where it collided with that method's own positional
   argument — every path-filtered commit query raised `TypeError` instead of

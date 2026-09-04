@@ -41,7 +41,7 @@ Agents also report **discovered work** (new todos) on every run, which the platf
 
 1. **Discover** — deterministic scanners sweep the roster: issues, PRs, workflow runs, docs gaps.
 2. **Queue** — findings become work items with stable dedup keys; rescans converge instead of duplicating.
-3. **Schedule** — a pure scheduler matches items to agent roles: priority bands, oldest first, repos interleaved round-robin so one noisy repo can't starve the rest.
+3. **Schedule** — a pure scheduler matches items to agent roles: priority bands, oldest first, repos interleaved round-robin so one noisy repo can't starve the rest. A roster entry's `roles:` list is an allowlist — only those agents touch that repo.
 4. **Balance** — each provider lane has a daily token budget; the balancer picks the first lane with headroom (subscription first, API spillover), benches rate-limited lanes, and tracks burn.
 5. **Dispatch** — the agent gets bounded evidence and must reply in a structured JSON contract; the platform validates every requested action against the role's grants before touching GitHub.
 6. **Monitor** — every run lands in a ledger; `wtd fleet status` shows queue, budgets, lanes, and outcomes.
