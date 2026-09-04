@@ -1013,6 +1013,59 @@ def fleet_loop(
         console.info("Fleet loop stopped.")
 
 
+@fleet_app.command("daily")
+def fleet_daily(
+    apply: bool = typer.Option(
+        False, "--apply", help="Write to GitHub (reviews, docs PRs, merges)."
+    ),
+    repo: list[str] = typer.Option(None, "--repo", "-r", help="Filter repos"),
+    max_runs: Optional[int] = typer.Option(None, "--max-runs", "-n"),
+    no_agents: bool = typer.Option(
+        False, "--no-agents", help="Sweep and report only; run no agents."
+    ),
+    discover: bool = typer.Option(
+        False, "--discover", help="Also run the per-cycle scanners (issues, CI)."
+    ),
+):
+    """📅 The daily pass: docs drift → review every PR → merge what is green."""
+    from wtd.ui.fleet_output import print_cycle_report, print_daily_report
+
+    async def _work(orchestrator):
+        report, cycle = await orchestrator.daily(
+            apply=apply or None,
+            repos=repo or None,
+            max_runs=max_runs,
+            run_agents=not no_agents,
+            discover=discover,
+        )
+        print_daily_report(report)
+        if cycle is not None:
+            print_cycle_report(cycle)
+
+    _with_orchestrator(_work)
+
+
+@fleet_app.command("merge-check")
+def fleet_merge_check(
+    repo: list[str] = typer.Option(None, "--repo", "-r", help="Filter repos"),
+    require_approval: bool = typer.Option(
+        False,
+        "--require-approval",
+        help="Also require a standing fleet review approval (as the sweep does).",
+    ),
+):
+    """🔍 Read-only: why each open PR would, or would not, be merged."""
+    from wtd.ui.fleet_output import print_merge_check
+
+    async def _work(orchestrator):
+        attempts = await orchestrator.harness().inspect_merges(
+            repo or None, require_approval=require_approval or False
+        )
+        print_merge_check(attempts, require_approval=require_approval)
+
+    _with_orchestrator(_work)
+
+
 @fleet_app.command("budget")
 def fleet_budget():
     """💰 Show today's token budgets and burn per provider lane."""

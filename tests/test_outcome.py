@@ -209,3 +209,47 @@ class TestContract:
         contract = output_contract(roles["reviewer"])
         assert '"type": "comment"' in contract
         assert "propose_pr" not in contract
+
+
+class TestMergeAction:
+    """merge_pr is a recommendation; validation keeps it honest and narrow."""
+
+    def review_item(self) -> WorkItem:
+        return WorkItem(
+            dedup_key=make_dedup_key("o/r", WorkKind.REVIEW_PR, "pr#7@abc"),
+            kind=WorkKind.REVIEW_PR,
+            repo="o/r",
+            title="Review PR #7",
+            evidence={"number": 7, "head_sha": "a" * 40},
+        )
+
+    def test_reviewer_may_request_a_merge_with_a_rationale(self, roles):
+        outcome = parse_outcome(
+            reply([{"type": "merge_pr", "body": "Docs-only, CI green, low risk."}]),
+            roles["reviewer"],
+            self.review_item(),
+        )
+        assert outcome.actions[0].type == ActionType.MERGE_PR
+        assert outcome.actions[0].body.startswith("Docs-only")
+
+    def test_a_merge_with_no_rationale_is_rejected(self, roles):
+        outcome = parse_outcome(
+            reply([{"type": "merge_pr", "body": "   "}]),
+            roles["reviewer"],
+            self.review_item(),
+        )
+        assert outcome.actions == []
+        assert "rationale" in outcome.rejected[0]
+
+    def test_other_roles_cannot_request_a_merge(self, roles, triage_item):
+        outcome = parse_outcome(
+            reply([{"type": "merge_pr", "body": "ship it"}]),
+            roles["triage"],
+            triage_item,
+        )
+        assert outcome.actions == []
+        assert "not granted to role 'triage'" in outcome.rejected[0]
+
+    def test_the_contract_shows_merge_only_to_roles_that_hold_it(self, roles):
+        assert "merge_pr" in output_contract(roles["reviewer"])
+        assert "merge_pr" not in output_contract(roles["doc-writer"])

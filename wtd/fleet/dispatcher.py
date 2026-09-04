@@ -26,6 +26,12 @@ from wtd.config import WTDConfig
 from wtd.fleet.balancer import CapacityBalancer
 from wtd.fleet.context import ContextBuilder
 from wtd.fleet.github import GitHubClient, GitHubError, has_marker, marker_comment
+from wtd.fleet.mergegate import (
+    APPROVAL_REASON_KEY,
+    APPROVAL_SHA_KEY,
+    evaluate_merge,
+    summarize_ci,
+)
 from wtd.fleet.models import (
     ActionType,
     AgentRunRecord,
@@ -50,7 +56,11 @@ _RATE_LIMIT_COOLDOWN_SECONDS = 900
 _KIND_INSTRUCTIONS = {
     "triage_issue": "Triage this issue per your role. Comment and label it.",
     "fix_bug": "Analyze this bug per your role and comment your findings.",
-    "review_pr": "Review this pull request per your role and comment your review.",
+    "review_pr": (
+        "Review this pull request per your role and comment your review. If "
+        "you would merge it yourself, also request the merge — the platform "
+        "re-verifies CI and policy before acting on that."
+    ),
     "investigate_ci": "Diagnose this standing CI failure per your role.",
     "write_docs": "Write the documentation this task describes, as a draft PR.",
     "improve_code": "Implement the smallest safe improvement for this TODO.",
@@ -317,6 +327,9 @@ class Dispatcher:
                 )
                 action.result_url = created.get("html_url")
 
+            elif action.type == ActionType.MERGE_PR:
+                await self._apply_merge(action, item, write_budget)
+
             elif action.type == ActionType.PROPOSE_PR:
                 repo_data = await self.github.get_repo(item.repo)
                 base = repo_data.get("default_branch", "main")
@@ -335,3 +348,58 @@ class Dispatcher:
         except GitHubError as exc:
             action.error = str(exc)[:500]
             await write_budget.refund()
+
+    # ------------------------------------------------------------------
+    async def _apply_merge(
+        self, action: ProposedAction, item: WorkItem, write_budget: CycleBudget
+    ) -> None:
+        """Act on a reviewer's merge recommendation — through the gate.
+
+        The agent's verdict is one of two keys. This is the other: live
+        GitHub state, re-read now, judged by pure code. When the gate
+        refuses, the approval is still recorded against the head commit the
+        reviewer read, so the daily merge sweep can act the moment the
+        remaining condition (usually "CI is still running") clears.
+        """
+        number = item.evidence.get("number")
+        if not number:
+            action.error = "no pull request number to merge"
+            await write_budget.refund()
+            return
+        head_sha = str(item.evidence.get("head_sha") or "")
+        policy = self.settings.merge_policy_for(item.repo)
+
+        inputs = await self.github.merge_inputs(item.repo, int(number))
+        pull = inputs["pull"]
+        if not head_sha:
+            head_sha = str(inputs["head_sha"])
+
+        # The approval is pinned to the commit the reviewer actually read.
+        item.evidence[APPROVAL_SHA_KEY] = head_sha
+        item.evidence[APPROVAL_REASON_KEY] = action.body[:500]
+
+        decision = evaluate_merge(
+            pull,
+            policy=policy,
+            ci=summarize_ci(inputs["check_runs"], inputs["combined_status"]),
+            reviews=inputs["reviews"],
+            approved_sha=head_sha,
+            fleet_authored=has_marker(str(pull.get("body") or ""), self.config.bot_marker),
+            repo=item.repo,
+        )
+        if not decision.allowed:
+            # A refusal writes nothing, so it must not spend the cycle's
+            # write budget — the approval simply waits for the next sweep.
+            action.error = f"merge gate refused: {decision.reason}"
+            await write_budget.refund()
+            return
+
+        await self.github.merge_pull(
+            item.repo,
+            int(number),
+            sha=decision.head_sha,
+            method=decision.method,
+            commit_title=f"{decision.title} (#{number})",
+        )
+        item.evidence.pop(APPROVAL_SHA_KEY, None)
+        action.result_url = item.url or decision.url

@@ -72,9 +72,23 @@ def output_contract(role: AgentRole) -> str:
             '"branch": "wtd/short-slug", '
             '"files": [{"path": "relative/path.md", "content": "full file content"}]}'
         ),
+        ActionType.MERGE_PR: (
+            '{"type": "merge_pr", "body": "why this change is safe to merge"}'
+        ),
     }
     allowed = [shapes[a] for a in role.allowed_actions]
     action_lines = "\n".join(f"  {shape}" for shape in allowed) or "  (none permitted)"
+    # The merge caveat is only shown to roles that can actually merge —
+    # every other role would just be reading about a door it cannot open.
+    merge_rule = (
+        """
+- "merge_pr" is a RECOMMENDATION, not a command: the platform re-verifies
+  CI, mergeability, and policy before merging, and refuses if anything is
+  off. Request it only when you would merge the change yourself, and always
+  alongside the comment that says why."""
+        if ActionType.MERGE_PR in role.allowed_actions
+        else ""
+    )
     return f"""
 RESPONSE FORMAT — reply with ONLY this JSON object, no prose around it:
 {{
@@ -93,7 +107,7 @@ Rules:
 - At most {MAX_ACTIONS_PER_RUN} actions. An empty actions list is a valid,
   often correct, outcome.
 - "discovered" is for NEW work you noticed that is out of scope for this
-  run. Do not rediscover the task you were given.
+  run. Do not rediscover the task you were given.{merge_rule}
 """
 
 
@@ -171,6 +185,14 @@ def _validate_action(raw: dict, role: AgentRole, item: WorkItem) -> ProposedActi
         return ProposedAction(
             type=action_type, title=title, body=body, branch=branch, files=files
         )
+
+    if action_type == ActionType.MERGE_PR:
+        body = str(raw.get("body", "")).strip()
+        if not body:
+            # A merge with no stated rationale is unreviewable after the
+            # fact; the body is what lands in the merge comment.
+            return "merge_pr without a rationale body"
+        return ProposedAction(type=action_type, body=body[:MAX_COMMENT_CHARS])
 
     return f"unhandled action type {action_type.value!r}"  # pragma: no cover
 

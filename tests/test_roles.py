@@ -28,11 +28,31 @@ class TestBuiltins:
 
     def test_role_grants_are_least_privilege(self):
         roles = builtin_roles()
-        # The reviewer can only comment — it must never file issues or PRs.
-        assert roles["reviewer"].allowed_actions == [ActionType.COMMENT]
+        # The reviewer comments and may recommend a merge (the merge gate
+        # decides whether that recommendation is acted on) — but it must
+        # never file issues or open pull requests.
+        assert roles["reviewer"].allowed_actions == [
+            ActionType.COMMENT,
+            ActionType.MERGE_PR,
+        ]
         # Writers open PRs but never label or file issues.
         assert ActionType.ADD_LABELS not in roles["doc-writer"].allowed_actions
         assert ActionType.CREATE_ISSUE not in roles["author"].allowed_actions
+
+    def test_only_the_reviewer_may_ever_request_a_merge(self):
+        # Merging is the fleet's most consequential action; exactly one
+        # built-in role holds the grant, and it is the one that reads diffs.
+        holders = [
+            name
+            for name, role in builtin_roles().items()
+            if ActionType.MERGE_PR in role.allowed_actions
+        ]
+        assert holders == ["reviewer"]
+
+    def test_the_reviewer_runs_on_opus_5(self):
+        # Review is where a missed defect ships, so the role pins its model
+        # rather than inheriting whatever the platform default happens to be.
+        assert builtin_roles()["reviewer"].model == "claude-opus-5"
 
     def test_house_rules_in_every_system_prompt(self):
         for role in builtin_roles().values():

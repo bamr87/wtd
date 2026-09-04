@@ -158,6 +158,14 @@ class WTDConfig(BaseSettings):
         ge=0,
         description="Cap on GitHub write actions per cycle (apply mode).",
     )
+    fleet_merge_enabled: bool = Field(
+        default=False,
+        description=(
+            "Default for the merge gate (wtd.yml's fleet.merge.enabled "
+            "overrides it). Off means the fleet may review pull requests "
+            "but never merge one, whatever an agent recommends."
+        ),
+    )
     fleet_claude_code_daily_tokens: int = Field(
         default=1_500_000,
         ge=0,

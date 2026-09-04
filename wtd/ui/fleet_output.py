@@ -223,3 +223,97 @@ def print_cycle_report(report: CycleReport) -> None:
                     console.warning(
                         f"{run.role}: {action.type.value} not applied — {action.error}"
                     )
+
+
+def print_daily_report(report) -> None:
+    """The daily harness: what drifted, what got reviewed, what merged."""
+    mode = "[green]APPLY[/]" if report.apply else "[yellow]DRY-RUN[/]"
+    lines = [
+        f"day: {report.day} · mode: {mode}",
+        f"docs: {report.docs_queued} of {len(report.docs)} repos need a "
+        f"documentation pass",
+        f"reviews: {report.reviews_queued} queued of {len(report.reviews)} open "
+        f"pull request(s)",
+        f"merges: {report.merged} merged of {len(report.merges)} evaluated",
+    ]
+    for note in report.notes:
+        lines.append(f"[yellow]note:[/] {note}")
+    console.print(Panel("\n".join(lines), title="Fleet daily", border_style="cyan"))
+
+    if report.docs:
+        table = Table(title="Docs drift", show_header=True)
+        for col in ("repo", "verdict", "drift", "commits", "readme", "why"):
+            table.add_column(col, overflow="fold")
+        for check in report.docs:
+            assessment = check.assessment
+            if check.error:
+                verdict = "[red]error[/]"
+            elif assessment.needs_update:
+                verdict = "[yellow]stale[/]"
+            else:
+                verdict = "[green]current[/]"
+            table.add_row(
+                check.repo,
+                verdict,
+                f"{assessment.drift_days:.0f}d" if assessment.drift_days else "—",
+                str(assessment.commits_since_docs or "—"),
+                str(assessment.readme_chars if assessment.readme_chars is not None else "none"),
+                (check.error or assessment.summary)[:80],
+            )
+        console.print(table)
+
+    if report.reviews:
+        table = Table(
+            title=f"Pull requests seen ({len(report.reviews)})", show_header=True
+        )
+        for col in ("repo", "pr", "head", "draft", "queued", "title"):
+            table.add_column(col, overflow="fold")
+        for target in report.reviews[:30]:
+            table.add_row(
+                target.repo,
+                f"#{target.number}",
+                target.head_sha[:8],
+                "yes" if target.draft else "no",
+                "[green]yes[/]" if target.queued else f"[dim]{target.reason}[/]",
+                target.title[:60],
+            )
+        if len(report.reviews) > 30:
+            console.muted(f"…and {len(report.reviews) - 30} more")
+        console.print(table)
+
+    if report.merges:
+        print_merge_check(report.merges, require_approval=True)
+
+
+def print_merge_check(attempts, *, require_approval: bool = False) -> None:
+    """The merge gate's verdict per pull request, with its reasons."""
+    if not attempts:
+        console.muted(
+            "No pull requests evaluated — nothing open, or merging is off "
+            "for every repo in scope."
+        )
+        return
+    title = f"Merge gate ({len(attempts)} pull request(s))"
+    if not require_approval:
+        title += " — approval requirement relaxed for inspection"
+    table = Table(title=title, show_header=True)
+    for col in ("repo", "pr", "head", "CI", "gate", "why"):
+        table.add_column(col, overflow="fold")
+    for attempt in attempts:
+        decision = attempt.decision
+        if attempt.merged:
+            gate = "[green]MERGED[/]"
+        elif decision.allowed:
+            gate = "[green]would merge[/]" if attempt.dry_run else "[yellow]allowed[/]"
+        else:
+            gate = "[yellow]held[/]"
+        ci = "[green]green[/]" if decision.ci.green else f"[red]{decision.ci.describe()}[/]"
+        table.add_row(
+            attempt.repo,
+            f"#{attempt.number}",
+            decision.head_sha[:8],
+            ci,
+            gate,
+            (attempt.error or decision.reason)[:90],
+        )
+    console.print(table)

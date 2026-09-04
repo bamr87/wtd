@@ -7,7 +7,8 @@ fleet:
     - repo: bamr87/wtd
       roles: [triage, bug-hunter, reviewer, janitor, doc-writer]
     - repo: bamr87/gitorio
-      roles: [triage, bug-hunter, reviewer, janitor]
+      roles: [triage, bug-hunter, reviewer, janitor, doc-writer]
+      merge: true       # opt in to the merge gate (still needs merge.enabled + --apply)
     - repo: bamr87/bamr87
       roles: [triage, bug-hunter, reviewer, janitor]
 
@@ -16,6 +17,34 @@ fleet:
     pulls: true
     ci: true
     docs: true
+
+  # The once-a-day pass (`wtd fleet daily`): docs drift across the whole
+  # roster, then a review of every open PR by the Opus 5 reviewer.
+  daily:
+    docs: true              # docs-drift sweep, one item per stale repo per day
+    review: true            # queue every open PR for review, keyed by head commit
+    review_drafts: true     # drafts get feedback early; the gate never merges them
+    stale_after_days: 14    # docs must lag code by this long...
+    min_commits_since_docs: 5   # ...and by this many commits, to count as drift
+    doc_paths: [README.md, docs]
+
+  # The merge gate. Merging needs ALL of: --apply, merge.enabled, and the
+  # repo's own `merge: true` — plus the gate's own verdict (CI green on the
+  # reviewed commit, mergeable, no changes requested, no blocking label).
+  merge:
+    # `enabled` is deliberately NOT set here: leaving it out lets the
+    # environment govern (WTD_FLEET_MERGE_ENABLED, default false), which is
+    # what keeps the Actions kill switch meaningful. Setting it true here
+    # would pin it on for every deployment reading this file. A committed
+    # `false` still cannot be overridden upward by the environment.
+    method: squash
+    require_checks: true            # a commit with no CI signal is NOT green
+    require_review_approval: true   # only PRs the Opus 5 reviewer approved
+    # The house convention is that an agent never merges its own work. Every
+    # open PR on gitorio was opened by this fleet, so flipping this to true
+    # is what would let them auto-merge — a deliberate decision, not a default.
+    allow_fleet_authored: false
+    max_per_cycle: 2
 
   # Per-cycle safety rails. Writes are capped low on purpose: an
   # autonomous loop should trickle, not flood.

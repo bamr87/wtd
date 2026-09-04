@@ -193,3 +193,89 @@ class TestConfigAliases:
         monkeypatch.setenv("WTD_ANTHROPIC_API_KEY", "prefixed")
         cfg = WTDConfig()
         assert cfg.anthropic_api_key == "prefixed"
+
+
+class TestMergeSettings:
+    """The merge gate's switches: two must agree, and env may only narrow."""
+
+    def write_config(self, tmp_path: Path, body: str) -> Path:
+        path = tmp_path / "wtd.yml"
+        path.write_text(body, encoding="utf-8")
+        return path
+
+    def load(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, body: str):
+        monkeypatch.setenv("WTD_FLEET_CONFIG", str(self.write_config(tmp_path, body)))
+        return load_settings(WTDConfig())
+
+    ENABLED = """
+fleet:
+  repos:
+    - repo: o/yes
+      merge: true
+    - repo: o/no
+  merge:
+    enabled: true
+    method: rebase
+"""
+
+    def test_both_switches_must_agree(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ):
+        settings = self.load(tmp_path, monkeypatch, self.ENABLED)
+        assert settings.merge_policy_for("o/yes").enabled is True
+        # Fleet-wide on, repo opted out: no merging there.
+        assert settings.merge_policy_for("o/no").enabled is False
+        # Not on the roster at all: no merging either.
+        assert settings.merge_policy_for("other/repo").enabled is False
+        assert settings.merge_policy_for("o/yes").method == "rebase"
+
+    def test_fleet_switch_off_disables_every_repo(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ):
+        body = self.ENABLED.replace("enabled: true", "enabled: false")
+        settings = self.load(tmp_path, monkeypatch, body)
+        assert settings.merge_policy_for("o/yes").enabled is False
+
+    def test_env_may_narrow_but_config_cannot_widen_past_it(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ):
+        # A kill switch that a committed file can override is not a kill switch.
+        monkeypatch.setenv("WTD_FLEET_MERGE_ENABLED", "false")
+        settings = self.load(tmp_path, monkeypatch, self.ENABLED)
+        assert settings.merge.enabled is False
+        assert settings.merge_policy_for("o/yes").enabled is False
+
+    def test_env_alone_does_not_enable_a_repo(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ):
+        monkeypatch.setenv("WTD_FLEET_MERGE_ENABLED", "true")
+        body = """
+fleet:
+  repos:
+    - repo: o/yes
+"""
+        settings = self.load(tmp_path, monkeypatch, body)
+        assert settings.merge.enabled is True  # env is the default...
+        assert settings.merge_policy_for("o/yes").enabled is False  # ...repo opted out
+
+    def test_unknown_merge_method_is_rejected_at_load(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ):
+        body = self.ENABLED.replace("method: rebase", "method: fast-forward")
+        with pytest.raises(ValueError, match="merge.method"):
+            self.load(tmp_path, monkeypatch, body)
+
+    def test_daily_block_parses(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+        body = """
+fleet:
+  repos: [o/r]
+  daily:
+    review_drafts: false
+    stale_after_days: 30
+    doc_paths: [README.md, docs, wiki]
+"""
+        settings = self.load(tmp_path, monkeypatch, body)
+        assert settings.daily.review_drafts is False
+        assert settings.daily.docs is True  # untouched default
+        assert settings.daily.docs_policy().stale_after_days == 30
+        assert settings.daily.docs_policy().doc_paths == ("README.md", "docs", "wiki")
