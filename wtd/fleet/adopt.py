@@ -28,15 +28,18 @@ from wtd.fleet.textscan import executes, find_evidence
 if TYPE_CHECKING:
     from wtd.fleet.github import GitHubClient
 from wtd.fleet.manifest import (
+    MANIFEST_FILENAME,
     FleetManifest,
     Guardrails,
     Harness,
     Lane,
     LaneKind,
+    ManifestError,
     Metering,
     TokenSpec,
     Trigger,
     TriggerKind,
+    parse_manifest,
 )
 
 # --- how a lane invokes a model -------------------------------------------
@@ -45,7 +48,14 @@ _HARNESS_PATTERNS: list[tuple[Harness, re.Pattern[str]]] = [
     (Harness.WTD_FLEET, re.compile(r"\bwtd\s+fleet\b")),
     (
         Harness.CLAUDE_CLI,
-        re.compile(r"(?<!\w)claude\s+-p\b|@anthropic-ai/claude-code|claude_args"),
+        # The bare CLI, plus the fleet's composite wrapper around it: a local
+        # `uses: ./.github/actions/claude-run`, a remote
+        # `uses: owner/repo/.../claude-run@ref`, or its `scripts/ai/run.sh`.
+        re.compile(
+            r"(?<!\w)claude\s+-p\b|@anthropic-ai/claude-code|claude_args"
+            r"|actions/claude-run\b|[\w.-]+/[\w.-]+/[^\s'\"]*claude-run@"
+            r"|scripts/ai/run\.sh"
+        ),
     ),
     (
         Harness.ENGINE,
@@ -308,6 +318,33 @@ def derive_manifest(
         agents=agents,
         skills=skills,
     )
+
+
+async def manifest_from_github(
+    client: "GitHubClient", repo_slug: str, *, summary: str = ""
+) -> FleetManifest:
+    """The repo's fleet manifest, declared if it committed one, else derived.
+
+    Mirrors the local-checkout rule: a committed ``fleet.manifest.yml`` always
+    wins over inference, because it carries what inference cannot know —
+    hand-written summary, metering, writable paths, deliberate exceptions.
+    An unreadable or invalid manifest falls back to derivation, never fails.
+    """
+    from wtd.fleet.github import GitHubError
+
+    text = ""
+    try:
+        text = await client.get_file(repo_slug, MANIFEST_FILENAME) or ""
+    except GitHubError:
+        text = ""
+    if text:
+        import yaml
+
+        try:
+            return parse_manifest(yaml.safe_load(text) or {})
+        except (yaml.YAMLError, ManifestError):
+            pass
+    return await derive_manifest_from_github(client, repo_slug, summary=summary)
 
 
 async def derive_manifest_from_github(
