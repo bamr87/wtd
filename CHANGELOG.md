@@ -7,6 +7,10 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+### Fixed
+- **`wtd fleet adopt` sees the fleet's composite runner.** The CLAUDE_CLI harness pattern in `wtd/fleet/adopt.py` now matches a local `uses: ./.github/actions/claude-run`, a remote `uses: owner/repo/.../claude-run@ref`, and a bare `scripts/ai/run.sh` — the three shapes the fleet wraps `claude -p` in. A caller workflow never says "claude" itself, so before this every such lane was dropped as `none`: lifehacker.dev derived 4 lanes where 17 run, it-journey 7 where 15 run. Four new tests (`tests/test_adopt.py`, 281 → 285).
+- **A committed manifest wins over inference on the GitHub path too.** `wtd fleet map` / `audit` over the roster called `derive_manifest_from_github` unconditionally, so a repo's hand-declared `fleet.manifest.yml` (its summary, metering, `writable_paths`, deliberate exceptions) was silently ignored unless you passed `--path`. New `manifest_from_github` in `wtd/fleet/adopt.py` reads the committed file first and falls back to derivation when it is absent or invalid, mirroring the local-checkout rule in `wtd/cli.py`.
+
 ### Added
 - **The daily harness** (`wtd fleet daily`) — a once-a-day pass over the whole
   roster, on top of the 4-hourly cycle. The per-cycle scanners ask "what is

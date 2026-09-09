@@ -1088,7 +1088,7 @@ def _collect_manifests(repos, paths, use_github):
     import asyncio
     from pathlib import Path as _Path
 
-    from wtd.fleet.adopt import derive_manifest, derive_manifest_from_github
+    from wtd.fleet.adopt import derive_manifest, manifest_from_github
     from wtd.fleet.manifest import MANIFEST_FILENAME, ManifestError, load_manifest
     from wtd.fleet.settings import load_settings
 
@@ -1121,7 +1121,8 @@ def _collect_manifests(repos, paths, use_github):
 
             client = GitHubClient(cfg.github_token, api_url=cfg.github_api_url)
             try:
-                return [await derive_manifest_from_github(client, s) for s in slugs]
+                # Same rule as local checkouts: a committed manifest wins.
+                return [await manifest_from_github(client, s) for s in slugs]
             finally:
                 await client.aclose()
 

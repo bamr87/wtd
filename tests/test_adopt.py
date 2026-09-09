@@ -14,6 +14,7 @@ from wtd.fleet.adopt import (
     detect_harness,
     detect_kind,
     lane_from_text,
+    manifest_from_github,
     merge_evidence,
 )
 from wtd.fleet.manifest import Harness, LaneKind
@@ -122,6 +123,40 @@ jobs:
       - run: git push origin HEAD:main && echo published
 """
 
+COMPOSITE_RUNNER = """\
+name: Content factory
+on:
+  schedule:
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+jobs:
+  grow:
+    if: vars.GROW_ENABLED == 'true'
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/claude-run
+        with:
+          agent: grow
+          prompt: Produce ONE piece and open ONE pull request.
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+"""
+
+REMOTE_RUNNER = """\
+name: Nightly review
+on:
+  schedule:
+    - cron: "0 3 * * *"
+jobs:
+  review:
+    if: vars.REVIEW_ENABLED == 'true'
+    steps:
+      - uses: actions/checkout@v7
+      - uses: bamr87/bamr87/templates/ai-runner/claude-run@v1
+        with:
+          prompt: Review the open pull requests.
+"""
+
 NOT_AN_AI_LANE = """\
 name: CI
 on: [push]
@@ -138,6 +173,19 @@ class TestHarnessDetection:
         assert detect_harness(GATED_CRON) is Harness.ENGINE
         assert detect_harness(DETECTOR) is Harness.CLAUDE_CLI
         assert detect_harness("run: wtd fleet run --apply") is Harness.WTD_FLEET
+
+    def test_composite_runner_is_the_cli_harness(self):
+        # The fleet wraps `claude -p` in a composite action; the caller
+        # workflow never says "claude" itself, so the wrapper is the evidence.
+        assert detect_harness(COMPOSITE_RUNNER) is Harness.CLAUDE_CLI
+        assert detect_harness(REMOTE_RUNNER) is Harness.CLAUDE_CLI
+        assert detect_harness("run: bash scripts/ai/run.sh --prompt x") is Harness.CLAUDE_CLI
+
+    def test_composite_runner_is_a_gated_lane(self):
+        lane = lane_from_text("content-factory.yml", COMPOSITE_RUNNER)
+        assert lane is not None
+        assert lane.switch == "GROW_ENABLED"
+        assert lane.uses_tokens == ["CLAUDE_CODE_OAUTH_TOKEN"]
 
     def test_non_ai_workflow_is_not_a_lane(self):
         assert detect_harness(NOT_AN_AI_LANE) is Harness.NONE
@@ -237,3 +285,59 @@ class TestDeriveManifest:
     def test_repo_without_workflows_is_empty_not_an_error(self, tmp_path: Path):
         manifest = derive_manifest(tmp_path, "owner/name")
         assert manifest.lanes == []
+
+
+class _FakeGitHub:
+    """Just enough of GitHubClient for the manifest path: a file tree."""
+
+    def __init__(self, files: dict[str, str]):
+        self.files = files
+
+    async def get_file(self, repo: str, path: str, *, ref=None):
+        return self.files.get(path)
+
+    async def list_dir(self, repo: str, path: str = ""):
+        prefix = path.rstrip("/") + "/"
+        return [{"name": p[len(prefix):]} for p in self.files if p.startswith(prefix)]
+
+
+DECLARED = """\
+spec_version: fleet/v1
+repo: acme/site
+provenance: declared
+summary: hand-written, so inference must not overwrite it
+lanes:
+  - id: grow
+    kind: content
+    harness: claude-cli
+    switch: GROW_ENABLED
+    guardrails:
+      writable_paths: [pages/]
+"""
+
+
+class TestManifestFromGithub:
+    async def test_committed_manifest_wins_over_inference(self):
+        client = _FakeGitHub({
+            "fleet.manifest.yml": DECLARED,
+            ".github/workflows/nightly.yml": UNGATED_CRON,
+        })
+        manifest = await manifest_from_github(client, "acme/site")
+        assert manifest.provenance == "declared"
+        assert manifest.summary.startswith("hand-written")
+        assert [lane.id for lane in manifest.lanes] == ["grow"]
+        assert manifest.lanes[0].guardrails.writable_paths == ["pages/"]
+
+    async def test_missing_or_invalid_manifest_falls_back_to_inference(self):
+        absent = _FakeGitHub({".github/workflows/nightly.yml": UNGATED_CRON})
+        derived = await manifest_from_github(absent, "acme/site")
+        assert derived.provenance == "derived"
+        assert [lane.id for lane in derived.lanes] == ["nightly"]
+
+        broken = _FakeGitHub({
+            "fleet.manifest.yml": "spec_version: fleet/v0\nrepo: acme/site\n",
+            ".github/workflows/nightly.yml": UNGATED_CRON,
+        })
+        fallback = await manifest_from_github(broken, "acme/site")
+        assert fallback.provenance == "derived"
+        assert [lane.id for lane in fallback.lanes] == ["nightly"]

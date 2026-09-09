@@ -202,6 +202,7 @@ The **fleet manifest** (`fleet.manifest.yml`, spec `fleet/v1`) is the common den
 
 ```bash
 wtd fleet adopt ../some-repo --write   # derive it from the repo's workflows
+                                       # (a committed manifest always wins over inference — locally and over the API)
 wtd fleet map                          # every lane, every repo, one table
 wtd fleet audit --strict               # fail CI on a critical convention breach
 ```
