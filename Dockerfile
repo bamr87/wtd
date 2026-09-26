@@ -12,7 +12,7 @@
 # The image carries both lanes: the claude CLI (Claude Code OAuth,
 # default) and the anthropic SDK (API fallback).
 
-FROM python:3.12-slim
+FROM python:3.14-slim
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends curl ca-certificates git \
