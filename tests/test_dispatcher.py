@@ -5,17 +5,23 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 from tests.helpers_github import FakeGitHub
 from wtd.config import WTDConfig
 from wtd.fleet.balancer import CapacityBalancer, Lane
+from wtd.fleet.context import ContextBuilder
 from wtd.fleet.dispatcher import CycleBudget, Dispatcher
 from wtd.fleet.models import (
     RunOutcome,
     WorkItem,
     WorkKind,
     WorkStatus,
+    is_recordless_discovery,
     make_dedup_key,
+    missing_record,
 )
+from wtd.fleet.outcome import parse_outcome
 from wtd.fleet.roles import builtin_roles
 from wtd.fleet.scheduler import Assignment
 from wtd.fleet.settings import FleetSettings
@@ -261,6 +267,110 @@ class TestFlywheel:
             len([i for i in state.items.values() if i.discovered_by == "agent:triage"])
             == 1
         )
+
+
+_SENTINELS = ("Issue #None", "URL: (none)", "Author: unknown", "Origin: unknown:?")
+
+
+def discovered_item(kind: str) -> WorkItem:
+    """An item exactly as the agent channel produces it (outcome.py)."""
+    parent = triage_assignment().item
+    parent.url = "https://github.com/o/r/issues/5"
+    reply = json.dumps(
+        {
+            "summary": "s",
+            "actions": [],
+            "discovered": [
+                {"kind": kind, "title": f"Found {kind}", "description": "the details"}
+            ],
+        }
+    )
+    return parse_outcome(reply, builtin_roles()["triage"], parent).discovered[0]
+
+
+class TestDiscoveredContext:
+    """bamr87/wtd#22: agent-discovered items must never render sentinels."""
+
+    @pytest.mark.parametrize("kind", ["fix_bug", "triage_issue", "improve_code"])
+    async def test_no_sentinels_for_agent_discovered_items(self, kind):
+        item = discovered_item(kind)
+        context = await ContextBuilder(FakeGitHub().client).build(item)
+        for sentinel in _SENTINELS:
+            assert sentinel not in context
+        assert f"Task: Found {kind}" in context
+        assert "the details" in context
+        assert "Triage issue: example (#5)" in context  # parent provenance
+        assert "agent:triage" in context
+
+    async def test_scanner_fix_bug_still_renders_its_issue(self):
+        fake = FakeGitHub()
+        fake.route(
+            "GET",
+            "/repos/o/r/issues/7/comments",
+            [{"body": "same here", "user": {"login": "bob"}}],
+        )
+        item = WorkItem(
+            dedup_key=make_dedup_key("o/r", WorkKind.FIX_BUG, "issue#7"),
+            kind=WorkKind.FIX_BUG,
+            repo="o/r",
+            title="Crash on start",
+            url="https://github.com/o/r/issues/7",
+            discovered_by="scanner:issues",
+            evidence={"number": 7, "author": "alice", "labels": ["bug"], "body": "boom"},
+        )
+        context = await ContextBuilder(fake.client).build(item)
+        assert "Issue #7: Crash on start" in context
+        assert "Author: alice" in context
+        assert "Labels: bug" in context
+        assert "URL: https://github.com/o/r/issues/7" in context
+        assert "boom" in context
+        assert "comment by bob" in context
+
+    @pytest.mark.parametrize("kind", ["write_docs", "write_article", "custom"])
+    def test_repo_built_kinds_are_not_caught(self, kind):
+        item = discovered_item(kind)
+        assert missing_record(item) is None
+        assert not is_recordless_discovery(item)
+
+    async def test_prompt_offers_no_comment_for_discovered_bug(self, tmp_path: Path):
+        router = FakeRouter(json.dumps({"summary": "nothing to do", "actions": []}))
+        dispatcher, state, _, fake = make_world(tmp_path, router=router)
+        item = discovered_item("fix_bug")
+        state.enqueue(item)
+        assignment = Assignment(item=item, role=builtin_roles()["bug-hunter"])
+
+        run = await dispatcher.run(assignment, apply=True, write_budget=CycleBudget(5))
+
+        prompt = router.calls[0]["prompt"]
+        assert '"type": "comment"' not in prompt
+        assert "no issue or file stands behind it" in prompt
+        for sentinel in _SENTINELS:
+            assert sentinel not in prompt
+        assert run.outcome == RunOutcome.COMPLETED
+        assert fake.writes() == []
+
+
+class TestTargetlessDispatch:
+    async def test_item_without_a_target_is_skipped_not_failed(self, tmp_path: Path):
+        router = FakeRouter(triage_reply())
+        dispatcher, state, *_ = make_world(tmp_path, router=router)
+        item = WorkItem(
+            dedup_key=make_dedup_key("o/r", WorkKind.FIX_BUG, "no-number"),
+            kind=WorkKind.FIX_BUG,
+            repo="o/r",
+            title="A bug with no issue behind it",
+        )
+        state.enqueue(item)
+        assignment = Assignment(item=item, role=builtin_roles()["bug-hunter"])
+
+        run = await dispatcher.run(assignment, apply=True, write_budget=CycleBudget(5))
+
+        assert run.outcome == RunOutcome.SKIPPED
+        assert "no target" in run.summary
+        assert item.status == WorkStatus.SKIPPED
+        assert item.attempts == 0  # no retry consumed
+        assert router.calls == []  # never reached the model
+        assert state.recent_runs()[0].id == run.id
 
 
 class TestFailureHandling:

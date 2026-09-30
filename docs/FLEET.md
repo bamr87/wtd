@@ -94,7 +94,8 @@ Agents must reply with a single JSON object:
 - at most 3 actions per run; body/title/label/file-count/file-size caps;
 - PR file paths are normalized and must stay inside the repo; `.github/workflows/**` is always refused (a workflow write would hand the agent the fleet's own credentials);
 - PR branches are forced under the `wtd/` prefix;
-- discovered items are capped per run, restricted to agent-discoverable kinds (`review_pr` can only come from the scanner), and never above `high` priority.
+- discovered items are capped per run, restricted to agent-discoverable kinds (`review_pr` can only come from the scanner), and never above `high` priority;
+- discovered items are typed `self_originated` and carry their parent's provenance (`parent_item`, `parent_kind`, `parent_title`, `parent_number`/`parent_url`, `origin`) — never a scanner-shaped record. A `fix_bug`/`triage_issue`/`improve_code` item with no issue number or file behind it renders through a *discovered* template instead of its kind's builder, and is never offered `comment`, `add_labels` or `merge_pr` (they have no target); `propose_pr`, where the role holds it, or an empty action list are what remain.
 
 Rejections don't fail the run — they're recorded on the run ledger so a drifting agent is visible.
 
@@ -128,7 +129,7 @@ A name in a roster list that matches no loaded role narrows to nothing rather th
 
 ## The dispatcher pipeline
 
-For each assignment: build bounded context (per-kind evidence, fenced as untrusted, ≤60K chars) → reserve a lane → generate via the router (system = role prompt + house rules; prompt = task + evidence + output contract) → parse/validate the outcome → apply actions (apply mode only) → enqueue discovered items → record the run.
+For each assignment: check the item has a target (a `fix_bug`/`triage_issue`/`improve_code` item with no issue number or file, and not typed as self-originated, is recorded **skipped** — no attempt consumed, no model call — rather than rendered as `Issue #None`) → build bounded context (per-kind evidence, fenced as untrusted, ≤60K chars) → reserve a lane → generate via the router (system = role prompt + house rules; prompt = task + evidence + output contract) → parse/validate the outcome → apply actions (apply mode only) → enqueue discovered items → record the run.
 
 Write-time guards, on top of outcome validation:
 

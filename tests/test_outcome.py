@@ -203,6 +203,57 @@ class TestDiscovered:
         )
         assert outcome.discovered[0].priority.value == "high"
 
+    def test_discovered_inherits_parent_provenance(self, roles, triage_item):
+        triage_item.url = "https://github.com/o/r/issues/5"
+        outcome = parse_outcome(
+            reply(discovered=[{"kind": "fix_bug", "title": "null deref in parser"}]),
+            roles["triage"],
+            triage_item,
+        )
+        ev = outcome.discovered[0].evidence
+        assert ev["self_originated"] is True
+        assert ev["parent_item"] == triage_item.dedup_key
+        assert ev["parent_kind"] == "triage_issue"
+        assert ev["parent_title"] == triage_item.title
+        assert ev["parent_number"] == 5
+        assert ev["parent_url"] == "https://github.com/o/r/issues/5"
+        assert ev["origin"] == "manual"
+
+
+def _discovered(roles, parent: WorkItem, kind: str) -> WorkItem:
+    outcome = parse_outcome(
+        reply(discovered=[{"kind": kind, "title": f"found {kind}"}]), roles["triage"], parent
+    )
+    return outcome.discovered[0]
+
+
+class TestRecordlessDiscovery:
+    """Agent-discovered work has no issue behind it (bamr87/wtd#22)."""
+
+    @pytest.mark.parametrize("kind", ["fix_bug", "triage_issue"])
+    def test_comment_is_rejected_without_a_target(self, roles, triage_item, kind):
+        item = _discovered(roles, triage_item, kind)
+        role = roles["bug-hunter"] if kind == "fix_bug" else roles["triage"]
+        outcome = parse_outcome(reply([{"type": "comment", "body": "hi"}]), role, item)
+        assert outcome.actions == []
+        assert any("no target" in r for r in outcome.rejected)
+
+    def test_contract_offers_propose_pr_but_not_comment(self, roles, triage_item):
+        item = _discovered(roles, triage_item, "improve_code")
+        contract = output_contract(roles["contributor"], item)
+        assert '"type": "propose_pr"' in contract
+        assert '"type": "comment"' not in contract
+
+    def test_contract_for_a_role_with_only_targeted_actions_is_empty(
+        self, roles, triage_item
+    ):
+        item = _discovered(roles, triage_item, "triage_issue")
+        assert "(none permitted)" in output_contract(roles["triage"], item)
+
+    def test_scanner_items_keep_their_comment_action(self, roles, triage_item):
+        contract = output_contract(roles["triage"], triage_item)
+        assert '"type": "comment"' in contract
+
 
 class TestContract:
     def test_contract_lists_only_granted_shapes(self, roles):

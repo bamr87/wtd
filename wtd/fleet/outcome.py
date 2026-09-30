@@ -19,10 +19,12 @@ from dataclasses import dataclass, field
 from wtd.core.agent import extract_json_block
 from wtd.core.models import TodoPriority
 from wtd.fleet.models import (
+    TARGETED_ACTIONS,
     ActionType,
     ProposedAction,
     WorkItem,
     WorkKind,
+    is_recordless_discovery,
     make_dedup_key,
     slugify,
 )
@@ -59,8 +61,16 @@ class Outcome:
     rejected: list[str] = field(default_factory=list)  # human-readable reasons
 
 
-def output_contract(role: AgentRole) -> str:
+def offered_actions(role: AgentRole, item: WorkItem | None = None) -> list[ActionType]:
+    """The role's grants, minus actions the item gives no target for."""
+    if item is not None and is_recordless_discovery(item):
+        return [a for a in role.allowed_actions if a not in TARGETED_ACTIONS]
+    return list(role.allowed_actions)
+
+
+def output_contract(role: AgentRole, item: WorkItem | None = None) -> str:
     """The response-format section appended to every fleet prompt."""
+    offered = offered_actions(role, item)
     shapes = {
         ActionType.COMMENT: '{"type": "comment", "body": "markdown"}',
         ActionType.ADD_LABELS: '{"type": "add_labels", "labels": ["bug"]}',
@@ -76,7 +86,7 @@ def output_contract(role: AgentRole) -> str:
             '{"type": "merge_pr", "body": "why this change is safe to merge"}'
         ),
     }
-    allowed = [shapes[a] for a in role.allowed_actions]
+    allowed = [shapes[a] for a in offered]
     action_lines = "\n".join(f"  {shape}" for shape in allowed) or "  (none permitted)"
     # The merge caveat is only shown to roles that can actually merge —
     # every other role would just be reading about a door it cannot open.
@@ -86,7 +96,7 @@ def output_contract(role: AgentRole) -> str:
   CI, mergeability, and policy before merging, and refuses if anything is
   off. Request it only when you would merge the change yourself, and always
   alongside the comment that says why."""
-        if ActionType.MERGE_PR in role.allowed_actions
+        if ActionType.MERGE_PR in offered
         else ""
     )
     return f"""
@@ -135,6 +145,8 @@ def _validate_action(raw: dict, role: AgentRole, item: WorkItem) -> ProposedActi
         return f"unknown action type {raw.get('type')!r}"
     if action_type not in role.allowed_actions:
         return f"action {action_type.value!r} not granted to role {role.name!r}"
+    if action_type not in offered_actions(role, item):
+        return f"action {action_type.value!r} has no target: agent-discovered item with no issue"
 
     if action_type == ActionType.COMMENT:
         body = str(raw.get("body", "")).strip()
@@ -218,6 +230,20 @@ def _validate_discovered(
         "low": TodoPriority.LOW,
     }
     priority = priority_map.get(str(raw.get("priority", "medium")).lower(), TodoPriority.MEDIUM)
+    # No issue or file stands behind agent-discovered work, so it is typed as
+    # self-originated and carries its parent's provenance instead — never the
+    # scanner-shaped record its builder would otherwise render as sentinels.
+    evidence: dict[str, object] = {
+        "parent_item": item.dedup_key,
+        "self_originated": True,
+        "parent_kind": item.kind.value,
+        "parent_title": item.title,
+        "origin": item.discovered_by,
+    }
+    if item.url:
+        evidence["parent_url"] = item.url
+    if item.evidence.get("number"):
+        evidence["parent_number"] = item.evidence["number"]
     return WorkItem(
         dedup_key=make_dedup_key(item.repo, kind, title),
         kind=kind,
@@ -226,7 +252,7 @@ def _validate_discovered(
         description=str(raw.get("description", "")).strip()[:2000],
         priority=priority,
         discovered_by=f"agent:{role.name}",
-        evidence={"parent_item": item.dedup_key},
+        evidence=evidence,
     )
 
 

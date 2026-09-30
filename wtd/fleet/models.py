@@ -83,6 +83,54 @@ class ActionType(str, Enum):
     MERGE_PR = "merge_pr"  # merge the item's PR — only through the merge gate
 
 
+#: Kinds whose context builder renders a record pre-fetched into ``evidence``
+#: by a scanner (an issue's number/author/body, a TODO's file/line), rather
+#: than rebuilding context from the repository at build time.
+RECORD_KINDS = frozenset({WorkKind.TRIAGE_ISSUE, WorkKind.FIX_BUG, WorkKind.IMPROVE_CODE})
+
+#: Actions that act on the item's own issue/PR, so need one to exist.
+TARGETED_ACTIONS = frozenset({ActionType.COMMENT, ActionType.ADD_LABELS, ActionType.MERGE_PR})
+
+
+def has_record(item: WorkItem) -> bool:
+    """True when ``evidence`` carries the record the item's builder renders."""
+    if item.kind in (WorkKind.TRIAGE_ISSUE, WorkKind.FIX_BUG):
+        number = item.evidence.get("number")
+        return isinstance(number, int) and not isinstance(number, bool) and number > 0
+    if item.kind == WorkKind.IMPROVE_CODE:
+        return bool(str(item.evidence.get("file_path") or "").strip())
+    return True
+
+
+def is_self_originated(item: WorkItem) -> bool:
+    """True for work an agent proposed, which has no scanner record behind it."""
+    return bool(item.evidence.get("self_originated")) or item.discovered_by.startswith(
+        "agent:"
+    )
+
+
+def is_recordless_discovery(item: WorkItem) -> bool:
+    """An agent-discovered item with no issue or file behind it.
+
+    These render through the *discovered* template and are never offered
+    actions that need a target (comment, labels, merge).
+    """
+    return item.kind in RECORD_KINDS and not has_record(item) and is_self_originated(item)
+
+
+def missing_record(item: WorkItem) -> str | None:
+    """Why an item cannot be dispatched, or None when it can.
+
+    An item routed to a record-rendering builder without that record, and not
+    typed as self-originated, would reach the model as a prompt of sentinels
+    (``Issue #None``, ``Origin: unknown:?``) with nothing to act on.
+    """
+    if item.kind not in RECORD_KINDS or has_record(item) or is_self_originated(item):
+        return None
+    need = "a file_path" if item.kind == WorkKind.IMPROVE_CODE else "a positive issue number"
+    return f"no target: {item.kind.value} item has no {need} in evidence"
+
+
 class ProposedAction(BaseModel):
     """A validated action an agent asked the platform to perform."""
 
