@@ -39,6 +39,8 @@ from wtd.fleet.models import (
     RunOutcome,
     WorkItem,
     WorkStatus,
+    is_recordless_discovery,
+    missing_record,
     slugify,
     utcnow,
 )
@@ -67,6 +69,12 @@ _KIND_INSTRUCTIONS = {
     "write_article": "Write the article this task describes, as a draft PR.",
     "custom": "Complete this task per your role.",
 }
+
+_DISCOVERED_INSTRUCTION = (
+    "Another agent proposed this task; no issue or file stands behind it. If "
+    "a concrete change is clear, propose it as a draft PR where your role "
+    "permits; otherwise return an empty actions list — that is a correct outcome."
+)
 
 
 class CycleBudget:
@@ -110,6 +118,8 @@ class Dispatcher:
     def build_prompt(self, assignment: Assignment, context: str) -> str:
         item, role = assignment.item, assignment.role
         instruction = _KIND_INSTRUCTIONS.get(item.kind.value, _KIND_INSTRUCTIONS["custom"])
+        if is_recordless_discovery(item):
+            instruction = _DISCOVERED_INSTRUCTION
         return (
             f"# Fleet work item\n"
             f"Kind: {item.kind.value}\n"
@@ -118,7 +128,7 @@ class Dispatcher:
             f"Priority: {item.priority.value}\n\n"
             f"# Your task\n{instruction}\n\n"
             f"# Evidence\n{context}\n\n"
-            f"{output_contract(role)}"
+            f"{output_contract(role, item)}"
         )
 
     # ------------------------------------------------------------------
@@ -134,6 +144,19 @@ class Dispatcher:
             role=role.name,
             dry_run=not apply,
         )
+        # 0. Target: an item whose builder needs a record it does not carry
+        # would reach the model as a prompt of sentinels with nothing to act
+        # on. That is not a failed attempt — there is nothing to retry.
+        problem = missing_record(item)
+        if problem:
+            logger.warning("skipping %s: %s", item.dedup_key, problem)
+            run.outcome = RunOutcome.SKIPPED
+            run.summary = f"skipped: {problem}"
+            run.finished_at = utcnow()
+            self.state.mark(item, WorkStatus.SKIPPED, error=problem)
+            self.state.record_run(run)
+            return run
+
         self.state.mark(item, WorkStatus.RUNNING)
         item.attempts += 1
 

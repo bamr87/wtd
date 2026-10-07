@@ -9,7 +9,7 @@ injection-aware.
 from __future__ import annotations
 
 from wtd.fleet.github import GitHubClient, GitHubError, has_marker
-from wtd.fleet.models import WorkItem, WorkKind
+from wtd.fleet.models import WorkItem, WorkKind, is_recordless_discovery
 
 MAX_CONTEXT_CHARS = 60_000
 _MAX_PATCH_CHARS = 3_000
@@ -47,8 +47,31 @@ class ContextBuilder:
             WorkKind.CUSTOM: self._custom_context,
         }
         builder = builders.get(item.kind, self._custom_context)
+        if is_recordless_discovery(item):
+            # The kind's builder would render the scanner record this item
+            # never had — `Issue #None`, `Origin: unknown:?` — so describe it
+            # by what IS known: the task and the run that proposed it.
+            builder = self._discovered_context
         context = await builder(item)
         return _clip(context, MAX_CONTEXT_CHARS)
+
+    # ------------------------------------------------------------------
+    async def _discovered_context(self, item: WorkItem) -> str:
+        ev = item.evidence
+        parent = str(ev.get("parent_title") or ev.get("parent_item") or "another fleet run")
+        if ev.get("parent_number"):
+            parent += f" (#{ev['parent_number']})"
+        if ev.get("parent_url"):
+            parent += f" — {ev['parent_url']}"
+        parts = [
+            f"Repository: {item.repo}",
+            f"Task: {item.title}",
+            f"Proposed by: {item.discovered_by}, while working on {parent}",
+            "There is no existing issue, pull request, or file reference behind this "
+            "task — another agent proposed it. There is nothing to comment on or label.",
+            _fence("task description", item.description),
+        ]
+        return "\n\n".join(parts)
 
     # ------------------------------------------------------------------
     async def _issue_context(self, item: WorkItem) -> str:
