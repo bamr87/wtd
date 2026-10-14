@@ -14,8 +14,10 @@ name: Fleet Loop
 # balancer decides which lane serves each run.
 
 on:
-  schedule:
-    - cron: "23 */4 * * *" # every 4 hours (offset to dodge top-of-hour load)
+  # Schedule paused (Actions waste reduction, Oct 14): the job is gated by vars.WTD_FLEET_ENABLED, which is
+  # currently off, so every scheduled run was skipped. To restore: set WTD_FLEET_ENABLED=true AND uncomment the block below.
+  # schedule:
+  #   - cron: "23 */4 * * *" # every 4 hours (offset to dodge top-of-hour load)
   workflow_dispatch:
     inputs:
       apply:
