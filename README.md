@@ -2,6 +2,10 @@
 
 > **The autonomous AI agent fleet platform**
 
+[![CI](https://github.com/bamr87/wtd/actions/workflows/ci.yml/badge.svg)](https://github.com/bamr87/wtd/actions/workflows/ci.yml) [![License](https://img.shields.io/github/license/bamr87/wtd)](LICENSE)
+
+## Overview
+
 WTD turns every TODO — a code comment, an unlabeled GitHub issue, an unreviewed pull request, a failing workflow, a missing README — into queued work for a fleet of Claude-powered agents that **look for work, do the work, and add new todos** as they go.
 
 ```
@@ -183,6 +187,15 @@ Drop `agents/<name>.md` files (YAML frontmatter + system prompt) into your proje
 
 The original local-first engine is still here and still the substrate: `wtd` scans the current repo (TODO/FIXME comments, markdown checklists), builds the recursive tree in `tree.json`, and can break tasks down with the same Claude-first provider chain. See `wtd --help`.
 
+## Project structure
+
+| Path | What it is |
+|---|---|
+| `wtd/` | Python package: CLI, daemon loop, REST API and agents |
+| `tests/` | Test suite |
+| `docs/` | Guides and reference |
+| `wtd.yml.example` | Example configuration |
+
 ## 🧪 Development
 
 ```bash
@@ -216,6 +229,14 @@ The audit encodes what the repos already say in prose: every scheduled AI loop n
 - [`PRD.md`](PRD.md) — the original product vision (v0.1)
 - [`CHANGELOG.md`](CHANGELOG.md) — release history
 
+## Contributing
+
+Contributions are welcome via pull request. Use [Conventional Commits](https://www.conventionalcommits.org/) and keep the CI checks green. The fleet-wide workflow is described in the hub's [CONTRIBUTING.md](https://github.com/bamr87/bamr87/blob/main/CONTRIBUTING.md). AI agents should start with [CLAUDE.md](CLAUDE.md).
+
+## Changelog
+
+Notable changes are recorded in [CHANGELOG.md](CHANGELOG.md). Tagged versions are on the [releases page](https://github.com/bamr87/wtd/releases).
+
 ## 📄 License
 
 MIT License — see [LICENSE](LICENSE).
@@ -225,3 +246,8 @@ MIT License — see [LICENSE](LICENSE).
 **Reality WTD'd.** The fleet finds the work. The fleet does the work. The fleet finds more work.
 
 *Ship it.* 🚀
+
+---
+
+<!-- bamr87-portfolio-footer -->
+<sub>Part of the [bamr87 portfolio](https://github.com/bamr87) — browse every project on [Amr's GitHub profile](https://github.com/bamr87).</sub>
