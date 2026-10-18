@@ -82,6 +82,9 @@ class TestClaudeCodeProvider:
         assert cli_model_alias("claude-opus-5") == "opus"
         assert cli_model_alias("claude-sonnet-5") == "sonnet"
         assert cli_model_alias("claude-haiku-4-5") == "haiku"
+        assert cli_model_alias("claude-opus-5-5") == "opus"
+        assert cli_model_alias("claude-sonnet-5-5") == "sonnet"
+        assert cli_model_alias("claude-haiku-5-5") == "haiku"
         assert cli_model_alias("some-custom-model") == "some-custom-model"
 
     def test_command_disables_tools_and_sessions(self):
@@ -89,7 +92,7 @@ class TestClaudeCodeProvider:
         # Only meaningful when the CLI exists on this machine.
         if not provider.available().available:
             pytest.skip("claude CLI not installed")
-        cmd = provider._build_command("sys prompt", "claude-opus-5")
+        cmd = provider._build_command("sys prompt", "claude-opus-5-5")
         assert "-p" in cmd
         assert "--output-format" in cmd and "json" in cmd
         tools_idx = cmd.index("--tools")
@@ -100,7 +103,8 @@ class TestClaudeCodeProvider:
 
 class TestThinkingKwargs:
     def test_adaptive_for_current_families(self):
-        for model in ("claude-opus-5", "claude-sonnet-5", "claude-fable-5",
+        for model in ("claude-opus-5-5", "claude-sonnet-5-5", "claude-haiku-5-5",
+                      "claude-opus-5", "claude-sonnet-5", "claude-fable-5",
                       "claude-opus-4-8"):
             assert thinking_kwargs(model) == {"thinking": {"type": "adaptive"}}
 

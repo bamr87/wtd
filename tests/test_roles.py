@@ -52,7 +52,7 @@ class TestBuiltins:
     def test_the_reviewer_runs_on_opus_5(self):
         # Review is where a missed defect ships, so the role pins its model
         # rather than inheriting whatever the platform default happens to be.
-        assert builtin_roles()["reviewer"].model == "claude-opus-5"
+        assert builtin_roles()["reviewer"].model == "claude-opus-5-5"
 
     def test_house_rules_in_every_system_prompt(self):
         for role in builtin_roles().values():
@@ -74,7 +74,7 @@ name: security-auditor
 description: Security-focused review.
 kinds: [review_pr]
 actions: [comment]
-model: claude-opus-5
+model: claude-opus-5-5
 max_tokens: 6000
 ---
 You are a security reviewer.""",
@@ -83,7 +83,7 @@ You are a security reviewer.""",
         assert role.name == "security-auditor"
         assert role.kinds == [WorkKind.REVIEW_PR]
         assert role.allowed_actions == [ActionType.COMMENT]
-        assert role.model == "claude-opus-5"
+        assert role.model == "claude-opus-5-5"
         assert role.max_tokens == 6000
         assert role.system_prompt == "You are a security reviewer."
         assert role.builtin is False

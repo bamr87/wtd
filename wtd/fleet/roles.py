@@ -94,7 +94,7 @@ If the evidence exposes a DIFFERENT latent bug, report it via `discovered`
             ),
             kinds=[WorkKind.REVIEW_PR],
             allowed_actions=[ActionType.COMMENT, ActionType.MERGE_PR],
-            model="claude-opus-5",
+            model="claude-opus-5-5",
             est_tokens=35_000,
             system_prompt="""You are the fleet's code reviewer, and you run on Claude Opus 5
 because review is the one place in this fleet where a missed defect ships.

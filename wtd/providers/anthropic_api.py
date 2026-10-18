@@ -2,7 +2,7 @@
 
 Uses the official ``anthropic`` SDK with ``ANTHROPIC_API_KEY`` (or
 ``WTD_ANTHROPIC_API_KEY``). Requests stream and default to
-``claude-opus-5`` with adaptive thinking.
+``claude-opus-5-5`` with adaptive thinking.
 
 Server-side refusal fallbacks (``fallbacks: "default"`` with the
 ``server-side-fallback-2026-07-01`` beta) are enabled by default so a
@@ -31,6 +31,7 @@ if TYPE_CHECKING:
 # Model families that take adaptive thinking. Older models (e.g. Haiku 4.5)
 # still use budget_tokens; we simply omit `thinking` for those.
 _ADAPTIVE_THINKING_PREFIXES = (
+    "claude-haiku-5",
     "claude-fable-5",
     "claude-mythos-5",
     "claude-opus-5",

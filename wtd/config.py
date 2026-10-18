@@ -36,10 +36,10 @@ class WTDConfig(BaseSettings):
         ),
     )
     model: str = Field(
-        default="claude-opus-5",
+        default="claude-opus-5-5",
         description=(
             "Default model. Full API model ID; the Claude Code lane maps it "
-            "to the matching CLI alias (e.g. claude-opus-5 -> opus)."
+            "to the matching CLI alias (e.g. claude-opus-5-5 -> opus)."
         ),
     )
     max_output_tokens: int = Field(

@@ -45,7 +45,7 @@ class FakeRouter:
         return GenerationResult(
             text=self.text,
             provider=self.provider,
-            model=model or "claude-opus-5",
+            model=model or "claude-opus-5-5",
             input_tokens=1000,
             output_tokens=500,
             cost_usd=0.02,

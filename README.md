@@ -105,7 +105,7 @@ Dry-run is the default everywhere: without `--apply` (or `WTD_FLEET_APPLY=true`)
 The default `WTD_LLM_PROVIDER=auto` resolves this chain:
 
 1. **`claude-code`** — headless Claude Code (`claude -p`), authenticated by `CLAUDE_CODE_OAUTH_TOKEN` (or an interactive `claude` login). Runs on your Claude subscription.
-2. **`anthropic`** — the Anthropic API via the official SDK (`ANTHROPIC_API_KEY`), default model `claude-opus-5`, streaming + adaptive thinking, with server-side refusal fallbacks enabled on Opus 5.
+2. **`anthropic`** — the Anthropic API via the official SDK (`ANTHROPIC_API_KEY`), default model `claude-opus-5-5`, streaming + adaptive thinking, with server-side refusal fallbacks enabled on Opus 5.
 
 Failover is automatic: rate limits, timeouts, and transient errors on one lane roll to the next, and the balancer's budgets decide which lane a run *starts* on. Legacy providers (`ollama`, `openai`) remain available when selected explicitly, but are never part of the auto chain.
 
@@ -145,7 +145,7 @@ WTD_FLEET_ENABLED=true      # master kill switch
 WTD_FLEET_APPLY=false       # THE write gate (dry-run by default)
 WTD_FLEET_MERGE_ENABLED=false       # the merge gate's own switch (default for wtd.yml)
 WTD_FLEET_CONCURRENCY=2     # concurrent agent runs
-WTD_MODEL=claude-opus-5     # default model for both lanes
+WTD_MODEL=claude-opus-5-5     # default model for both lanes
 ```
 
 ## 🛡️ Safety rails

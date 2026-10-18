@@ -16,7 +16,7 @@ This document describes the fleet subsystem introduced in 0.2.0: a standalone pl
 wtd/providers/            the model lanes
   base.py                 LLMProvider interface, GenerationResult, pricing
   claude_code.py          headless `claude -p` (OAuth / subscription)   [default]
-  anthropic_api.py        anthropic SDK (API key, claude-opus-5)        [fallback]
+  anthropic_api.py        anthropic SDK (API key, claude-opus-5-5)        [fallback]
   legacy.py               ollama, openai (explicit opt-in only)
   router.py               chain resolution + failover
 
@@ -158,7 +158,7 @@ Three sweeps, in this order, because the order is what makes the loop close in o
 
 Merging is the fleet's most consequential action, so it is the one place with a **two-key** design: the model supplies judgement, pure code supplies the facts, and both must agree.
 
-- **Key 1 — the reviewer's verdict.** The `reviewer` role runs on `claude-opus-5` (pinned on the role, not inherited from the platform default) and may request a `merge_pr` action with a written rationale. Its prompt tells it to withhold that recommendation whenever it has a blocking comment, whenever the diff is too large or elided to judge, whenever the change touches security, auth, credentials, CI/CD, release, or data migration, and whenever CI is not green on the commit it read. Its review context now includes the CI summary of the head commit, so this is a judgement on evidence rather than a guess.
+- **Key 1 — the reviewer's verdict.** The `reviewer` role runs on `claude-opus-5-5` (pinned on the role, not inherited from the platform default) and may request a `merge_pr` action with a written rationale. Its prompt tells it to withhold that recommendation whenever it has a blocking comment, whenever the diff is too large or elided to judge, whenever the change touches security, auth, credentials, CI/CD, release, or data migration, and whenever CI is not green on the commit it read. Its review context now includes the CI summary of the head commit, so this is a judgement on evidence rather than a guess.
 - **Key 2 — the gate** (`mergegate.py`, pure, no I/O, no clock). Given the pull request, its check runs, its commit statuses, and its reviews, `evaluate_merge` collects **every** blocker rather than short-circuiting, so "why didn't this merge?" has a complete answer in one line.
 
 A merge needs all of: the pull request open and not a draft; `mergeable` true and `mergeable_state` not `dirty`/`blocked`/`behind`; no blocking label; nobody's latest review requesting changes; CI green; and the approval pinned to the current head commit.
