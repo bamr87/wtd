@@ -40,13 +40,17 @@ if TYPE_CHECKING:
 # model-name rollovers on the subscription side, so map the common full IDs
 # down to their alias for this lane.
 _MODEL_ALIASES = {
+    "claude-fable-5-1": "fable",
     "claude-fable-5": "fable",
+    "claude-opus-5-5": "opus",
     "claude-opus-5": "opus",
     "claude-opus-4-8": "opus",
     "claude-opus-4-7": "opus",
     "claude-opus-4-6": "opus",
+    "claude-sonnet-5-5": "sonnet",
     "claude-sonnet-5": "sonnet",
     "claude-sonnet-4-6": "sonnet",
+    "claude-haiku-5-5": "haiku",
     "claude-haiku-4-5": "haiku",
 }
 

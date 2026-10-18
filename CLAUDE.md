@@ -23,7 +23,7 @@ mypy wtd                  # gates CI (baseline is clean)
 
 ## Architecture in seven lines
 
-1. `wtd/providers/` — the model lanes: `claude-code` (headless `claude -p`, OAuth/subscription, default) → `anthropic` (SDK, `claude-opus-5`, fallback); router fails over on retryable errors; legacy ollama/openai are explicit opt-ins only.
+1. `wtd/providers/` — the model lanes: `claude-code` (headless `claude -p`, OAuth/subscription, default) → `anthropic` (SDK, `claude-opus-5-5`, fallback); router fails over on retryable errors; legacy ollama/openai are explicit opt-ins only.
 2. `wtd/fleet/discovery.py` scans the roster (wtd.yml) into `WorkItem`s with **stable dedup keys** — rescans converge, never duplicate.
 3. `wtd/fleet/scheduler.py` (pure) matches items to roles: priority bands + per-repo round-robin fairness; `balancer.py` (pure) picks the provider lane by daily token budget with reservations and cooldowns.
 4. `wtd/fleet/dispatcher.py` runs one agent: bounded untrusted-fenced context → JSON **output contract** → `outcome.py` validates every action against the role's grants → apply-gated GitHub writes with dedup markers.

@@ -27,7 +27,7 @@ def test_defaults_are_claude_first(monkeypatch: pytest.MonkeyPatch) -> None:
     cfg = get_config()
 
     assert cfg.llm_provider == "auto"
-    assert cfg.model == "claude-opus-5"
+    assert cfg.model == "claude-opus-5-5"
     assert cfg.fleet_apply is False
     assert cfg.fleet_enabled is True
     assert cfg.api_host == "127.0.0.1"
